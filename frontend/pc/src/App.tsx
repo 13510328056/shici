@@ -57,6 +57,7 @@ export default function App() {
 
   // 围栏
   const [fenceMode, setFenceMode] = useState(false)
+  const [viewingPoet, setViewingPoet] = useState<string|null>(null) // 正在查看作品的诗人ID
   const [fenceResults, setFenceResults] = useState<{lat:number;lon:number;places:PlaceName[]}|undefined>(undefined)
 
   // 交游线段（暂存多诗人间的交游连线）
@@ -249,34 +250,6 @@ export default function App() {
                 </div>
               </div>
             )) : <div style={{fontSize:12,color:'#aaa',padding:'8px 0'}}>无结果，试试单字如"酒""月"</div>}
-          </div>
-        )}
-
-        {/* 诗人作品 */}
-        {selectedIds.length > 0 && (
-          <div style={{...S.panel, maxHeight:200, overflowY:'auto'}}>
-            <div style={S.sectionTitle}>诗人作品</div>
-            {selectedIds.map(id => {
-              const poems = poemsMap.get(id) || []
-              const p = poets.find(pn => pn.poet_id === id)
-              if (!poems.length) return <div key={id} style={{fontSize:11,color:T.textMuted}}>{p?.name || ''} 暂无作品数据</div>
-              return (
-                <div key={id} style={{marginBottom:4}}>
-                  {poems.slice(0, 15).map(poem => (
-                    <div key={poem.title} style={{fontSize:11,lineHeight:1.8,padding:'1px 0 1px 8px',cursor:'pointer',borderLeft:'2px solid '+T.border,marginBottom:1}}
-                      onClick={() => {
-                        const el = document.getElementById('poem-view');
-                        if(el) el.innerHTML='<div style="font-size:14px;font-weight:600;margin-bottom:8px">'+poem.title+'</div><div style="font-size:13px;line-height:2;white-space:pre-wrap;font-family:serif">'+poem.content+'</div>'+(poem.mood_tags?.length?'<div style="font-size:11px;color:#888;margin-top:8px">意境: '+poem.mood_tags.join(' · ')+'</div>':'');
-                        const ov=document.getElementById('poem-overlay');if(ov)ov.style.display='flex';
-                      }}>
-                      <span style={{color:T.textTitle}}>{poem.title}</span>
-                      <span style={{color:T.textMuted,marginLeft:4,fontSize:10}}>{poem.genre}</span>
-                    </div>
-                  ))}
-                  {poems.length > 15 && <div style={{fontSize:10,color:T.textMuted,marginLeft:8}}>... 共 {poems.length} 首</div>}
-                </div>
-              )
-            })}
           </div>
         )}
 
@@ -539,6 +512,33 @@ export default function App() {
           fenceMode={fenceMode} onFenceClick={handleFenceClick}
           searchResults={showSearch ? searchResults.map(r=>({title:r.title,author:r.author})) : []} />
       </div>
+
+      {/* 诗人作品浮层 */}
+      {viewingPoet && (() => {
+        const poems = poemsMap.get(viewingPoet) || []
+        const p = poets.find(pn => pn.poet_id === viewingPoet)
+        return (
+          <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}}
+            onClick={()=>setViewingPoet(null)}>
+            <div style={{background:'#FFFEF9',borderRadius:8,width:'70%',maxWidth:700,height:'80%',display:'flex',flexDirection:'column',boxShadow:'0 8px 40px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'16px 20px',borderBottom:'2px solid #E5DDD0'}}>
+                <span style={{fontSize:16,fontWeight:600,color:'#5B4A3E'}}>{p?.name || ''} 的作品 ({poems.length}首)</span>
+                <button onClick={()=>setViewingPoet(null)} style={{...ST.animBtn,padding:'4px 12px'}}>关闭</button>
+              </div>
+              <div style={{flex:1,overflow:'auto',padding:'12px 20px'}}>
+                {poems.map(poem => (
+                  <div key={poem.title} style={{padding:'10px 12px',margin:'4px 0',border:'1px solid #E5DDD0',borderRadius:6,cursor:'pointer'}}
+                    onClick={() => alert(poem.content)}>
+                    <div style={{fontSize:13,fontWeight:600,color:'#5B4A3E'}}>{poem.title}</div>
+                    <div style={{fontSize:11,color:'#999',marginTop:2}}>{poem.genre}{poem.mood_tags?.length ? ' · ' + poem.mood_tags.join(' · ') : ''}</div>
+                    <div style={{fontSize:12,color:'#666',lineHeight:1.6,marginTop:4,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{poem.content.slice(0,60)}...</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* 多诗对比浮层 */}
       {showCompare && compareList.length >= 2 && (
