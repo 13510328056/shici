@@ -7,7 +7,7 @@ import { getHeatmap, fenceQuery } from './api'
 
 const S = {
   container: { display:'flex', width:'100vw', height:'100vh', fontFamily:'serif', color:'#2c2c2c', overflow:'hidden' } as const,
-  sidebar: { width:340, minWidth:340, height:'100vh', borderRight:'1px solid #e0e0e0', display:'flex', flexDirection:'column', background:'#fafaf8' } as const,
+  sidebar: { width:340, minWidth:340, height:'100vh', borderRight:'1px solid #e0e0e0', display:'flex', flexDirection:'column', background:'#fafaf8', position:'relative' } as const,
   header: { padding:'16px 16px 12px', borderBottom:'1px solid #e8e4de', background:'#fff' } as const,
   h1: { fontSize:18, fontWeight:700, color:'#3a3a3a', margin:0 } as const,
   hsub: { fontSize:11, color:'#888', marginTop:2 } as const,
@@ -218,9 +218,11 @@ export default function App() {
           )}
         </div>
 
-        {/* 检索结果 */}
+        {/* 检索结果（浮动在上层，不占流式位置） */}
         {showSearch && (
-          <div style={{...S.panel, maxHeight:280, overflowY:'auto', padding:'8px 16px'}}>
+          <div style={{...S.panel, maxHeight:300, overflowY:'auto', padding:'8px 16px',
+            position:'absolute', left:0, right:0, zIndex:100, background:'#fafaf8', boxShadow:'0 4px 12px rgba(0,0,0,.15)',
+            borderBottom:'2px solid #5B4A3E'}}>
             <div style={S.ptitle}>检索结果 ({searchTotal}条)
               <button onClick={()=>setShowSearch(false)} style={{...S.animBtn,float:'right',padding:'0 6px',fontSize:10}}>关闭</button>
               {compareList.length>=2 && <button onClick={()=>setShowCompare(true)} style={{...S.animBtn,float:'right',padding:'0 6px',fontSize:10,marginRight:4,background:'#5B4A3E',color:'#fff'}}>对比({compareList.length})</button>}
