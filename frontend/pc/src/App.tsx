@@ -40,6 +40,7 @@ export default function App() {
   const [showCompare, setShowCompare] = useState(false)
 
   const [poets, setPoets] = useState<Array<{poet_id:string;name:string;dynasty:string}>>([])
+  const [poetSearch, setPoetSearch] = useState('')
   // 多诗人选择（最多10位）
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [poetsData, setPoetsData] = useState<Map<string, TrajectoryEvent[]>>(new Map())
@@ -248,18 +249,26 @@ export default function App() {
         )}
 
         {/* 诗人选择（多选） */}
-        <div style={S.panel}>
-          <div style={S.sectionTitle}>选择诗人（最多10位，点击切换）</div>
-          <div>{poets.map(p => (
-            <button key={p.poet_id} style={selectedIds.includes(p.poet_id) ? {
-              ...S.accentBtn, background: POET_COLORS[selectedIds.indexOf(p.poet_id) % POET_COLORS.length],
-            } : S.classicBtn}
-              onClick={()=>togglePoet(p.poet_id)}>{p.name}</button>
-          ))}</div>
+                <div style={S.panel}>
+          <div style={S.sectionTitle}>选择诗人</div>
+          <input type="text" value={poetSearch} onChange={e=>setPoetSearch(e.target.value)}
+            placeholder="搜索诗人姓名..."
+            style={{...S.input, width:'100%', marginBottom:6, fontSize:T.fsSmall}} />
+          <div style={{maxHeight:180, overflowY:'auto', marginBottom:4}}>
+            {poets.filter(p => !poetSearch || p.name.includes(poetSearch)).map(p =>
+              <button key={p.poet_id} style={selectedIds.includes(p.poet_id) ? {
+                ...S.classicBtn, background: POET_COLORS[selectedIds.indexOf(p.poet_id) % POET_COLORS.length], color:'#fff', border:'none',
+              } : S.classicBtn}
+                onClick={()=>togglePoet(p.poet_id)}>{p.name}</button>
+            )}
+          </div>
           {selectedIds.length > 0 && (
-            <div style={{marginTop:6,fontSize:11,color:'#888'}}>
-              已选: {selectedIds.map(id => poetName(id)).join(' + ')}
+            <div style={{marginTop:4,fontSize:T.fsSmall,color:T.textMuted}}>
+              已选 {selectedIds.length} 位: {selectedIds.map(id => poetName(id)).join(' · ')}
             </div>
+          )}
+          <div style={{fontSize:10,color:T.textMuted,marginTop:4}}>载入 {poets.length} 位唐宋诗人 · 搜索过滤</div>
+        </div>
           )}
         </div>
 
@@ -469,7 +478,7 @@ export default function App() {
               )
             })}
             </div>
-          ) : <div style={{fontSize:12,color:'#aaa'}}>选择 1-4 位诗人<br/>点击地图可进行围栏查询</div>}
+          ) : <div style={{fontSize:12,color:'#aaa'}}>选择诗人开始探索<br/>点击地图可进行围栏查询</div>}
         </div>
 
         <div style={ST.statusBar}>
