@@ -46,13 +46,34 @@ class SearchService:
         conditions = []
         params = {}
 
-        # 关键词（全文）
+        # 关键词（全文，支持中文单字拆分模糊匹配）
         if keyword:
-            if self._pg:
-                conditions.append("p.content ILIKE :kw")
+            # 对中文：拆成单个汉字，匹配任意一字
+            chars = [c for c in keyword if '一' <= c <= '鿿']
+            if len(chars) >= 2:
+                # 多字：OR 匹配（命中任一单字即返回）
+                or_clauses = []
+                for i, ch in enumerate(chars):
+                    key = f"kw_{i}"
+                    if self._pg:
+                        or_clauses.append(f"p.content ILIKE :{key}")
+                    else:
+                        or_clauses.append(f"p.content LIKE :{key}")
+                    params[f"kw_{i}"] = f"%{ch}%"
+                # 也保留整体匹配（提高精度）
+                all_key = "kw_all"
+                if self._pg:
+                    conditions.append(f"(p.content ILIKE :{all_key} OR {' OR '.join(or_clauses)})")
+                else:
+                    conditions.append(f"(p.content LIKE :{all_key} OR {' OR '.join(or_clauses)})")
+                params[all_key] = f"%{keyword}%"
             else:
-                conditions.append("p.content LIKE :kw")
-            params["kw"] = f"%{keyword}%"
+                # 单字直接匹配
+                if self._pg:
+                    conditions.append("p.content ILIKE :kw")
+                else:
+                    conditions.append("p.content LIKE :kw")
+                params["kw"] = f"%{keyword}%"
 
         # 作者
         if author:

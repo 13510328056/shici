@@ -220,23 +220,29 @@ export default function App() {
 
         {/* 检索结果 */}
         {showSearch && (
-          <div style={{...S.panel, maxHeight:240, overflow:'auto'}}>
+          <div style={{...S.panel, maxHeight:280, overflowY:'auto', padding:'8px 16px'}}>
             <div style={S.ptitle}>检索结果 ({searchTotal}条)
               <button onClick={()=>setShowSearch(false)} style={{...S.animBtn,float:'right',padding:'0 6px',fontSize:10}}>关闭</button>
               {compareList.length>=2 && <button onClick={()=>setShowCompare(true)} style={{...S.animBtn,float:'right',padding:'0 6px',fontSize:10,marginRight:4,background:'#5B4A3E',color:'#fff'}}>对比({compareList.length})</button>}
             </div>
             {searchResults.length > 0 ? searchResults.map(r => (
-              <div key={r.poetry_id} style={{padding:'4px 0',borderBottom:'1px solid #f0eee8',fontSize:12}}>
-                <input type="checkbox" checked={compareList.some(c=>c.poetry_id===r.poetry_id)} onChange={()=>{
-                  setCompareList(prev => prev.some(c=>c.poetry_id===r.poetry_id) ? prev.filter(c=>c.poetry_id!==r.poetry_id) : [...prev, r])
-                }} style={{marginRight:4}} />
-                <span style={{cursor:'pointer'}} onClick={()=>alert(r.content)}>
-                  <b>{r.title}</b> — {r.author}
-                  <span style={{float:'right',fontSize:10,color:'#888'}}>{r.dynasty}/{r.genre}</span>
-                </span>
-                <div style={{fontSize:11,color:'#666',marginLeft:18}}>{r.mood_tags?.join(' · ') || r.imagery_items?.slice(0,3).join(',')}</div>
+              <div key={r.poetry_id} style={{padding:'6px 4px',borderBottom:'1px solid #f0eee8',fontSize:12,lineHeight:1.6}}>
+                <div style={{display:'flex',alignItems:'flex-start',gap:6}}>
+                  <input type="checkbox" checked={compareList.some(c=>c.poetry_id===r.poetry_id)} onChange={()=>{
+                    setCompareList(prev => prev.some(c=>c.poetry_id===r.poetry_id) ? prev.filter(c=>c.poetry_id!==r.poetry_id) : [...prev, r])
+                  }} style={{marginTop:2}} />
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{cursor:'pointer',wordBreak:'break-word'}} onClick={()=>alert(r.content)}>
+                      <b>{r.title}</b> — {r.author}
+                      <span style={{float:'right',fontSize:10,color:'#888',marginLeft:4}}>{r.dynasty}/{r.genre}</span>
+                    </div>
+                    <div style={{fontSize:11,color:'#666',wordBreak:'break-word',lineHeight:1.5,marginTop:2}}>
+                      {r.mood_tags?.join(' · ')}{r.mood_tags?.length && r.imagery_items?.length ? ' | ' : ''}{r.imagery_items?.slice(0,5).join(' · ')}
+                    </div>
+                  </div>
+                </div>
               </div>
-            )) : <div style={{fontSize:12,color:'#aaa'}}>无结果</div>}
+            )) : <div style={{fontSize:12,color:'#aaa',padding:'8px 0'}}>无结果，试试单字如"酒""月"</div>}
           </div>
         )}
 
