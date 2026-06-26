@@ -77,13 +77,16 @@ export default function App() {
         return next
       }
       if (prev.length >= 10) return prev
-      fetch(`/api/v1/poets/${pid}/trajectory`).then(r=>r.json()).then(d => {
-        setPoetsData(m => { const n = new Map(m); n.set(pid, d.events || []); return n })
-      })
-      fetch(`/api/v1/poets/${pid}/poetry`).then(r=>r.json()).then(d => {
-        setPoemsMap(m => { const n = new Map(m); n.set(pid, d.poems || []); return n })
-      })
       return [...prev, pid]
+    })
+    // 在 setSelectedIds 之外发起 fetch
+    fetch(`/api/v1/poets/${pid}/trajectory`).then(r=>r.json()).then(d => {
+      setPoetsData(m => { const n = new Map(m); n.set(pid, d.events || []); return n })
+    })
+    fetch(`/api/v1/poets/${pid}/poetry`).then(r=>r.json()).then(d => {
+      if (d && d.poems) {
+        setPoemsMap(m => { const n = new Map(m); n.set(pid, d.poems); return n })
+      }
     })
     setAnimIndex(undefined); setIsPlaying(false)
   }, [])
@@ -408,62 +411,6 @@ export default function App() {
         </div>
       </div>
     </div>
-
-        {/* 诗人作品 */}
-        {selectedIds.length > 0 && (
-          <div style={{...S.panel, maxHeight:180, overflowY:'auto'}}>
-            <div style={S.sectionTitle}>诗人作品</div>
-            {selectedIds.map(id => {
-              const poems = poemsMap.get(id) || []
-              const p = poets.find(pn => pn.poet_id === id)
-              if (!poems.length) return null
-              return (
-                <div key={id} style={{marginBottom:4}}>
-                  <div style={{fontSize:11,fontWeight:600,color:T.textTitle,marginBottom:2}}>{p?.name}</div>
-                  {poems.slice(0, 10).map(poem => (
-                    <div key={poem.title} style={{fontSize:11,lineHeight:1.8,padding:'1px 0 1px 8px',cursor:'pointer',borderLeft:'2px solid '+T.border, marginBottom:2}}
-                      onClick={() => {
-                        const el = document.getElementById('poem-view');
-                        if(el){el.innerHTML='<div style="font-size:14px;font-weight:600;margin-bottom:8px">'+poem.title+'</div><div style="font-size:13px;line-height:2;white-space:pre-wrap;font-family:serif">'+poem.content+'</div>'+(poem.mood_tags?.length?'<div style="font-size:11px;color:#888;margin-top:8px">意境: '+poem.mood_tags.join(' · ')+'</div>':'');
-                        document.getElementById('poem-overlay')!.style.display='flex';}
-                      }}>
-                      <span style={{color:T.textTitle}}>{poem.title}</span>
-                      <span style={{color:T.textMuted,marginLeft:4,fontSize:10}}>{poem.genre}</span>
-                      {/* 诗词阅读浮层 */}
-      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
-        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
-        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
-          <div id="poem-view"></div>
-          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
-            style={{...ST.animBtn, marginTop:12}}>关闭</button>
-        </div>
-      </div>
-    </div>
-                  ))}
-                  {poems.length > 10 && <div style={{fontSize:10,color:T.textMuted,marginLeft:8}}>...共 {poems.length} 首</div>}
-                  {/* 诗词阅读浮层 */}
-      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
-        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
-        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
-          <div id="poem-view"></div>
-          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
-            style={{...ST.animBtn, marginTop:12}}>关闭</button>
-        </div>
-      </div>
-    </div>
-              )
-            })}
-            {/* 诗词阅读浮层 */}
-      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
-        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
-        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
-          <div id="poem-view"></div>
-          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
-            style={{...ST.animBtn, marginTop:12}}>关闭</button>
-        </div>
-      </div>
-    </div>
-        )}
 
         {/* 动画 */}
         {lastEvents.length > 0 && (
