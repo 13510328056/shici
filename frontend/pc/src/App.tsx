@@ -269,8 +269,6 @@ export default function App() {
           )}
           <div style={{fontSize:10,color:T.textMuted,marginTop:4}}>载入 {poets.length} 位唐宋诗人 · 搜索过滤</div>
         </div>
-          )}
-        </div>
 
         {/* 动画 */}
         {lastEvents.length > 0 && (
