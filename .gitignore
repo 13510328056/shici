@@ -30,3 +30,16 @@ logs/
 
 # Config
 config/local.yaml
+
+# Security
+*.pem
+*.key
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Environment
+backend/.venv/
+backend/poetry_space_dev.db*
