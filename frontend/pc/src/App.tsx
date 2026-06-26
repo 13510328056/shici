@@ -24,7 +24,21 @@ const S = {
   tag: (c:string) => ({ display:'inline-block', padding:'2px 8px', margin:2, borderRadius:10, fontSize:11, background:c+'22', color:c, fontWeight:600 } as const),
 }
 
+// ─── 搜索结果类型 ──────────────────────────
+interface SearchResult {
+  poetry_id: string; title: string; content: string; author: string;
+  dynasty: string; genre: string; mood_tags: string[];
+  imagery_items: string[]; place_name: string | null; creation_year: string | null;
+}
+
 export default function App() {
+  // 检索状态
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [searchTotal, setSearchTotal] = useState(0)
+  const [searching, setSearching] = useState(false)
+  const [showSearch, setShowSearch] = useState(false)
+
   const [poets, setPoets] = useState<Array<{poet_id:string;name:string;dynasty:string}>>([])
   // 多诗人选择
   const [selectedIds, setSelectedIds] = useState<string[]>([])
@@ -119,6 +133,20 @@ export default function App() {
     else setHeatmap([])
   }, [showHeatmap])
 
+  // ── 多维检索 ────────────────────────────
+  const doSearch = useCallback(async (q: string) => {
+    if (!q.trim()) return
+    setSearching(true)
+    try {
+      const r = await fetch(`/api/v1/search/poetry?keyword=${encodeURIComponent(q)}&page_size=30`)
+      const d = await r.json()
+      setSearchResults(d.results || [])
+      setSearchTotal(d.total || 0)
+      setShowSearch(true)
+    } catch { setSearchResults([]) }
+    setSearching(false)
+  }, [])
+
   // 交游：对选择的诗人两两计算
   useEffect(() => {
     if (selectedIds.length < 2) { setEncounterLines([]); return }
@@ -155,7 +183,31 @@ export default function App() {
         <div style={S.header}>
           <h1 style={S.h1}>诗词时空</h1>
           <div style={S.hsub}>中国古诗词文化互动平台 | 学术工具端</div>
+          <div style={{display:'flex',gap:4,marginTop:8}}>
+            <input type="text" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
+              onKeyDown={e=>e.key==='Enter'&&doSearch(searchQuery)}
+              placeholder="检索诗词（作者/关键词/意象）"
+              style={{flex:1,padding:'4px 8px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif'}} />
+            <button onClick={()=>doSearch(searchQuery)} style={{...S.animBtn,background:'#5B4A3E',color:'#fff',border:'none'}}>检索</button>
+          </div>
         </div>
+
+        {/* 检索结果 */}
+        {showSearch && (
+          <div style={{...S.panel, maxHeight:200, overflow:'auto'}}>
+            <div style={S.ptitle}>检索结果 ({searchTotal}条)
+              <button onClick={()=>setShowSearch(false)} style={{...S.animBtn,float:'right',padding:'0 6px',fontSize:10}}>关闭</button>
+            </div>
+            {searchResults.length > 0 ? searchResults.map(r => (
+              <div key={r.poetry_id} style={{padding:'4px 0',borderBottom:'1px solid #f0eee8',fontSize:12,cursor:'pointer'}}
+                onClick={()=>{setSearchQuery(r.title); alert(r.content.slice(0,80)+'...')}}>
+                <b>{r.title}</b> — {r.author}
+                <span style={{float:'right',fontSize:10,color:'#888'}}>{r.dynasty}/{r.genre}</span>
+                <div style={{fontSize:11,color:'#666'}}>{r.mood_tags?.join(' · ')}</div>
+              </div>
+            )) : <div style={{fontSize:12,color:'#aaa'}}>无结果</div>}
+          </div>
+        )}
 
         {/* 诗人选择（多选） */}
         <div style={S.panel}>
