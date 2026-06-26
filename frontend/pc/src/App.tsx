@@ -40,6 +40,7 @@ export default function App() {
   const [showHeatmap, setShowHeatmap] = useState(false)
 
   // 围栏
+  const [fenceMode, setFenceMode] = useState(false)
   const [fenceResults, setFenceResults] = useState<{lat:number;lon:number;places:PlaceName[]}|undefined>(undefined)
 
   // 交游线段（暂存多诗人间的交游连线）
@@ -99,10 +100,16 @@ export default function App() {
   }, [isPlaying, speed, lastEvents.length])
 
   // 围栏查询
+  const toggleFenceMode = useCallback(() => {
+    setFenceMode(v => !v)
+    setFenceResults(undefined)
+  }, [])
+
   const handleFenceClick = useCallback(async (lat: number, lon: number) => {
     try {
       const data = await fenceQuery(lon, lat)
       setFenceResults({ lat, lon, places: data.places })
+      setFenceMode(false)
     } catch {}
   }, [])
 
@@ -192,6 +199,11 @@ export default function App() {
           <div style={S.layerItem}><input type="checkbox" checked={selectedIds.length>0} readOnly /><span>轨迹 ({selectedIds.length}人)</span></div>
           <div style={S.layerItem}><input type="checkbox" checked={showHeatmap} onChange={toggleHeatmap} /><span>热力</span></div>
           <div style={S.layerItem}><input type="checkbox" checked={encounterLines.length>0} readOnly /><span>交游 ({encounterLines.length}条)</span></div>
+          <div style={S.layerItem}>
+            <button style={{...S.animBtn, background:fenceMode?'#e8e0d4':'#fff', margin:0, fontSize:11}}
+              onClick={toggleFenceMode}>{fenceMode ? '退出围栏模式' : '围栏查询'}</button>
+            {fenceMode && <span style={{fontSize:11,color:'#E91E63',marginLeft:6}}>点地图查80km内</span>}
+          </div>
         </div>
 
         {/* 围栏信息 */}
@@ -241,7 +253,8 @@ export default function App() {
 
       <div style={S.main}>
         <PoetryMap poets={trajectoryPoets} heatmap={showHeatmap?heatmap:[]}
-          encounterLines={encounterLines} fenceResults={fenceResults} onFenceClick={handleFenceClick} />
+          encounterLines={encounterLines} fenceResults={fenceResults}
+          fenceMode={fenceMode} onFenceClick={handleFenceClick} />
       </div>
     </div>
   )

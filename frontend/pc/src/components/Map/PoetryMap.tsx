@@ -142,15 +142,19 @@ function EncounterLines({ lines }: { lines: Array<{ from: [number,number]; to: [
   return null
 }
 
-// ─── 围栏查询交互 ──────────────────────────
-function FenceClickHandler({ onFenceClick }: { onFenceClick?: (lat: number, lon: number) => void }) {
+// ─── 围栏查询交互（进入围栏模式后生效，避免与点位点击冲突）──
+function FenceClickHandler({ fenceMode, onFenceClick }: { fenceMode: boolean; onFenceClick?: (lat: number, lon: number) => void }) {
   const map = useMap()
   useEffect(() => {
-    if (!onFenceClick) return
+    if (!fenceMode || !onFenceClick) return
+    map.getContainer().style.cursor = 'crosshair'
     const handler = (e: L.LeafletMouseEvent) => onFenceClick(e.latlng.lat, e.latlng.lng)
     map.on('click', handler)
-    return () => { map.off('click', handler) }
-  }, [map, onFenceClick])
+    return () => {
+      map.getContainer().style.cursor = ''
+      map.off('click', handler)
+    }
+  }, [map, fenceMode, onFenceClick])
   return null
 }
 
@@ -210,11 +214,13 @@ interface PoetryMapProps {
   heatmap?: HeatmapPoint[]
   encounterLines?: Array<{ from: [number,number]; to: [number,number]; probability: number }>
   fenceResults?: { lat: number; lon: number; places: PlaceName[] }
+  fenceMode?: boolean
   onFenceClick?: (lat: number, lon: number) => void
 }
 
 export default function PoetryMap({
-  places = [], poets = [], heatmap = [], encounterLines = [], fenceResults, onFenceClick,
+  places = [], poets = [], heatmap = [], encounterLines = [],
+  fenceResults, fenceMode = false, onFenceClick,
 }: PoetryMapProps) {
   return (
     <div style={{ width:'100%', height:'100%', position:'relative' }}>
@@ -236,7 +242,7 @@ export default function PoetryMap({
             {encounterLines.length > 0 && <EncounterLines lines={encounterLines} />}
           </LayersControl.Overlay>
         </LayersControl>
-        <FenceClickHandler onFenceClick={onFenceClick} />
+        <FenceClickHandler fenceMode={fenceMode} onFenceClick={onFenceClick} />
         {fenceResults && <FenceResults results={fenceResults.places} lat={fenceResults.lat} lon={fenceResults.lon} />}
         <Legend />
       </MapContainer>
