@@ -14,6 +14,21 @@ from app.services.spatial import SpatialQueryService
 router = APIRouter()
 
 
+@router.get("")
+async def list_poets(db: AsyncSession = Depends(get_db)):
+    """获取所有诗人列表"""
+    from app.models.poet import Poet
+    from sqlalchemy import select
+    result = await db.execute(select(Poet).order_by(Poet.dynasty, Poet.name))
+    poets = result.scalars().all()
+    return {
+        "poets": [
+            {"poet_id": str(p.poet_id), "name": p.name, "dynasty": p.dynasty}
+            for p in poets
+        ]
+    }
+
+
 @router.get("/{poet_id}/trajectory")
 async def get_trajectory(
     poet_id: str,
