@@ -111,7 +111,7 @@ export default function App() {
         return prev + 1
       })
     }, delay)
-    return <>() => { if (animRef.current) clearInterval(animRef.current) }
+    return () => { if (animRef.current) clearInterval(animRef.current) }
   }, [isPlaying, speed, lastEvents.length])
 
   // 围栏查询
@@ -516,6 +516,6 @@ export default function App() {
           </div>
         </div>
       )}
-    </div></>
+    </div>
   )
 }
