@@ -50,3 +50,31 @@ async def search_poetry(
         mood_tag=mood_tag, allusion=allusion,
         page=page, page_size=page_size,
     )
+
+
+@router.get("/all")
+async def search_all(
+    keyword: Optional[str] = Query(None, description="统一关键词"),
+    db: AsyncSession = Depends(get_db),
+):
+    """统一搜索：同时搜索诗人 + 诗词"""
+    from app.models.poet import Poet
+    from sqlalchemy import select, func
+
+    results = {"poets": [], "poems": []}
+
+    if keyword:
+        from sqlalchemy import text as sqltext
+        poet_sql = sqltext("SELECT poet_id, name, dynasty FROM poets WHERE name LIKE :kw LIMIT 10")
+        poet_rows = (await db.execute(poet_sql, {"kw": f"%{keyword}%"})).mappings().all()
+        results["poets"] = [
+            {"poet_id": str(r["poet_id"]), "name": r["name"], "dynasty": r["dynasty"]}
+            for r in poet_rows
+        ]
+
+        # 搜索诗词（带地点坐标）
+        s = SearchService(db)
+        poem_data = await s.search(keyword=keyword, page_size=15)
+        results["poems"] = poem_data.get("results", [])
+
+    return results

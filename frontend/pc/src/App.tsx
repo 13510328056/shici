@@ -34,6 +34,8 @@ export default function App() {
   const [showSearch, setShowSearch] = useState(false)
   const [searchFilters, setSearchFilters] = useState({ dynasty: '', mood: '', season: '' })
   const [showFilters, setShowFilters] = useState(false)
+  const [unifiedResults, setUnifiedResults] = useState<any>(null)
+  const [showUnified, setShowUnified] = useState(false)
 
   // 多诗对比
   const [compareList, setCompareList] = useState<SearchResult[]>([])
@@ -134,6 +136,26 @@ export default function App() {
     } catch {}
   }, [])
 
+  const handlePoemClick = useCallback(async (poem: any) => {
+    const poet = poets.find(p => p.name === poem.author)
+    if (!poet) return
+    setSelectedIds(prev => {
+      if (prev.includes(poet.poet_id)) return prev
+      fetch(\`/api/v1/poets/\${poet.poet_id}/trajectory\`).then(r=>r.json()).then(d => {
+        setPoetsData(m => { const n = new Map(m); n.set(poet.poet_id, d.events || []); return n })
+      })
+      fetch(\`/api/v1/poets/\${poet.poet_id}/poetry\`).then(r=>r.json()).then(d => {
+        if (d?.poems) setPoemsMap(m => { const n = new Map(m); n.set(poet.poet_id, d.poems); return n })
+      })
+      return [...prev, poet.poet_id]
+    })
+    setViewingPoet(poet.poet_id)
+    setTimeout(() => {
+      const el = document.getElementById('poem-view')
+      if(el) el.innerHTML='<div style=\"font-size:14px;font-weight:600;margin-bottom:8px;color:#C23B22\">'+poem.title+'</div><div style=\"font-size:13px;line-height:2;white-space:pre-wrap;font-family:serif\">'+poem.content+'</div>'+(poem.mood_tags?.length?'<div style=\"font-size:11px;color:#888;margin-top:8px\">意境: '+poem.mood_tags.join(' \u00b7 ')+'</div>':'')
+    }, 100)
+  }, [poets])
+
   const toggleHeatmap = useCallback(async () => {
     setShowHeatmap(v => !v)
     if (!showHeatmap) { try { const d=await getHeatmap(); setHeatmap(d.points||[]) } catch {} }
@@ -202,37 +224,61 @@ export default function App() {
             </div>
           </div>
           <div style={{display:'flex',gap:4,marginTop:8}}>
-            <input type="text" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
-              onKeyDown={e=>e.key==='Enter'&&doSearch(searchQuery)}
-              placeholder="检索诗词（作者/关键词/意象）"
+            <input type="text" value={searchQuery} onChange={async e=>{
+              setSearchQuery(e.target.value);
+              if(e.target.value.trim().length>=1){
+                try{const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(e.target.value));const d=await r.json();setUnifiedResults(d);setShowUnified(true)}catch{}
+              } else {setShowUnified(false)}
+            }}
+              onFocus={async e=>{if(searchQuery.trim()){try{const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(searchQuery));const d=await r.json();setUnifiedResults(d);setShowUnified(true)}catch{}}}}
+              placeholder="搜索诗人或诗词..."
               style={{flex:1,padding:'4px 8px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif'}} />
-            <button onClick={()=>doSearch(searchQuery, searchFilters.dynasty||searchFilters.mood||searchFilters.season ? searchFilters : undefined)} style={{...S.accentBtn, padding:'4px 12px'}}>检索</button>
-            <button onClick={()=>setShowFilters(v=>!v)} style={{...S.classicBtn, padding:'4px 10px'}}>{showFilters ? '✕' : '⚙'}</button>
+            <button style={{...S.classicBtn, padding:'4px 8px',fontSize:11}} onClick={()=>setShowUnified(false)}>{showUnified?'✕':'⚙'}</button>
           </div>
-          {showFilters && (
-            <div style={{display:'flex',gap:4,marginTop:4,flexWrap:'wrap'}}>
-              <select value={searchFilters.dynasty} onChange={e=>setSearchFilters(f=>({...f,dynasty:e.target.value}))} style={{...S.input,fontSize:T.fsSmall,padding:'2px 6px',flex:1}}>
-                <option value="">朝代</option><option value="唐">唐</option><option value="宋">宋</option>
-              </select>
-              <select value={searchFilters.mood} onChange={e=>setSearchFilters(f=>({...f,mood:e.target.value}))} style={{...S.input,fontSize:T.fsSmall,padding:'2px 6px',flex:1}}>
-                <option value="">意境</option><option value="边塞">边塞</option><option value="送别">送别</option><option value="思乡">思乡</option><option value="田园">田园</option><option value="怀古">怀古</option><option value="豪放">豪放</option><option value="婉约">婉约</option>
-              </select>
-              <select value={searchFilters.season} onChange={e=>setSearchFilters(f=>({...f,season:e.target.value}))} style={{...S.input,fontSize:T.fsSmall,padding:'2px 6px',flex:1}}>
-                <option value="">季节</option><option value="春">春</option><option value="夏">夏</option><option value="秋">秋</option><option value="冬">冬</option>
-              </select>
-            </div>
-          )}
         </div>
 
-        {/* 检索结果（浮动在上层，不占流式位置） */}
-        {showSearch && (
-          <div style={{...S.panel, maxHeight:300, overflowY:'auto', padding:'8px 16px',
-            position:'absolute', left:0, right:0, zIndex:100, background:'#fafaf8', boxShadow:'0 4px 12px rgba(0,0,0,.15)',
+        {/* 统一搜索结果浮层 */}
+        {showUnified && unifiedResults && (
+          <div style={{...S.panel, maxHeight:350, overflowY:'auto', padding:'8px 12px',
+            position:'absolute', left:0, right:0, zIndex:100, background:'#FFFEF9', boxShadow:'0 4px 12px rgba(0,0,0,.15)',
             borderBottom:'2px solid #5B4A3E'}}>
-            <div style={S.sectionTitle}>检索结果 ({searchTotal}条)
-              <button onClick={()=>setShowSearch(false)} style={{...ST.animBtn,float:'right',padding:'0 6px',fontSize:10}}>关闭</button>
-              {compareList.length>=2 && <button onClick={()=>setShowCompare(true)} style={{...ST.animBtn,float:'right',padding:'0 6px',fontSize:10,marginRight:4,background:'#5B4A3E',color:'#fff'}}>对比({compareList.length})</button>}
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
+              <span style={{fontSize:11,color:T.textMuted}}>搜索结果</span>
+              <button onClick={()=>setShowUnified(false)} style={{...ST.animBtn,padding:'0 6px',fontSize:10}}>✕</button>
             </div>
+            {unifiedResults.poets?.length > 0 && (
+              <div style={{marginBottom:6}}>
+                <div style={{fontSize:11,fontWeight:600,color:T.textTitle,marginBottom:2}}>诗人 ({unifiedResults.poets.length})</div>
+                {unifiedResults.poets.map(p =>
+                  <div key={p.poet_id} style={{padding:'3px 6px',cursor:'pointer',fontSize:11,borderRadius:3}}
+                    onMouseEnter={e=>e.currentTarget.style.background=T.bg}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}
+                    onClick={()=>{togglePoet(p.poet_id);setShowUnified(false);setSearchQuery('')}}>
+                    {p.name} <span style={{color:T.textMuted,fontSize:10}}>{p.dynasty}</span>
+                  </div>
+                )}
+              </div>
+            )}
+            {unifiedResults.poems?.length > 0 && (
+              <div>
+                <div style={{fontSize:11,fontWeight:600,color:T.textTitle,marginBottom:2}}>诗词 ({unifiedResults.poems.length})</div>
+                {unifiedResults.poems.map(r =>
+                  <div key={r.poetry_id} style={{padding:'4px 6px',cursor:'pointer',fontSize:11,borderRadius:3,borderBottom:'1px solid '+T.divider}}
+                    onMouseEnter={e=>e.currentTarget.style.background=T.bg}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}
+                    onClick={()=>{handlePoemClick(r);setShowUnified(false);setSearchQuery('')}}>
+                    <b>{r.title}</b> — {r.author}
+                    <span style={{float:'right',color:T.textMuted,fontSize:10}}>{r.dynasty}/{r.genre}</span>
+                    <div style={{color:'#666',fontSize:10,marginTop:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{r.content?.slice(0,40)}...</div>
+                  </div>
+                )}
+              </div>
+            )}
+            {(!unifiedResults.poets?.length && !unifiedResults.poems?.length) && (
+              <div style={{fontSize:11,color:T.textMuted}}>无结果</div>
+            )}
+          </div>
+        )}
             {searchResults.length > 0 ? searchResults.map(r => (
               <div key={r.poetry_id} style={{padding:'6px 4px',borderBottom:'1px solid #f0eee8',fontSize:12,lineHeight:1.6}}>
                 <div style={{display:'flex',alignItems:'flex-start',gap:6}}>
