@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import PoetryMap from './components/Map/PoetryMap'
 import type { PoetTrajectoryData } from './components/Map/PoetryMap'
 import { POET_COLORS } from './components/Map/PoetryMap'
@@ -68,16 +68,18 @@ export default function App() {
     setAnimIndex(undefined); setIsPlaying(false)
   }, [])
 
-  // 构建传给地图的诗人数据
-  const trajectoryPoets: PoetTrajectoryData[] = selectedIds.map((id, i) => {
-    const p = poets.find(p => p.poet_id === id)
-    return {
-      name: p?.name || id,
-      events: poetsData.get(id) || [],
-      color: POET_COLORS[i % POET_COLORS.length],
-      animIndex: id === selectedIds[selectedIds.length-1] ? animIndex : undefined,
-    }
-  })
+  // 构建传给地图的诗人数据（useMemo 避免每次渲染重建引用导致地图闪烁）
+  const trajectoryPoets: PoetTrajectoryData[] = useMemo(() =>
+    selectedIds.map((id, i) => {
+      const p = poets.find(p => p.poet_id === id)
+      return {
+        name: p?.name || id,
+        events: poetsData.get(id) || [],
+        color: POET_COLORS[i % POET_COLORS.length],
+        animIndex: id === selectedIds[selectedIds.length-1] ? animIndex : undefined,
+      }
+    }),
+  [selectedIds, poets, poetsData, animIndex])
 
   // 动画控制（只对最后选中的生效）
   const lastId = selectedIds[selectedIds.length-1]

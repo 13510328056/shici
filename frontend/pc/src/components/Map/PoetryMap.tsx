@@ -16,10 +16,23 @@ import { EVENT_COLORS } from '../../types'
 
 export const POET_COLORS = ['#2196F3', '#F44336', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4', '#FF5722', '#795548']
 
+// 国内网络环境可用的瓦片地图源
+// OSM/CartoDB/OpenTopoMap 在部分网络受限环境下不可用，已替换为高德地图
+// 国内可用的高德地图瓦片
+// style=8: 标准路网图，通过{webrd,wprd}{01-04}子域名负载均衡
 const TILES = {
-  modern: { name: '现代地图', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attr: '&copy; OSM' },
-  light: { name: '水墨淡彩', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', attr: '&copy; CartoDB' },
-  terrain: { name: '地形晕渲', url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', attr: '&copy; OpenTopoMap' },
+  modern: {
+    name: '高德路网',
+    url: 'https://{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+    attr: '&copy; 高德地图',
+    subdomains: ['webrd01', 'webrd02', 'webrd03', 'webrd04'],
+  },
+  light: {
+    name: '高德简图',
+    url: 'https://{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+    attr: '&copy; 高德地图',
+    subdomains: ['wprd01', 'wprd02', 'wprd03', 'wprd04'],
+  },
 }
 
 // ─── 地名 ─────────────────────────────────
@@ -209,25 +222,19 @@ export default function PoetryMap({
         <LayersControl position="topright">
           {Object.entries(TILES).map(([k, t]) => (
             <LayersControl.BaseLayer key={k} name={t.name} checked={k==='modern'}>
-              <TileLayer url={t.url} attribution={t.attr} />
+              <TileLayer url={t.url} attribution={t.attr} subdomains={t.subdomains} />
             </LayersControl.BaseLayer>
           ))}
           <LayersControl.Overlay name="地名" checked><PlaceMarkers places={places} /></LayersControl.Overlay>
-          {poets.length > 0 && (
-            <LayersControl.Overlay name="诗人轨迹" checked>
-              <MultiTrajectoryLayer poets={poets} />
-            </LayersControl.Overlay>
-          )}
-          {heatmap.length > 0 && (
-            <LayersControl.Overlay name="诗词热力" checked={false}>
-              <HeatmapLayer points={heatmap} />
-            </LayersControl.Overlay>
-          )}
-          {encounterLines.length > 0 && (
-            <LayersControl.Overlay name="交游网络" checked>
-              <EncounterLines lines={encounterLines} />
-            </LayersControl.Overlay>
-          )}
+          <LayersControl.Overlay name="诗人轨迹" checked={poets.length>0}>
+            {poets.length > 0 && <MultiTrajectoryLayer poets={poets} />}
+          </LayersControl.Overlay>
+          <LayersControl.Overlay name="诗词热力" checked={false}>
+            {heatmap.length > 0 && <HeatmapLayer points={heatmap} />}
+          </LayersControl.Overlay>
+          <LayersControl.Overlay name="交游网络" checked={encounterLines.length>0}>
+            {encounterLines.length > 0 && <EncounterLines lines={encounterLines} />}
+          </LayersControl.Overlay>
         </LayersControl>
         <FenceClickHandler onFenceClick={onFenceClick} />
         {fenceResults && <FenceResults results={fenceResults.places} lat={fenceResults.lat} lon={fenceResults.lon} />}
