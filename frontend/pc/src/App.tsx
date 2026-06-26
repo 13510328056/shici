@@ -4,23 +4,19 @@ import type { PoetTrajectoryData } from './components/Map/PoetryMap'
 import { POET_COLORS } from './components/Map/PoetryMap'
 import type { TrajectoryEvent, HeatmapPoint, PlaceName } from './types'
 import { getHeatmap, fenceQuery } from './api'
+import { theme as T, sharedStyles as S } from './theme'
 
-const S = {
-  container: { display:'flex', width:'100vw', height:'100vh', fontFamily:'serif', color:'#2c2c2c', overflow:'hidden' } as const,
-  sidebar: { width:340, minWidth:340, height:'100vh', borderRight:'1px solid #e0e0e0', display:'flex', flexDirection:'column', background:'#fafaf8', position:'relative' } as const,
-  header: { padding:'14px 16px 12px', borderBottom:'1px solid #e8e4de', background:'#fff' } as const,
-  panel: { padding:'10px 16px', borderBottom:'1px solid #e8e4de' } as const,
-  ptitle: { fontSize:12, fontWeight:600, marginBottom:6, color:'#555' } as const,
-  btn: { display:'inline-block', padding:'3px 10px', margin:'3px', borderRadius:12, border:'1px solid #d0cdc4', background:'#fff', fontSize:12, cursor:'pointer' } as const,
-  btnA: { display:'inline-block', padding:'3px 10px', margin:'3px', borderRadius:12, border:'none', background:'#5B4A3E', fontSize:12, cursor:'pointer', color:'#fff' } as const,
-  layerItem: { display:'flex', alignItems:'center', gap:6, padding:'3px 0', fontSize:12 } as const,
-  statusBar: { height:28, borderTop:'1px solid #e8e4de', display:'flex', alignItems:'center', padding:'0 16px', fontSize:11, color:'#888', background:'#fff' } as const,
+const ST = {
+  container: { display:'flex', width:'100vw', height:'100vh', fontFamily:'"Noto Serif SC","Source Han Serif SC",serif', color:T.text, overflow:'hidden', background:T.bg } as const,
+  sidebar: { width:340, minWidth:340, height:'100vh', borderRight:`1px solid ${T.border}`, display:'flex', flexDirection:'column', background:T.sidebarBg, position:'relative' as const },
+  header: { padding:T.headerPadding, borderBottom:`1px solid ${T.border}`, background:T.headerBg } as const,
   main: { flex:1, position:'relative' as const },
-  slider: { width:'100%', margin:'6px 0', accentColor:'#5B4A3E' } as const,
-  animBtn: { padding:'2px 10px', margin:'0 4px', borderRadius:4, border:'1px solid #ccc', background:'#fff', fontSize:12, cursor:'pointer' } as const,
-  chip: { display:'inline-flex', alignItems:'center', gap:4, padding:'2px 8px', margin:2, borderRadius:10, fontSize:11, background:'#f0eee8' } as const,
-  tag: (c:string) => ({ display:'inline-block', padding:'2px 8px', margin:2, borderRadius:10, fontSize:11, background:c+'22', color:c, fontWeight:600 } as const),
-}
+  statusBar: { height:28, borderTop:`1px solid ${T.border}`, display:'flex', alignItems:'center', padding:'0 16px', fontSize:T.fsSmall, color:T.textMuted, background:T.statusBg } as const,
+  slider: { width:'100%', margin:'6px 0', accentColor:T.accent } as const,
+  animBtn: { padding:'2px 10px', margin:'0 4px', borderRadius:3, border:`1px solid ${T.borderDark}`, background:T.panelBg, fontSize:T.fsBody, cursor:'pointer', fontFamily:'inherit' } as const,
+  chip: { display:'inline-flex', alignItems:'center', gap:4, padding:'2px 8px', margin:2, borderRadius:3, fontSize:T.fsSmall, background:T.bg, color:T.textSecondary } as const,
+  tag: (c:string) => ({ display:'inline-block', padding:'2px 8px', margin:2, borderRadius:3, fontSize:T.fsSmall, background:c+'22', color:c, fontWeight:600 } as const),
+} as const
 
 // ─── 搜索结果类型 ──────────────────────────
 interface SearchResult {
@@ -188,9 +184,9 @@ export default function App() {
   const poetName = (id: string) => poets.find(p => p.poet_id === id)?.name || id
 
   return (
-    <div style={S.container}>
-      <div style={S.sidebar}>
-        <div style={S.header}>
+    <div style={ST.container}>
+      <div style={ST.sidebar}>
+        <div style={ST.header}>
           <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
             <div style={{width:32,height:32,background:'#5B4A3E',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',color:'#F5F0EA',fontSize:16,fontWeight:'bold',fontFamily:'serif'}}>诗</div>
             <div>
@@ -203,18 +199,18 @@ export default function App() {
               onKeyDown={e=>e.key==='Enter'&&doSearch(searchQuery)}
               placeholder="检索诗词（作者/关键词/意象）"
               style={{flex:1,padding:'4px 8px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif'}} />
-            <button onClick={()=>doSearch(searchQuery, searchFilters.dynasty||searchFilters.mood||searchFilters.season ? searchFilters : undefined)} style={{...S.animBtn,background:'#5B4A3E',color:'#fff',border:'none'}}>检索</button>
-            <button onClick={()=>setShowFilters(v=>!v)} style={{...S.animBtn,background:showFilters?'#e8e0d4':'#fff'}}>▼</button>
+            <button onClick={()=>doSearch(searchQuery, searchFilters.dynasty||searchFilters.mood||searchFilters.season ? searchFilters : undefined)} style={{...S.accentBtn, padding:'4px 12px'}}>检索</button>
+            <button onClick={()=>setShowFilters(v=>!v)} style={{...S.classicBtn, padding:'4px 10px'}}>{showFilters ? '✕' : '⚙'}</button>
           </div>
           {showFilters && (
             <div style={{display:'flex',gap:4,marginTop:4,flexWrap:'wrap'}}>
-              <select value={searchFilters.dynasty} onChange={e=>setSearchFilters(f=>({...f,dynasty:e.target.value}))} style={{fontSize:11,padding:'2px 4px',borderRadius:4,border:'1px solid #d0cdc4'}}>
+              <select value={searchFilters.dynasty} onChange={e=>setSearchFilters(f=>({...f,dynasty:e.target.value}))} style={{...S.input,fontSize:T.fsSmall,padding:'2px 6px',flex:1}}>
                 <option value="">朝代</option><option value="唐">唐</option><option value="宋">宋</option>
               </select>
-              <select value={searchFilters.mood} onChange={e=>setSearchFilters(f=>({...f,mood:e.target.value}))} style={{fontSize:11,padding:'2px 4px',borderRadius:4,border:'1px solid #d0cdc4'}}>
+              <select value={searchFilters.mood} onChange={e=>setSearchFilters(f=>({...f,mood:e.target.value}))} style={{...S.input,fontSize:T.fsSmall,padding:'2px 6px',flex:1}}>
                 <option value="">意境</option><option value="边塞">边塞</option><option value="送别">送别</option><option value="思乡">思乡</option><option value="田园">田园</option><option value="怀古">怀古</option><option value="豪放">豪放</option><option value="婉约">婉约</option>
               </select>
-              <select value={searchFilters.season} onChange={e=>setSearchFilters(f=>({...f,season:e.target.value}))} style={{fontSize:11,padding:'2px 4px',borderRadius:4,border:'1px solid #d0cdc4'}}>
+              <select value={searchFilters.season} onChange={e=>setSearchFilters(f=>({...f,season:e.target.value}))} style={{...S.input,fontSize:T.fsSmall,padding:'2px 6px',flex:1}}>
                 <option value="">季节</option><option value="春">春</option><option value="夏">夏</option><option value="秋">秋</option><option value="冬">冬</option>
               </select>
             </div>
@@ -226,9 +222,9 @@ export default function App() {
           <div style={{...S.panel, maxHeight:300, overflowY:'auto', padding:'8px 16px',
             position:'absolute', left:0, right:0, zIndex:100, background:'#fafaf8', boxShadow:'0 4px 12px rgba(0,0,0,.15)',
             borderBottom:'2px solid #5B4A3E'}}>
-            <div style={S.ptitle}>检索结果 ({searchTotal}条)
-              <button onClick={()=>setShowSearch(false)} style={{...S.animBtn,float:'right',padding:'0 6px',fontSize:10}}>关闭</button>
-              {compareList.length>=2 && <button onClick={()=>setShowCompare(true)} style={{...S.animBtn,float:'right',padding:'0 6px',fontSize:10,marginRight:4,background:'#5B4A3E',color:'#fff'}}>对比({compareList.length})</button>}
+            <div style={S.sectionTitle}>检索结果 ({searchTotal}条)
+              <button onClick={()=>setShowSearch(false)} style={{...ST.animBtn,float:'right',padding:'0 6px',fontSize:10}}>关闭</button>
+              {compareList.length>=2 && <button onClick={()=>setShowCompare(true)} style={{...ST.animBtn,float:'right',padding:'0 6px',fontSize:10,marginRight:4,background:'#5B4A3E',color:'#fff'}}>对比({compareList.length})</button>}
             </div>
             {searchResults.length > 0 ? searchResults.map(r => (
               <div key={r.poetry_id} style={{padding:'6px 4px',borderBottom:'1px solid #f0eee8',fontSize:12,lineHeight:1.6}}>
@@ -253,11 +249,11 @@ export default function App() {
 
         {/* 诗人选择（多选） */}
         <div style={S.panel}>
-          <div style={S.ptitle}>选择诗人（最多10位，点击切换）</div>
+          <div style={S.sectionTitle}>选择诗人（最多10位，点击切换）</div>
           <div>{poets.map(p => (
             <button key={p.poet_id} style={selectedIds.includes(p.poet_id) ? {
-              ...S.btnA, background: POET_COLORS[selectedIds.indexOf(p.poet_id) % POET_COLORS.length],
-            } : S.btn}
+              ...S.accentBtn, background: POET_COLORS[selectedIds.indexOf(p.poet_id) % POET_COLORS.length],
+            } : S.classicBtn}
               onClick={()=>togglePoet(p.poet_id)}>{p.name}</button>
           ))}</div>
           {selectedIds.length > 0 && (
@@ -270,17 +266,17 @@ export default function App() {
         {/* 动画 */}
         {lastEvents.length > 0 && (
           <div style={S.panel}>
-            <div style={S.ptitle}>
+            <div style={S.sectionTitle}>
               动画 · {poetName(lastId)}
               <span style={{float:'right',fontWeight:400,fontSize:11,color:'#888'}}>
                 {animIndex!==undefined ? lastEvents[animIndex]?.event_year : lastEvents[0]?.event_year}~{lastEvents[lastEvents.length-1]?.event_year}
               </span>
             </div>
-            <input type="range" style={S.slider} min={0} max={Math.max(0,lastEvents.length-1)}
+            <input type="range" style={ST.slider} min={0} max={Math.max(0,lastEvents.length-1)}
               value={animIndex??0} onChange={e=>{setAnimIndex(parseInt(e.target.value));setIsPlaying(false)}} />
             <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
-              <button style={S.animBtn} onClick={()=>{if(!isPlaying)setAnimIndex(p=>p===lastEvents.length-1?0:p??0);setIsPlaying(v=>!v)}}>{isPlaying?'⏸':'▶'}</button>
-              {[1,2,4].map(s => <button key={s} style={{...S.animBtn,background:speed===s?'#e8e0d4':'#fff'}} onClick={()=>setSpeed(s)}>{s}×</button>)}
+              <button style={ST.animBtn} onClick={()=>{if(!isPlaying)setAnimIndex(p=>p===lastEvents.length-1?0:p??0);setIsPlaying(v=>!v)}}>{isPlaying?'⏸':'▶'}</button>
+              {[1,2,4].map(s => <button key={s} style={{...ST.animBtn,background:speed===s?'#e8e0d4':'#fff'}} onClick={()=>setSpeed(s)}>{s}×</button>)}
               <span style={{fontSize:11,color:'#888'}}>{animIndex!==undefined?animIndex+1:0}/{lastEvents.length}</span>
             </div>
           </div>
@@ -288,7 +284,7 @@ export default function App() {
 
         {/* 图层 */}
         <div style={S.panel}>
-          <div style={S.ptitle}>图层控制</div>
+          <div style={S.sectionTitle}>图层控制</div>
           <div style={S.layerItem}><input type="checkbox" defaultChecked readOnly /><span>地名</span></div>
           <div style={S.layerItem}><input type="checkbox" checked={selectedIds.length>0} readOnly /><span>轨迹 ({selectedIds.length}人)</span></div>
           <div style={S.layerItem}>
@@ -307,7 +303,7 @@ export default function App() {
           </div>
           <div style={S.layerItem}><input type="checkbox" checked={encounterLines.length>0} readOnly /><span>交游 ({encounterLines.length}条)</span></div>
           <div style={S.layerItem}>
-            <button style={{...S.animBtn, background:fenceMode?'#e8e0d4':'#fff', margin:0, fontSize:11}}
+            <button style={{...ST.animBtn, background:fenceMode?'#e8e0d4':'#fff', margin:0, fontSize:11}}
               onClick={toggleFenceMode}>{fenceMode ? '退出围栏模式' : '围栏查询'}</button>
             {fenceMode && <span style={{fontSize:11,color:'#E91E63',marginLeft:6}}>点地图查80km内</span>}
           </div>
@@ -315,7 +311,7 @@ export default function App() {
 
         {/* AI 创作工具 */}
         <div style={S.panel}>
-          <div style={S.ptitle}>AI 创作辅助</div>
+          <div style={S.sectionTitle}>AI 创作辅助</div>
 
           {/* 对仗推荐 */}
           <div style={{fontSize:11,color:'#888',marginBottom:4}}>对仗推荐</div>
@@ -328,7 +324,7 @@ export default function App() {
               const d=await fetch('/api/v1/ai/antithesis/recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input_text:v})}).then(r=>r.json());
               const el=document.getElementById('ai-results');
               if(el) el.innerHTML=(d.candidates||[]).map((c:any)=>'<span style="display:inline-block;padding:2px 8px;margin:2px;border-radius:8px;border:1px solid #e0dcd4;font-size:12px">'+c.word+' <small style="color:#888">'+c.category+'</small></span>').join('')||'<span style="font-size:11px;color:#aaa">无推荐</span>';
-            }} style={S.animBtn}>推荐</button>
+            }} style={ST.animBtn}>推荐</button>
           </div>
           <div id="ai-results" style={{minHeight:20,marginBottom:6}}></div>
 
@@ -350,7 +346,7 @@ export default function App() {
               if(!el)return;
               if(d.passed){el.innerHTML='<span style="font-size:12px;color:#4CAF50">格律无误</span>'}
               else{el.innerHTML='<div style="font-size:12px;color:#E91E63">发现 '+d.errors.length+' 处问题：</div>'+d.errors.map((e:any)=>'<div style="font-size:11px;color:#666;padding:2px 0"><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fdd;margin-right:4px;font-size:10px">'+e.type+'</span>'+String(e.message||'').slice(0,50)+'</div>').join('')}
-            }} style={S.animBtn}>校验</button>
+            }} style={ST.animBtn}>校验</button>
           </div>
           <div id="rhythm-results" style={{minHeight:20,marginTop:4,marginBottom:6}}></div>
 
@@ -387,7 +383,7 @@ export default function App() {
               const el=document.getElementById('rw-results');
               if(el) el.innerHTML='<div style="font-size:12px;line-height:1.8;color:#333;padding:6px;background:#f5f0ea;border-radius:4px">'+(d.result||d.error||'无结果')+'</div>'+(d.note?'<div style="font-size:10px;color:#888;margin-top:2px">'+d.note+'</div>':'');
             }catch(e){}
-          }} style={{...S.animBtn,width:'100%',marginTop:4}}>生成</button>
+          }} style={{...ST.animBtn,width:'100%',marginTop:4}}>生成</button>
           <div id="rw-results" style={{minHeight:20,marginTop:4,marginBottom:4}}></div>
 
           {/* 意境匹配 */}
@@ -413,14 +409,14 @@ export default function App() {
             el.innerHTML='<div style="font-size:12px;font-weight:600;margin-bottom:4px">【'+d.mood+'】'+d.description+'</div>'+
               '<div style="font-size:11px;color:#666;margin-bottom:4px">推荐意象：'+d.recommended_imagery.join('、')+'</div>'+
               (d.framework?.tips?.length ? '<div style="font-size:11px;color:#555">创作提示：<ul style="margin:2px 0;padding-left:16px">'+d.framework.tips.map((t:string)=>'<li>'+t+'</li>').join('')+'</ul></div>' : '');
-          }} style={{...S.animBtn,width:'100%',marginTop:2}}>生成创作框架</button>
+          }} style={{...ST.animBtn,width:'100%',marginTop:2}}>生成创作框架</button>
           <div id="mood-results" style={{minHeight:20,marginTop:6,fontSize:12,lineHeight:1.6}}></div>
         </div>
 
         {/* 围栏信息 */}
         {fenceResults && (
           <div style={S.panel}>
-            <div style={S.ptitle}>围栏查询结果</div>
+            <div style={S.sectionTitle}>围栏查询结果</div>
             <div style={{fontSize:12,lineHeight:1.6,color:'#888'}}>
               中心: {fenceResults.lat.toFixed(4)}, {fenceResults.lon.toFixed(4)}
             </div>
@@ -432,13 +428,13 @@ export default function App() {
                 {p.ancient_name}（{p.modern_name}）{p.distance_km ? `${p.distance_km.toFixed(1)}km` : ''}
               </div>
             ))}
-            <button style={{...S.animBtn,marginTop:4}} onClick={()=>setFenceResults(undefined)}>清除</button>
+            <button style={{...ST.animBtn,marginTop:4}} onClick={()=>setFenceResults(undefined)}>清除</button>
           </div>
         )}
 
         {/* 数据导出 */}
         <div style={S.panel}>
-          <div style={S.ptitle}>数据导出 (CSV)</div>
+          <div style={S.sectionTitle}>数据导出 (CSV)</div>
           <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>
             {[
               {label:'地名', url:'/api/v1/export/places'},
@@ -449,7 +445,7 @@ export default function App() {
               {label:'统计', url:'/api/v1/export/stats'},
             ].map(btn => (
               <a key={btn.label} href={btn.url} target="_blank" rel="noopener"
-                style={{...S.animBtn, textDecoration:'none', color:'#333', fontSize:11}}>{btn.label}</a>
+                style={{...ST.animBtn, textDecoration:'none', color:'#333', fontSize:11}}>{btn.label}</a>
             ))}
           </div>
           <div style={{fontSize:10,color:'#aaa',marginTop:4}}>UTF-8 CSV，Excel 打开建议"数据→自文本/CSV"</div>
@@ -457,7 +453,7 @@ export default function App() {
 
         {/* 统计 */}
         <div style={{...S.panel, flex:1, borderBottom:'none', overflow:'auto'}}>
-          <div style={S.ptitle}>轨迹统计</div>
+          <div style={S.sectionTitle}>轨迹统计</div>
           {selectedIds.length > 0 ? (
             <div>
             {selectedIds.map((id, i) => {
@@ -465,7 +461,7 @@ export default function App() {
               const p = poets.find(p => p.poet_id === id)
               return (
                 <div key={id} style={{marginBottom:8}}>
-                  <div style={S.tag(POET_COLORS[i % POET_COLORS.length])}>{p?.name}</div>
+                  <div style={ST.tag(POET_COLORS[i % POET_COLORS.length])}>{p?.name}</div>
                   <div style={{fontSize:11,lineHeight:1.6,color:'#666',marginLeft:4}}>
                     {evts.length} 事件 · 年份 {evts[0]?.event_year||'?'}~{evts[evts.length-1]?.event_year||'?'}
                   </div>
@@ -476,13 +472,13 @@ export default function App() {
           ) : <div style={{fontSize:12,color:'#aaa'}}>选择 1-4 位诗人<br/>点击地图可进行围栏查询</div>}
         </div>
 
-        <div style={S.statusBar}>
+        <div style={ST.statusBar}>
           <span>诗人 {selectedIds.length}位 · 轨迹 {trajectoryPoets.reduce((s,p)=>s+p.events.length,0)}条 · 围栏 {fenceResults?.places.length||0}点</span>
           <span style={{fontSize:10,color:'#b8b0a8',marginLeft:'auto'}}>v0.2</span>
         </div>
       </div>
 
-      <div style={S.main}>
+      <div style={ST.main}>
         <PoetryMap poets={trajectoryPoets} heatmap={showHeatmap?heatmap:[]}
           encounterLines={encounterLines} fenceResults={fenceResults}
           fenceMode={fenceMode} onFenceClick={handleFenceClick}
@@ -495,7 +491,7 @@ export default function App() {
           <div style={{background:'#fff',borderRadius:8,maxWidth:'80%',maxHeight:'80%',overflow:'auto',padding:20,boxShadow:'0 4px 20px rgba(0,0,0,.2)'}} onClick={e=>e.stopPropagation()}>
             <div style={{display:'flex',justifyContent:'space-between',marginBottom:12}}>
               <h2 style={{fontSize:16,fontWeight:600,margin:0}}>诗词对比</h2>
-              <button onClick={()=>setShowCompare(false)} style={{...S.animBtn}}>关闭</button>
+              <button onClick={()=>setShowCompare(false)} style={{...ST.animBtn}}>关闭</button>
             </div>
             <div style={{display:'flex',gap:16,flexWrap:'wrap'}}>
               {compareList.map(r => (

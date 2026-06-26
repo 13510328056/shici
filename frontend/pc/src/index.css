@@ -1,50 +1,57 @@
-/* 古诗词文化互动平台 — 全局样式 */
+/* 古诗词文化互动平台 — 中国古风雅致主题 */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body, #root { width: 100%; height: 100%; overflow: hidden; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Serif SC", "Source Han Serif SC", "SimSun", "PingFang SC", serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Noto Serif SC", "Source Han Serif SC", "SimSun", "PingFang SC", serif;
   color: #2c2c2c;
   background: #F5F0EA;
   -webkit-font-smoothing: antialiased;
 }
 
+/* ─── 按钮互动 ─── */
 button {
   font-family: inherit;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   outline: none;
 }
-button:hover { opacity: 0.85; transform: translateY(-1px); }
+button:hover { opacity: 0.85; }
 button:active { transform: scale(0.97); }
 
 input, select, textarea {
   font-family: inherit;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 input:focus, select:focus, textarea:focus {
   border-color: #8B7355 !important;
-  box-shadow: 0 0 0 2px rgba(139, 115, 85, 0.15);
+  box-shadow: 0 0 0 2px rgba(139, 115, 85, 0.12);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 5px; }
+/* ─── 古典卷轴滚动条 ─── */
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #D4C5A9; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #D4C5A9; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #B8A88C; }
 
-/* Leaflet popup */
+/* ─── Leaflet 样式覆盖 ─── */
 .leaflet-popup-content {
   font-family: "Noto Serif SC", "Source Han Serif SC", serif;
-  font-size: 13px; line-height: 1.7;
+  font-size: 13px; line-height: 1.8;
+  color: #2c2c2c;
 }
 .leaflet-popup-content b { color: #5B4A3E; }
 .leaflet-popup-content small { color: #999; }
-
-/* Leaflet control overrides */
-.leaflet-control-zoom a { color: #5B4A3E !important; }
+.leaflet-popup-content-wrapper { border-radius: 6px !important; }
+.leaflet-control-zoom a { color: #5B4A3E !important; font-weight: 600 !important; }
 .leaflet-control-layers-expanded {
   font-family: "Noto Serif SC", serif;
   font-size: 12px;
   color: #5B4A3E;
+  background: #FFFEF9 !important;
+  border: 1px solid #E5DDD0;
+  border-radius: 4px;
 }
 .leaflet-control-layers-selector { accent-color: #5B4A3E; }
+.leaflet-control-attribution { font-size: 10px !important; color: #999 !important; }
