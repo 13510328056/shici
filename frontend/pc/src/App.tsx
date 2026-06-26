@@ -41,6 +41,7 @@ export default function App() {
 
   const [poets, setPoets] = useState<Array<{poet_id:string;name:string;dynasty:string}>>([])
   const [poetSearch, setPoetSearch] = useState('')
+  const [showPoetList, setShowPoetList] = useState(false)
   // 多诗人选择（最多10位）
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [poetsData, setPoetsData] = useState<Map<string, TrajectoryEvent[]>>(new Map())
@@ -253,34 +254,42 @@ export default function App() {
           </div>
         )}
 
-        {/* 诗人选择（多选） */}
-                <div style={S.panel}>
-          <div style={S.sectionTitle}>选择诗人</div>
-          <input type="text" value={poetSearch} onChange={e=>setPoetSearch(e.target.value)}
-            placeholder="搜索诗人姓名..."
-            style={{...S.input, width:'100%', marginBottom:6, fontSize:T.fsSmall}} />
-          <div style={{maxHeight:180, overflowY:'auto', marginBottom:4}}>
-            {poets.filter(p => !poetSearch || p.name.includes(poetSearch)).map(p =>
-              <button key={p.poet_id} style={selectedIds.includes(p.poet_id) ? {
-                ...S.classicBtn, background: POET_COLORS[selectedIds.indexOf(p.poet_id) % POET_COLORS.length], color:'#fff', border:'none',
-              } : S.classicBtn}
-                onClick={()=>togglePoet(p.poet_id)}>{p.name}</button>
-            )}
-          </div>
-          {selectedIds.length > 0 && (
-            <div style={{marginTop:4,fontSize:T.fsSmall,color:T.textMuted}}>
-              已选 {selectedIds.length} 位: {selectedIds.map(id => {
-                const hasPoems = poemsMap.get(id)?.length > 0
-                return <span key={id}>{poetName(id)}
-                  <span style={{marginLeft:4,cursor:'pointer',color:T.accent,fontWeight:600,fontSize:10}}
-                    onClick={()=>{
-                      if(!hasPoems){fetch(`/api/v1/poets/${id}/poetry`).then(r=>r.json()).then(d=>{if(d?.poems){setPoemsMap(m=>{const n=new Map(m);n.set(id,d.poems);return n});setViewingPoet(id)}})}else setViewingPoet(id)
-                    }}>[作品]</span>{' · '}
-                </span>
-              })}
+        {/* 诗人选择 — 搜索式 */}
+        <div style={S.panel}>
+          <div style={S.sectionTitle}>诗人</div>
+          <input type="text" value={poetSearch} onChange={e=>{setPoetSearch(e.target.value);if(e.target.value&&!showPoetList)setShowPoetList(true)}}
+            onFocus={()=>setShowPoetList(true)}
+            placeholder="搜索添加诗人..."
+            style={{...S.input, width:'100%', fontSize:T.fsSmall}} />
+          {showPoetList && poetSearch && (
+            <div style={{maxHeight:160, overflowY:'auto', marginTop:4, border:'1px solid '+T.border, borderRadius:3, padding:4}}>
+              {poets.filter(p => p.name.includes(poetSearch) && !selectedIds.includes(p.poet_id)).slice(0, 15).map(p =>
+                <div key={p.poet_id} style={{padding:'3px 6px',cursor:'pointer',fontSize:T.fsBody,borderRadius:3}}
+                  onMouseEnter={e=>e.currentTarget.style.background=T.bg}
+                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}
+                  onClick={()=>{togglePoet(p.poet_id);setPoetSearch('');setShowPoetList(false)}}>
+                  {p.name} <span style={{color:T.textMuted,fontSize:10}}>{p.dynasty}</span>
+                </div>
+              )}
+              {poets.filter(p => p.name.includes(poetSearch) && !selectedIds.includes(p.poet_id)).length === 0 && (
+                <div style={{padding:'3px 6px',fontSize:T.fsSmall,color:T.textMuted}}>无匹配诗人</div>
+              )}
             </div>
           )}
-          <div style={{fontSize:10,color:T.textMuted,marginTop:4}}>载入 {poets.length} 位唐宋诗人 · 搜索过滤</div>
+          {selectedIds.length > 0 && (
+            <div style={{marginTop:6,fontSize:T.fsSmall,color:T.textMuted,lineHeight:1.8}}>
+              {selectedIds.map(id => (
+                <span key={id} style={{display:'inline-flex',alignItems:'center',gap:2,marginRight:4,padding:'1px 6px',background:T.bg,borderRadius:3}}>
+                  {poetName(id)}
+                  <span style={{cursor:'pointer',color:T.accent,fontWeight:600,fontSize:10,marginLeft:2}}
+                    onClick={()=>{
+                      if(!poemsMap.get(id)?.length){fetch(`/api/v1/poets/${id}/poetry`).then(r=>r.json()).then(d=>{if(d?.poems){setPoemsMap(m=>{const n=new Map(m);n.set(id,d.poems);return n});setViewingPoet(id)}})}else setViewingPoet(id)
+                    }}>📖</span>
+                  <span style={{cursor:'pointer',color:T.textMuted,fontSize:10,marginLeft:1}} onClick={()=>togglePoet(id)}>✕</span>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 动画 */}
