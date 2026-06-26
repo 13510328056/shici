@@ -258,6 +258,46 @@ export default function App() {
           </div>
         </div>
 
+        {/* AI 创作工具 */}
+        <div style={S.panel}>
+          <div style={S.ptitle}>AI 创作辅助</div>
+
+          <div style={{fontSize:11,color:'#888',marginBottom:4}}>对仗推荐</div>
+          <div style={{display:'flex',gap:4,marginBottom:6}}>
+            <input type="text" id="ai-input" placeholder="输入字词"
+              style={{flex:1,padding:'3px 6px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif'}} />
+            <button onClick={async()=>{
+              const v=(document.getElementById('ai-input') as HTMLInputElement).value;
+              if(!v)return;
+              const d=await fetch('/api/v1/ai/antithesis/recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input_text:v})}).then(r=>r.json());
+              const el=document.getElementById('ai-results');
+              if(el) el.innerHTML=(d.candidates||[]).map((c:any)=>'<span style="display:inline-block;padding:2px 8px;margin:2px;border-radius:8px;border:1px solid #e0dcd4;font-size:12px">'+c.word+' <small style="color:#888">'+c.category+'</small></span>').join('')||'<span style="font-size:11px;color:#aaa">无推荐</span>';
+            }} style={S.animBtn}>推荐</button>
+          </div>
+          <div id="ai-results" style={{minHeight:20,marginBottom:6}}></div>
+
+          <div style={{fontSize:11,color:'#888',marginBottom:4,marginTop:6}}>格律校验</div>
+          <textarea id="rhythm-input" placeholder="输入诗句，如：白日依山尽，黄河入海流。" rows={3}
+            style={{width:'100%',padding:'4px 6px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif',resize:'vertical'}} />
+          <div style={{display:'flex',gap:4,marginTop:4}}>
+            <select id="rhythm-genre" style={{padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
+              <option value="七绝">七绝</option><option value="七律">七律</option>
+              <option value="五绝" selected>五绝</option><option value="五律">五律</option>
+            </select>
+            <button onClick={async()=>{
+              const c=(document.getElementById('rhythm-input') as HTMLTextAreaElement).value;
+              const g=(document.getElementById('rhythm-genre') as HTMLSelectElement).value;
+              if(!c)return;
+              const d=await fetch('/api/v1/ai/rhythm/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:c,genre:g,rhyme_system:'平水韵'})}).then(r=>r.json());
+              const el=document.getElementById('rhythm-results');
+              if(!el)return;
+              if(d.passed){el.innerHTML='<span style="font-size:12px;color:#4CAF50">格律无误</span>'}
+              else{el.innerHTML='<div style="font-size:12px;color:#E91E63">发现 '+d.errors.length+' 处问题：</div>'+d.errors.map((e:any)=>'<div style="font-size:11px;color:#666;padding:2px 0"><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fdd;margin-right:4px;font-size:10px">'+e.type+'</span>'+String(e.message||'').slice(0,50)+'</div>').join('')}
+            }} style={S.animBtn}>校验</button>
+          </div>
+          <div id="rhythm-results" style={{minHeight:20,marginTop:4}}></div>
+        </div>
+
         {/* 围栏信息 */}
         {fenceResults && (
           <div style={S.panel}>
