@@ -38,9 +38,15 @@ export default function App() {
   const [searchTotal, setSearchTotal] = useState(0)
   const [searching, setSearching] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
+  const [searchFilters, setSearchFilters] = useState({ dynasty: '', mood: '', season: '' })
+  const [showFilters, setShowFilters] = useState(false)
+
+  // 多诗对比
+  const [compareList, setCompareList] = useState<SearchResult[]>([])
+  const [showCompare, setShowCompare] = useState(false)
 
   const [poets, setPoets] = useState<Array<{poet_id:string;name:string;dynasty:string}>>([])
-  // 多诗人选择
+  // 多诗人选择（最多10位）
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [poetsData, setPoetsData] = useState<Map<string, TrajectoryEvent[]>>(new Map())
   // 单诗人动画（只对最后选中的生效）
@@ -73,7 +79,7 @@ export default function App() {
         setPoetsData(m => { const n = new Map(m); n.delete(pid); return n })
         return next
       }
-      if (prev.length >= 4) return prev // 最多4人同屏
+      if (prev.length >= 10) return prev // 最多10人同屏
       // 加载轨迹
       fetch(`/api/v1/poets/${pid}/trajectory`).then(r=>r.json()).then(d => {
         setPoetsData(m => { const n = new Map(m); n.set(pid, d.events || []); return n })
@@ -134,11 +140,17 @@ export default function App() {
   }, [showHeatmap])
 
   // ── 多维检索 ────────────────────────────
-  const doSearch = useCallback(async (q: string) => {
-    if (!q.trim()) return
+  const doSearch = useCallback(async (q: string, filters?: { dynasty?: string; mood?: string; season?: string }) => {
+    if (!q.trim() && !filters?.mood && !filters?.dynasty) return
     setSearching(true)
     try {
-      const r = await fetch(`/api/v1/search/poetry?keyword=${encodeURIComponent(q)}&page_size=30`)
+      const params = new URLSearchParams()
+      if (q.trim()) params.set('keyword', q.trim())
+      if (filters?.dynasty) params.set('dynasty', filters.dynasty)
+      if (filters?.mood) params.set('mood_tag', filters.mood)
+      if (filters?.season) params.set('season', filters.season)
+      params.set('page_size', '30')
+      const r = await fetch(`/api/v1/search/poetry?${params}`)
       const d = await r.json()
       setSearchResults(d.results || [])
       setSearchTotal(d.total || 0)
@@ -188,22 +200,41 @@ export default function App() {
               onKeyDown={e=>e.key==='Enter'&&doSearch(searchQuery)}
               placeholder="检索诗词（作者/关键词/意象）"
               style={{flex:1,padding:'4px 8px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif'}} />
-            <button onClick={()=>doSearch(searchQuery)} style={{...S.animBtn,background:'#5B4A3E',color:'#fff',border:'none'}}>检索</button>
+            <button onClick={()=>doSearch(searchQuery, searchFilters.dynasty||searchFilters.mood||searchFilters.season ? searchFilters : undefined)} style={{...S.animBtn,background:'#5B4A3E',color:'#fff',border:'none'}}>检索</button>
+            <button onClick={()=>setShowFilters(v=>!v)} style={{...S.animBtn,background:showFilters?'#e8e0d4':'#fff'}}>▼</button>
           </div>
+          {showFilters && (
+            <div style={{display:'flex',gap:4,marginTop:4,flexWrap:'wrap'}}>
+              <select value={searchFilters.dynasty} onChange={e=>setSearchFilters(f=>({...f,dynasty:e.target.value}))} style={{fontSize:11,padding:'2px 4px',borderRadius:4,border:'1px solid #d0cdc4'}}>
+                <option value="">朝代</option><option value="唐">唐</option><option value="宋">宋</option>
+              </select>
+              <select value={searchFilters.mood} onChange={e=>setSearchFilters(f=>({...f,mood:e.target.value}))} style={{fontSize:11,padding:'2px 4px',borderRadius:4,border:'1px solid #d0cdc4'}}>
+                <option value="">意境</option><option value="边塞">边塞</option><option value="送别">送别</option><option value="思乡">思乡</option><option value="田园">田园</option><option value="怀古">怀古</option><option value="豪放">豪放</option><option value="婉约">婉约</option>
+              </select>
+              <select value={searchFilters.season} onChange={e=>setSearchFilters(f=>({...f,season:e.target.value}))} style={{fontSize:11,padding:'2px 4px',borderRadius:4,border:'1px solid #d0cdc4'}}>
+                <option value="">季节</option><option value="春">春</option><option value="夏">夏</option><option value="秋">秋</option><option value="冬">冬</option>
+              </select>
+            </div>
+          )}
         </div>
 
         {/* 检索结果 */}
         {showSearch && (
-          <div style={{...S.panel, maxHeight:200, overflow:'auto'}}>
+          <div style={{...S.panel, maxHeight:240, overflow:'auto'}}>
             <div style={S.ptitle}>检索结果 ({searchTotal}条)
               <button onClick={()=>setShowSearch(false)} style={{...S.animBtn,float:'right',padding:'0 6px',fontSize:10}}>关闭</button>
+              {compareList.length>=2 && <button onClick={()=>setShowCompare(true)} style={{...S.animBtn,float:'right',padding:'0 6px',fontSize:10,marginRight:4,background:'#5B4A3E',color:'#fff'}}>对比({compareList.length})</button>}
             </div>
             {searchResults.length > 0 ? searchResults.map(r => (
-              <div key={r.poetry_id} style={{padding:'4px 0',borderBottom:'1px solid #f0eee8',fontSize:12,cursor:'pointer'}}
-                onClick={()=>{setSearchQuery(r.title); alert(r.content.slice(0,80)+'...')}}>
-                <b>{r.title}</b> — {r.author}
-                <span style={{float:'right',fontSize:10,color:'#888'}}>{r.dynasty}/{r.genre}</span>
-                <div style={{fontSize:11,color:'#666'}}>{r.mood_tags?.join(' · ')}</div>
+              <div key={r.poetry_id} style={{padding:'4px 0',borderBottom:'1px solid #f0eee8',fontSize:12}}>
+                <input type="checkbox" checked={compareList.some(c=>c.poetry_id===r.poetry_id)} onChange={()=>{
+                  setCompareList(prev => prev.some(c=>c.poetry_id===r.poetry_id) ? prev.filter(c=>c.poetry_id!==r.poetry_id) : [...prev, r])
+                }} style={{marginRight:4}} />
+                <span style={{cursor:'pointer'}} onClick={()=>alert(r.content)}>
+                  <b>{r.title}</b> — {r.author}
+                  <span style={{float:'right',fontSize:10,color:'#888'}}>{r.dynasty}/{r.genre}</span>
+                </span>
+                <div style={{fontSize:11,color:'#666',marginLeft:18}}>{r.mood_tags?.join(' · ') || r.imagery_items?.slice(0,3).join(',')}</div>
               </div>
             )) : <div style={{fontSize:12,color:'#aaa'}}>无结果</div>}
           </div>
@@ -211,7 +242,7 @@ export default function App() {
 
         {/* 诗人选择（多选） */}
         <div style={S.panel}>
-          <div style={S.ptitle}>选择诗人（最多4位，点击切换）</div>
+          <div style={S.ptitle}>选择诗人（最多10位，点击切换）</div>
           <div>{poets.map(p => (
             <button key={p.poet_id} style={selectedIds.includes(p.poet_id) ? {
               ...S.btnA, background: POET_COLORS[selectedIds.indexOf(p.poet_id) % POET_COLORS.length],
@@ -346,8 +377,32 @@ export default function App() {
       <div style={S.main}>
         <PoetryMap poets={trajectoryPoets} heatmap={showHeatmap?heatmap:[]}
           encounterLines={encounterLines} fenceResults={fenceResults}
-          fenceMode={fenceMode} onFenceClick={handleFenceClick} />
+          fenceMode={fenceMode} onFenceClick={handleFenceClick}
+          searchResults={showSearch ? searchResults.map(r=>({title:r.title,author:r.author})) : []} />
       </div>
+
+      {/* 多诗对比浮层 */}
+      {showCompare && compareList.length >= 2 && (
+        <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.4)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setShowCompare(false)}>
+          <div style={{background:'#fff',borderRadius:8,maxWidth:'80%',maxHeight:'80%',overflow:'auto',padding:20,boxShadow:'0 4px 20px rgba(0,0,0,.2)'}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:12}}>
+              <h2 style={{fontSize:16,fontWeight:600,margin:0}}>诗词对比</h2>
+              <button onClick={()=>setShowCompare(false)} style={{...S.animBtn}}>关闭</button>
+            </div>
+            <div style={{display:'flex',gap:16,flexWrap:'wrap'}}>
+              {compareList.map(r => (
+                <div key={r.poetry_id} style={{flex:'1 1 300px',border:'1px solid #e0dcd4',borderRadius:8,padding:12,background:'#fafaf8'}}>
+                  <div style={{fontSize:14,fontWeight:600}}>{r.title}</div>
+                  <div style={{fontSize:12,color:'#888',marginBottom:8}}>{r.author} · {r.dynasty} · {r.genre}</div>
+                  <div style={{fontSize:13,lineHeight:1.8,whiteSpace:'pre-wrap',fontFamily:'serif'}}>{r.content}</div>
+                  {r.mood_tags?.length > 0 && <div style={{marginTop:8,fontSize:11,color:'#888'}}>意境: {r.mood_tags.join(' · ')}</div>}
+                  {r.imagery_items?.length > 0 && <div style={{fontSize:11,color:'#888'}}>意象: {r.imagery_items.slice(0,5).join(' · ')}</div>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

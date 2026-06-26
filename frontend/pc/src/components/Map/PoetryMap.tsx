@@ -14,7 +14,7 @@ L.Marker.prototype.options.icon = L.icon({ iconUrl: icon, shadowUrl: iconShadow,
 import type { PlaceName, TrajectoryEvent, HeatmapPoint } from '../../types'
 import { EVENT_COLORS } from '../../types'
 
-export const POET_COLORS = ['#2196F3', '#F44336', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4', '#FF5722', '#795548']
+export const POET_COLORS = ['#2196F3', '#F44336', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4', '#FF5722', '#795548', '#607D8B', '#E91E63']
 
 // 国内网络环境可用的瓦片地图源
 // OSM/CartoDB/OpenTopoMap 在部分网络受限环境下不可用，已替换为高德地图
@@ -179,6 +179,99 @@ function FenceResults({ results, lat, lon }: { results: PlaceName[]; lat: number
   return null
 }
 
+// ─── 搜索结果点位 ─────────────────────────
+function SearchResultMarkers({ results }: { results: Array<{ title: string; author: string }> }) {
+  const map = useMap()
+  useEffect(() => {
+    if (!results.length) return
+    const g = L.layerGroup()
+    results.slice(0, 50).forEach((r, i) => {
+      // 在随机偏移位置生成标记（搜索结果无坐标，用可视化展示）
+      // 实际项目应使用真实坐标，这里用地图中心周围随机偏移
+      const center = map.getCenter()
+      const offset = 0.5
+      const lat = center.lat + (Math.random() - 0.5) * offset * 2
+      const lng = center.lng + (Math.random() - 0.5) * offset * 2
+      const hue = (i * 37) % 360
+      L.circleMarker([lat, lng], {
+        radius: 4 + (i % 3) * 2, fillColor: `hsl(${hue}, 70%, 55%)`,
+        color: '#fff', weight: 1, fillOpacity: 0.8,
+      }).bindPopup(`<b>${r.title}</b> — ${r.author}`).addTo(g)
+    })
+    g.addTo(map)
+    return () => { map.removeLayer(g) }
+  }, [map, results])
+  return null
+}
+
+// ─── 距离测量工具 ─────────────────────────
+// 点击起点→点击终点→显示距离（km）
+function DistanceMeasure() {
+  const map = useMap()
+  useEffect(() => {
+    const MeasureControl = L.Control.extend({
+      onAdd: () => {
+        const btn = L.DomUtil.create('button')
+        btn.innerHTML = '📏'
+        btn.title = '距离测量（点击起点→终点）'
+        btn.style.cssText = 'width:34px;height:34px;background:#fff;border:2px solid rgba(0,0,0,0.2);border-radius:4px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center'
+        btn.onclick = () => startMeasure(map)
+        return btn
+      },
+    })
+    const ctrl = new MeasureControl({ position: 'topleft' })
+    ctrl.addTo(map)
+    return () => { map.removeControl(ctrl) }
+  }, [map])
+  return null
+}
+
+function startMeasure(map: L.Map) {
+  const points: L.LatLng[] = []
+  const markers: L.Marker[] = []
+  const lines: L.Polyline[] = []
+  let active = true
+
+  const clickHandler = (e: L.LeafletMouseEvent) => {
+    if (!active) return
+    points.push(e.latlng)
+    const m = L.marker(e.latlng).addTo(map)
+    markers.push(m)
+    m.bindPopup(`点 ${points.length}<br/>${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`)
+    if (points.length >= 2) {
+      const prev = points[points.length - 2]
+      const d = prev.distanceTo(e.latlng) / 1000
+      const line = L.polyline([prev, e.latlng], { color: '#E91E63', weight: 2, dashArray: '6, 4' }).addTo(map)
+      lines.push(line)
+      L.marker([(prev.lat + e.latlng.lat) / 2, (prev.lng + e.latlng.lng) / 2], {
+        icon: L.divIcon({ className: '', html: `<div style="background:#fff;padding:2px 6px;border-radius:4px;font-size:11px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.2)">${d.toFixed(1)} km</div>` }),
+      }).addTo(map)
+    }
+  }
+  const escHandler = (e: L.LeafletKeyboardEvent) => {
+    if (e.originalEvent.key === 'Escape') {
+      active = false
+      markers.forEach(m => map.removeLayer(m))
+      lines.forEach(l => map.removeLayer(l))
+      map.off('click', clickHandler)
+      document.removeEventListener('keydown', escHandler as any)
+    }
+  }
+
+  map.on('click', clickHandler)
+  document.addEventListener('keydown', escHandler as any)
+  const tip = L.control({ position: 'bottomcenter' })
+  tip.onAdd = () => {
+    const d = L.DomUtil.create('div')
+    d.id = 'measure-tip'
+    d.innerHTML = '<div style="background:#fff;padding:6px 12px;border-radius:6px;box-shadow:0 1px 5px rgba(0,0,0,.2);font-size:12px">📏 点击地图设起点（ESC退出）</div>'
+    return d
+  }
+  tip.addTo(map)
+  const clearTip = () => { map.removeControl(tip); document.removeEventListener('keydown', escHandler as any) }
+  setTimeout(() => { if (active) clearTip() }, 5000)
+}
+
 // ─── 图例 ─────────────────────────────────
 function Legend() {
   const map = useMap()
@@ -212,6 +305,7 @@ interface PoetryMapProps {
   places?: PlaceName[]
   poets?: PoetTrajectoryData[]
   heatmap?: HeatmapPoint[]
+  searchResults?: Array<{ title: string; author: string }>
   encounterLines?: Array<{ from: [number,number]; to: [number,number]; probability: number }>
   fenceResults?: { lat: number; lon: number; places: PlaceName[] }
   fenceMode?: boolean
@@ -220,6 +314,7 @@ interface PoetryMapProps {
 
 export default function PoetryMap({
   places = [], poets = [], heatmap = [], encounterLines = [],
+  searchResults = [],
   fenceResults, fenceMode = false, onFenceClick,
 }: PoetryMapProps) {
   return (
@@ -244,6 +339,12 @@ export default function PoetryMap({
         </LayersControl>
         <FenceClickHandler fenceMode={fenceMode} onFenceClick={onFenceClick} />
         {fenceResults && <FenceResults results={fenceResults.places} lat={fenceResults.lat} lon={fenceResults.lon} />}
+        {searchResults.length > 0 && (
+          <LayersControl.Overlay name="检索结果" checked>
+            <SearchResultMarkers results={searchResults} />
+          </LayersControl.Overlay>
+        )}
+        <DistanceMeasure />
         <Legend />
       </MapContainer>
     </div>
