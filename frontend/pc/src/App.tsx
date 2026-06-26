@@ -397,6 +397,25 @@ export default function App() {
           </div>
         )}
 
+        {/* 数据导出 */}
+        <div style={S.panel}>
+          <div style={S.ptitle}>数据导出 (CSV)</div>
+          <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>
+            {[
+              {label:'地名', url:'/api/v1/export/places'},
+              {label:'诗人', url:'/api/v1/export/poets'},
+              {label:'轨迹', url:'/api/v1/export/trajectories'},
+              {label:'诗词', url:'/api/v1/export/poetry'},
+              {label:'交游', url:'/api/v1/export/encounters'},
+              {label:'统计', url:'/api/v1/export/stats'},
+            ].map(btn => (
+              <a key={btn.label} href={btn.url} target="_blank" rel="noopener"
+                style={{...S.animBtn, textDecoration:'none', color:'#333', fontSize:11}}>{btn.label}</a>
+            ))}
+          </div>
+          <div style={{fontSize:10,color:'#aaa',marginTop:4}}>UTF-8 CSV，Excel 打开建议"数据→自文本/CSV"</div>
+        </div>
+
         {/* 统计 */}
         <div style={{...S.panel, flex:1, borderBottom:'none', overflow:'auto'}}>
           <div style={S.ptitle}>轨迹统计</div>

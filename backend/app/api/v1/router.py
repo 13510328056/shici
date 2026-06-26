@@ -4,7 +4,7 @@ API v1 路由聚合
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import places, poets, search, ai
+from app.api.v1.endpoints import places, poets, search, ai, export
 
 api_router = APIRouter()
 
@@ -19,3 +19,6 @@ api_router.include_router(search.router, prefix="/search", tags=["多维检索"]
 
 # AI 服务（预留）
 api_router.include_router(ai.router, prefix="/ai", tags=["AI 辅助"])
+
+# 数据导出服务
+api_router.include_router(export.router, prefix="/export", tags=["数据导出"])
