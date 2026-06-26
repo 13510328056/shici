@@ -280,7 +280,20 @@ export default function App() {
           <div style={S.ptitle}>图层控制</div>
           <div style={S.layerItem}><input type="checkbox" defaultChecked readOnly /><span>地名</span></div>
           <div style={S.layerItem}><input type="checkbox" checked={selectedIds.length>0} readOnly /><span>轨迹 ({selectedIds.length}人)</span></div>
-          <div style={S.layerItem}><input type="checkbox" checked={showHeatmap} onChange={toggleHeatmap} /><span>热力</span></div>
+          <div style={S.layerItem}>
+            <input type="checkbox" checked={showHeatmap} onChange={toggleHeatmap} /><span>热力</span>
+            {showHeatmap && (
+              <select id="heat-filter" style={{fontSize:10,padding:'1px 4px',borderRadius:4,border:'1px solid #d0cdc4',marginLeft:4}}
+                onChange={async(e)=>{
+                  const v=e.target.value;
+                  try{const d=await getHeatmap(v||undefined);setHeatmap(d.points||[])}catch{}
+                }}>
+                <option value="">全部</option><option value="唐">唐代</option><option value="宋">宋代</option>
+                <option value="边塞">边塞</option><option value="田园">田园</option>
+                <option value="怀古">怀古</option><option value="送别">送别</option>
+              </select>
+            )}
+          </div>
           <div style={S.layerItem}><input type="checkbox" checked={encounterLines.length>0} readOnly /><span>交游 ({encounterLines.length}条)</span></div>
           <div style={S.layerItem}>
             <button style={{...S.animBtn, background:fenceMode?'#e8e0d4':'#fff', margin:0, fontSize:11}}
@@ -293,6 +306,7 @@ export default function App() {
         <div style={S.panel}>
           <div style={S.ptitle}>AI 创作辅助</div>
 
+          {/* 对仗推荐 */}
           <div style={{fontSize:11,color:'#888',marginBottom:4}}>对仗推荐</div>
           <div style={{display:'flex',gap:4,marginBottom:6}}>
             <input type="text" id="ai-input" placeholder="输入字词"
@@ -307,8 +321,9 @@ export default function App() {
           </div>
           <div id="ai-results" style={{minHeight:20,marginBottom:6}}></div>
 
-          <div style={{fontSize:11,color:'#888',marginBottom:4,marginTop:6}}>格律校验</div>
-          <textarea id="rhythm-input" placeholder="输入诗句，如：白日依山尽，黄河入海流。" rows={3}
+          {/* 格律校验 */}
+          <div style={{fontSize:11,color:'#888',marginBottom:4}}>格律校验</div>
+          <textarea id="rhythm-input" placeholder="输入诗句" rows={2}
             style={{width:'100%',padding:'4px 6px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif',resize:'vertical'}} />
           <div style={{display:'flex',gap:4,marginTop:4}}>
             <select id="rhythm-genre" style={{padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
@@ -326,7 +341,33 @@ export default function App() {
               else{el.innerHTML='<div style="font-size:12px;color:#E91E63">发现 '+d.errors.length+' 处问题：</div>'+d.errors.map((e:any)=>'<div style="font-size:11px;color:#666;padding:2px 0"><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fdd;margin-right:4px;font-size:10px">'+e.type+'</span>'+String(e.message||'').slice(0,50)+'</div>').join('')}
             }} style={S.animBtn}>校验</button>
           </div>
-          <div id="rhythm-results" style={{minHeight:20,marginTop:4}}></div>
+          <div id="rhythm-results" style={{minHeight:20,marginTop:4,marginBottom:6}}></div>
+
+          {/* 意境匹配 */}
+          <div style={{fontSize:11,color:'#888',marginBottom:4}}>意境匹配创作</div>
+          <div style={{display:'flex',gap:4,flexWrap:'wrap',marginBottom:4}}>
+            <select id="mood-select" style={{flex:1,minWidth:80,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
+              {['山水','送别','思乡','边塞','田园','怀古','登临','闺怨'].map(m => <option key={m} value={m} selected={m==='山水'}>{m}</option>)}
+            </select>
+            <select id="mood-season" style={{width:60,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
+              <option value="">四季</option><option value="春">春</option><option value="夏">夏</option><option value="秋">秋</option><option value="冬">冬</option>
+            </select>
+            <select id="mood-level" style={{width:60,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
+              <option value="入门">入门</option><option value="进阶">进阶</option>
+            </select>
+          </div>
+          <button onClick={async()=>{
+            const mood=(document.getElementById('mood-select') as HTMLSelectElement).value;
+            const season=(document.getElementById('mood-season') as HTMLSelectElement).value;
+            const level=(document.getElementById('mood-level') as HTMLSelectElement).value;
+            const d=await fetch('/api/v1/ai/mood/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mood_tag:mood,season,level})}).then(r=>r.json());
+            const el=document.getElementById('mood-results');
+            if(!el)return;
+            el.innerHTML='<div style="font-size:12px;font-weight:600;margin-bottom:4px">【'+d.mood+'】'+d.description+'</div>'+
+              '<div style="font-size:11px;color:#666;margin-bottom:4px">推荐意象：'+d.recommended_imagery.join('、')+'</div>'+
+              (d.framework?.tips?.length ? '<div style="font-size:11px;color:#555">创作提示：<ul style="margin:2px 0;padding-left:16px">'+d.framework.tips.map((t:string)=>'<li>'+t+'</li>').join('')+'</ul></div>' : '');
+          }} style={{...S.animBtn,width:'100%',marginTop:2}}>生成创作框架</button>
+          <div id="mood-results" style={{minHeight:20,marginTop:6,fontSize:12,lineHeight:1.6}}></div>
         </div>
 
         {/* 围栏信息 */}

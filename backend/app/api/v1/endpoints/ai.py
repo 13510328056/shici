@@ -10,8 +10,28 @@ from app.schemas.ai import (
     RhythmCheckRequest, RhythmCheckResponse,
 )
 from app.services.antithesis import AntithesisService
+from app.services.mood_matching import MoodMatchingService
 
 router = APIRouter()
+
+@router.post("/mood/generate")
+async def generate_mood(
+    body: dict = Body(...),
+):
+    """
+    意境匹配创作 — 需求 4.4.2
+    选意境→自动生成创作框架+推荐意象+写作指引
+    """
+    service = MoodMatchingService()
+    result = await service.generate(
+        mood_tag=body.get('mood_tag', '山水'),
+        season=body.get('season'),
+        location=body.get('location'),
+        level=body.get('level', '入门'),
+        genre=body.get('genre', '七绝'),
+    )
+    return result
+
 
 
 @router.post("/antithesis/recommend")
