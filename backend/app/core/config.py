@@ -28,8 +28,7 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ORIGINS: list[str] = [
-        "http://localhost:3000",   # PC Web
-        "http://localhost:5173",   # Vite dev
+        "http://localhost:15173",  # PC Web (Vite dev)
     ]
 
     # 时空围栏 — 需求 4.1.4 固化参数
