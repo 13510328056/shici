@@ -11,6 +11,7 @@ from app.schemas.ai import (
 )
 from app.services.antithesis import AntithesisService
 from app.services.mood_matching import MoodMatchingService
+from app.services.rewrite import RewriteService
 
 router = APIRouter()
 
@@ -50,6 +51,34 @@ async def recommend_antithesis(
         mood_tag=body.mood_tag,
     )
     return result
+
+
+@router.post("/rewrite/style")
+async def rewrite_style(body: dict = Body(...)):
+    """同风格仿写 — 需求4.4.6"""
+    s = RewriteService()
+    return await s.rewrite_style(body.get('content',''), body.get('style','唐诗雄浑'), body.get('genre','七绝'))
+
+
+@router.post("/rewrite/expand")
+async def rewrite_expand(body: dict = Body(...)):
+    """短句扩写 — 需求4.4.6"""
+    s = RewriteService()
+    return await s.expand_lines(body.get('input',''), body.get('genre','七绝'))
+
+
+@router.post("/rewrite/convert")
+async def rewrite_convert(body: dict = Body(...)):
+    """体裁互转 — 需求4.4.6"""
+    s = RewriteService()
+    return await s.convert_genre(body.get('content',''), body.get('from_genre','七绝'), body.get('to_genre','七律'))
+
+
+@router.post("/rewrite/perspective")
+async def rewrite_perspective(body: dict = Body(...)):
+    """视角改写 — 需求4.4.6"""
+    s = RewriteService()
+    return await s.change_perspective(body.get('content',''), body.get('perspective','隐士'))
 
 
 @router.post("/rhythm/check")

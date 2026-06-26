@@ -351,6 +351,42 @@ export default function App() {
           </div>
           <div id="rhythm-results" style={{minHeight:20,marginTop:4,marginBottom:6}}></div>
 
+          {/* 仿写改写 */}
+          <div style={{fontSize:11,color:'#888',marginBottom:4}}>仿写改写</div>
+          <div style={{display:'flex',gap:4,flexWrap:'wrap',marginBottom:4}}>
+            <select id="rw-mode" style={{flex:1,minWidth:60,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
+              <option value="style">风格仿写</option><option value="expand">短句扩写</option>
+              <option value="convert">体裁互转</option><option value="perspective">视角改写</option>
+            </select>
+            <select id="rw-style" style={{width:80,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
+              <option value="唐诗雄浑">唐诗雄浑</option><option value="宋词婉约">宋词婉约</option>
+              <option value="边塞豪放">边塞豪放</option>
+            </select>
+            <select id="rw-genre" style={{width:60,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
+              <option value="七绝">七绝</option><option value="七律">七律</option>
+              <option value="五绝" selected>五绝</option>
+            </select>
+          </div>
+          <textarea id="rw-input" placeholder="输入诗句或关键词" rows={2}
+            style={{width:'100%',padding:'4px 6px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif',resize:'vertical'}} />
+          <button onClick={async()=>{
+            const mode=(document.getElementById('rw-mode') as HTMLSelectElement).value;
+            const style=(document.getElementById('rw-style') as HTMLSelectElement).value;
+            const genre=(document.getElementById('rw-genre') as HTMLSelectElement).value;
+            const input=(document.getElementById('rw-input') as HTMLTextAreaElement).value;
+            let url='', body={};
+            if(mode==='style'){url='/api/v1/ai/rewrite/style';body={content:input,style,genre}}
+            else if(mode==='expand'){url='/api/v1/ai/rewrite/expand';body={input,genre}}
+            else if(mode==='convert'){url='/api/v1/ai/rewrite/convert';body={content:input,from_genre:genre,to_genre:genre==='五绝'?'七绝':'五绝'}}
+            else{url='/api/v1/ai/rewrite/perspective';body={content:input,perspective:style==='唐诗雄浑'?'隐士':'游子'}}
+            try{
+              const d=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+              const el=document.getElementById('rw-results');
+              if(el) el.innerHTML='<div style="font-size:12px;line-height:1.8;color:#333;padding:6px;background:#f5f0ea;border-radius:4px">'+(d.result||d.error||'无结果')+'</div>'+(d.note?'<div style="font-size:10px;color:#888;margin-top:2px">'+d.note+'</div>':'');
+            }catch(e){}
+          }} style={{...S.animBtn,width:'100%',marginTop:4}}>生成</button>
+          <div id="rw-results" style={{minHeight:20,marginTop:4,marginBottom:4}}></div>
+
           {/* 意境匹配 */}
           <div style={{fontSize:11,color:'#888',marginBottom:4}}>意境匹配创作</div>
           <div style={{display:'flex',gap:4,flexWrap:'wrap',marginBottom:4}}>
