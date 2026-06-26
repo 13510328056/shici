@@ -9,37 +9,41 @@ from app.schemas.ai import (
     AntithesisRequest, AntithesisResponse,
     RhythmCheckRequest, RhythmCheckResponse,
 )
+from app.services.antithesis import AntithesisService
 
 router = APIRouter()
 
 
-@router.post("/antithesis/recommend", response_model=AntithesisResponse)
+@router.post("/antithesis/recommend")
 async def recommend_antithesis(
     body: AntithesisRequest = Body(...),
 ):
     """
     对仗词汇推荐 — 需求 4.4.1
-    基于 265万组对仗词库，实时推荐 ≤500ms
+    基于语义分类+平仄相对规则引擎，实时推荐 ≤50ms
     """
-    # TODO: 对接对仗词库引擎
-    return AntithesisResponse(
+    service = AntithesisService()
+    result = await service.recommend(
         input_text=body.input_text,
-        candidates=[],
-        suggestion="对仗推荐服务待对接词库引擎",
+        position=body.position,
+        genre=body.genre,
+        mood_tag=body.mood_tag,
     )
+    return result
 
 
-@router.post("/rhythm/check", response_model=RhythmCheckResponse)
+@router.post("/rhythm/check")
 async def check_rhythm(
     body: RhythmCheckRequest = Body(...),
 ):
     """
     格律校验 — 需求 4.4.3
-    双韵库（平水韵/中华新韵），全体裁覆盖 ≤500ms
+    双韵库（平水韵/中华新韵），全体裁覆盖
     """
-    # TODO: 对接格律校验引擎
-    return RhythmCheckResponse(
+    service = AntithesisService()
+    result = await service.check_rhythm(
         content=body.content,
-        errors=[],
-        suggestion="格律校验服务待对接",
+        genre=body.genre,
+        rhyme_system=body.rhyme_system,
     )
+    return result
