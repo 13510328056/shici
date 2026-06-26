@@ -538,32 +538,62 @@ export default function App() {
           searchResults={showSearch ? searchResults.map(r=>({title:r.title,author:r.author})) : []} />
       </div>
 
-      {/* 诗人作品浮层 */}
+      {/* 诗人作品浮层 — 古风卷轴 */}
       {viewingPoet && (() => {
         const poems = poemsMap.get(viewingPoet) || []
         const p = poets.find(pn => pn.poet_id === viewingPoet)
         return (
-          <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}}
+          <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(44,44,44,0.6)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}}
             onClick={()=>setViewingPoet(null)}>
-            <div style={{background:'#FFFEF9',borderRadius:8,width:'70%',maxWidth:700,height:'80%',display:'flex',flexDirection:'column',boxShadow:'0 8px 40px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'16px 20px',borderBottom:'2px solid #E5DDD0'}}>
-                <span style={{fontSize:16,fontWeight:600,color:'#5B4A3E'}}>{p?.name || ''} 的作品 ({poems.length}首)</span>
-                <button onClick={()=>setViewingPoet(null)} style={{...ST.animBtn,padding:'4px 12px'}}>关闭</button>
+            <div style={{background:'#F8F4EE',border:'1px solid #C4B5A0',borderRadius:4,width:'72%',maxWidth:720,height:'82%',display:'flex',flexDirection:'column',boxShadow:'0 12px 50px rgba(0,0,0,.4)',position:'relative'}} onClick={e=>e.stopPropagation()}>
+              {/* 卷轴顶轴 */}
+              <div style={{height:4,background:'linear-gradient(90deg,#8B7355,#C4B5A0,#8B7355)',borderRadius:'2px 2px 0 0'}} />
+              {/* 标题区 */}
+              <div style={{padding:'20px 28px 12px',borderBottom:'1px solid #D4C5A9',textAlign:'center',position:'relative'}}>
+                <div style={{fontSize:18,fontWeight:600,color:'#5B4A3E',letterSpacing:2,fontFamily:'serif'}}>{p?.name || ''}<span style={{fontSize:14,color:'#8B7355',marginLeft:8}}>诗文集</span></div>
+                <div style={{fontSize:11,color:'#999',marginTop:4}}>共收录诗词 {poems.length} 首</div>
+                <button onClick={()=>setViewingPoet(null)} style={{position:'absolute',top:20,right:20,padding:'4px 12px',border:'1px solid #C4B5A0',background:'#FFFEF9',borderRadius:3,fontSize:11,cursor:'pointer',color:'#5B4A3E',fontFamily:'serif'}}>闭卷 ✕</button>
               </div>
-              <div style={{flex:1,overflow:'auto',padding:'12px 20px'}}>
-                {poems.map(poem => (
-                  <div key={poem.title} style={{padding:'10px 12px',margin:'4px 0',border:'1px solid #E5DDD0',borderRadius:6,cursor:'pointer'}}
-                    onClick={() => alert(poem.content)}>
-                    <div style={{fontSize:13,fontWeight:600,color:'#5B4A3E'}}>{poem.title}</div>
-                    <div style={{fontSize:11,color:'#999',marginTop:2}}>{poem.genre}{poem.mood_tags?.length ? ' · ' + poem.mood_tags.join(' · ') : ''}</div>
-                    <div style={{fontSize:12,color:'#666',lineHeight:1.6,marginTop:4,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{poem.content.slice(0,60)}...</div>
+              {/* 诗作列表 — 仿古书简 */}
+              <div style={{flex:1,overflow:'auto',padding:'12px 24px'}}>
+                {poems.map((poem, idx) => (
+                  <div key={poem.title} style={{padding:'10px 14px',margin:'6px 0',border:'1px solid #E5DDD0',borderRadius:3,cursor:'pointer',background:'#FFFEF9',transition:'all 0.2s'}}
+                    onClick={() => {
+                      const el = document.getElementById('poem-view');
+                      if(el) el.innerHTML='<div style=\"font-size:16px;font-weight:600;color:#5B4A3E;margin-bottom:8px;letter-spacing:1px\">'+poem.title+'</div><div style=\"font-size:13px;color:#888;margin-bottom:10px\">'+poem.genre+(poem.mood_tags?.length?' · '+poem.mood_tags.join(' · '):'')+'</div><div style=\"font-size:14px;line-height:2.2;white-space:pre-wrap;font-family:serif;color:#2c2c2c\">'+poem.content+'</div>';
+                      const ov=document.getElementById('poem-overlay');if(ov)ov.style.display='flex';
+                    }}>
+                    <div style={{display:'flex',alignItems:'baseline',gap:8}}>
+                      <span style={{fontSize:11,color:'#C4B5A0',fontWeight:600,minWidth:24}}>{String(idx+1).padStart(2,'0')}</span>
+                      <span style={{fontSize:14,fontWeight:600,color:'#5B4A3E',fontFamily:'serif'}}>{poem.title}</span>
+                      <span style={{fontSize:11,color:'#B8A88C',marginLeft:'auto'}}>{poem.genre}</span>
+                    </div>
+                    <div style={{fontSize:11,color:'#999',marginLeft:32,marginTop:2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{poem.content.slice(0,50)}...</div>
                   </div>
                 ))}
               </div>
+              {/* 卷轴底轴 */}
+              <div style={{height:4,background:'linear-gradient(90deg,#8B7355,#C4B5A0,#8B7355)',borderRadius:'0 0 2px 2px'}} />
             </div>
           </div>
         )
       })()}
+
+      {/* 诗词阅读浮层 — 古风书卷 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(44,44,44,0.6)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#F8F4EE',border:'1px solid #C4B5A0',borderRadius:4,maxWidth:'80%',maxHeight:'80%',overflow:'auto',padding:0,boxShadow:'0 12px 50px rgba(0,0,0,.4)',width:600}} onClick={e=>e.stopPropagation()}>
+          <div style={{height:4,background:'linear-gradient(90deg,#8B7355,#C4B5A0,#8B7355)'}} />
+          <div style={{padding:'28px 32px 20px'}}>
+            <div id="poem-view"></div>
+          </div>
+          <div style={{textAlign:'center',padding:'0 32px 20px'}}>
+            <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+              style={{padding:'6px 24px',border:'1px solid #C4B5A0',background:'#FFFEF9',borderRadius:3,fontSize:12,cursor:'pointer',color:'#5B4A3E',fontFamily:'serif',letterSpacing:1}}>合卷</button>
+          </div>
+          <div style={{height:4,background:'linear-gradient(90deg,#8B7355,#C4B5A0,#8B7355)'}} />
+        </div>
+      </div>
 
       {/* 多诗对比浮层 */}
       {showCompare && compareList.length >= 2 && (
@@ -587,15 +617,6 @@ export default function App() {
           </div>
         </div>
       )}
-      {/* 诗词阅读浮层 */}
-      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
-        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
-        <div style={{background:'#FFFEF9',borderRadius:8,maxWidth:'80%',maxHeight:'80%',overflow:'auto',padding:24,boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
-          <div id="poem-view"></div>
-          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
-            style={{...ST.animBtn,marginTop:12}}>关闭</button>
-        </div>
-      </div>
 
     </div>
   )
