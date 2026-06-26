@@ -8,9 +8,7 @@ import { getHeatmap, fenceQuery } from './api'
 const S = {
   container: { display:'flex', width:'100vw', height:'100vh', fontFamily:'serif', color:'#2c2c2c', overflow:'hidden' } as const,
   sidebar: { width:340, minWidth:340, height:'100vh', borderRight:'1px solid #e0e0e0', display:'flex', flexDirection:'column', background:'#fafaf8', position:'relative' } as const,
-  header: { padding:'16px 16px 12px', borderBottom:'1px solid #e8e4de', background:'#fff' } as const,
-  h1: { fontSize:18, fontWeight:700, color:'#3a3a3a', margin:0 } as const,
-  hsub: { fontSize:11, color:'#888', marginTop:2 } as const,
+  header: { padding:'14px 16px 12px', borderBottom:'1px solid #e8e4de', background:'#fff' } as const,
   panel: { padding:'10px 16px', borderBottom:'1px solid #e8e4de' } as const,
   ptitle: { fontSize:12, fontWeight:600, marginBottom:6, color:'#555' } as const,
   btn: { display:'inline-block', padding:'3px 10px', margin:'3px', borderRadius:12, border:'1px solid #d0cdc4', background:'#fff', fontSize:12, cursor:'pointer' } as const,
@@ -193,8 +191,13 @@ export default function App() {
     <div style={S.container}>
       <div style={S.sidebar}>
         <div style={S.header}>
-          <h1 style={S.h1}>诗词时空</h1>
-          <div style={S.hsub}>中国古诗词文化互动平台 | 学术工具端</div>
+          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
+            <div style={{width:32,height:32,background:'#5B4A3E',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',color:'#F5F0EA',fontSize:16,fontWeight:'bold',fontFamily:'serif'}}>诗</div>
+            <div>
+              <div style={{fontSize:16,fontWeight:700,color:'#3a3a3a',lineHeight:1.2}}>古诗词文化互动平台</div>
+              <div style={{fontSize:10,color:'#999',letterSpacing:1}}>PoetrySpace · 学术工具端</div>
+            </div>
+          </div>
           <div style={{display:'flex',gap:4,marginTop:8}}>
             <input type="text" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
               onKeyDown={e=>e.key==='Enter'&&doSearch(searchQuery)}
@@ -475,6 +478,7 @@ export default function App() {
 
         <div style={S.statusBar}>
           <span>诗人 {selectedIds.length}位 · 轨迹 {trajectoryPoets.reduce((s,p)=>s+p.events.length,0)}条 · 围栏 {fenceResults?.places.length||0}点</span>
+          <span style={{fontSize:10,color:'#b8b0a8',marginLeft:'auto'}}>v0.2</span>
         </div>
       </div>
 
