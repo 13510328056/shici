@@ -43,7 +43,6 @@ export default function App() {
 
   const [poets, setPoets] = useState<Array<{poet_id:string;name:string;dynasty:string}>>([])
   const [poetSearch, setPoetSearch] = useState('')
-  const [showPoetList, setShowPoetList] = useState(false)
   // 多诗人选择（最多10位）
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [poetsData, setPoetsData] = useState<Map<string, TrajectoryEvent[]>>(new Map())
@@ -136,26 +135,6 @@ export default function App() {
     } catch {}
   }, [])
 
-  const handlePoemClick = useCallback(async (poem: any) => {
-    const poet = poets.find(p => p.name === poem.author)
-    if (!poet) return
-    setSelectedIds(prev => {
-      if (prev.includes(poet.poet_id)) return prev
-      fetch(\`/api/v1/poets/\${poet.poet_id}/trajectory\`).then(r=>r.json()).then(d => {
-        setPoetsData(m => { const n = new Map(m); n.set(poet.poet_id, d.events || []); return n })
-      })
-      fetch(\`/api/v1/poets/\${poet.poet_id}/poetry\`).then(r=>r.json()).then(d => {
-        if (d?.poems) setPoemsMap(m => { const n = new Map(m); n.set(poet.poet_id, d.poems); return n })
-      })
-      return [...prev, poet.poet_id]
-    })
-    setViewingPoet(poet.poet_id)
-    setTimeout(() => {
-      const el = document.getElementById('poem-view')
-      if(el) el.innerHTML='<div style=\"font-size:14px;font-weight:600;margin-bottom:8px;color:#C23B22\">'+poem.title+'</div><div style=\"font-size:13px;line-height:2;white-space:pre-wrap;font-family:serif\">'+poem.content+'</div>'+(poem.mood_tags?.length?'<div style=\"font-size:11px;color:#888;margin-top:8px\">意境: '+poem.mood_tags.join(' \u00b7 ')+'</div>':'')
-    }, 100)
-  }, [poets])
-
   const toggleHeatmap = useCallback(async () => {
     setShowHeatmap(v => !v)
     if (!showHeatmap) { try { const d=await getHeatmap(); setHeatmap(d.points||[]) } catch {} }
@@ -210,6 +189,26 @@ export default function App() {
     calc()
   }, [selectedIds, poetsData])
 
+  const handlePoemClick = useCallback(async (poem: any) => {
+    const poet = poets.find(p => p.name === poem.author)
+    if (!poet) return
+    setSelectedIds(prev => {
+      if (prev.includes(poet.poet_id)) return prev
+      fetch('/api/v1/poets/' + poet.poet_id + '/trajectory').then(r=>r.json()).then(d => {
+        setPoetsData(m => { const n = new Map(m); n.set(poet.poet_id, d.events || []); return n })
+      })
+      fetch('/api/v1/poets/' + poet.poet_id + '/poetry').then(r=>r.json()).then(d => {
+        if (d?.poems) setPoemsMap(m => { const n = new Map(m); n.set(poet.poet_id, d.poems); return n })
+      })
+      return [...prev, poet.poet_id]
+    })
+    setViewingPoet(poet.poet_id)
+    setTimeout(() => {
+      const el = document.getElementById('poem-view')
+      if(el) el.innerHTML='<div style="font-size:14px;font-weight:600;margin-bottom:8px;color:#C23B22">'+poem.title+'</div><div style="font-size:13px;line-height:2;white-space:pre-wrap;font-family:serif">'+poem.content+'</div>'+(poem.mood_tags?.length?'<div style="font-size:11px;color:#888;margin-top:8px">意境: '+poem.mood_tags.join(' · ')+'</div>':'')
+    }, 100)
+  }, [poets])
+
   const poetName = (id: string) => poets.find(p => p.poet_id === id)?.name || id
 
   return (
@@ -224,27 +223,30 @@ export default function App() {
             </div>
           </div>
           <div style={{display:'flex',gap:4,marginTop:8}}>
-            <input type="text" value={searchQuery} onChange={async e=>{
-              setSearchQuery(e.target.value);
-              if(e.target.value.trim().length>=1){
-                try{const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(e.target.value));const d=await r.json();setUnifiedResults(d);setShowUnified(true)}catch{}
-              } else {setShowUnified(false)}
-            }}
-              onFocus={async e=>{if(searchQuery.trim()){try{const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(searchQuery));const d=await r.json();setUnifiedResults(d);setShowUnified(true)}catch{}}}}
+            <input type="text" value={searchQuery}
+              onChange={async e=>{
+                setSearchQuery(e.target.value);
+                const v=e.target.value.trim();
+                if(v.length>=1){
+                  try{const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(v));const d=await r.json();setUnifiedResults(d);setShowUnified(true)}catch(e){}
+                } else setShowUnified(false)
+              }}
+              onFocus={async ()=>{if(searchQuery.trim().length>=1){try{const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(searchQuery.trim()));const d=await r.json();setUnifiedResults(d);setShowUnified(true)}catch(e){}}}}
               placeholder="搜索诗人或诗词..."
               style={{flex:1,padding:'4px 8px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif'}} />
-            <button style={{...S.classicBtn, padding:'4px 8px',fontSize:11}} onClick={()=>setShowUnified(false)}>{showUnified?'✕':'⚙'}</button>
+            <button style={{...S.classicBtn,padding:'4px 8px',fontSize:11}}
+              onClick={()=>setShowUnified(false)}>{showUnified?'✕':'⚙'}</button>
           </div>
         </div>
 
-        {/* 统一搜索结果浮层 */}
+        {/* 统一搜索浮层 */}
         {showUnified && unifiedResults && (
           <div style={{...S.panel, maxHeight:350, overflowY:'auto', padding:'8px 12px',
             position:'absolute', left:0, right:0, zIndex:100, background:'#FFFEF9', boxShadow:'0 4px 12px rgba(0,0,0,.15)',
             borderBottom:'2px solid #5B4A3E'}}>
             <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
               <span style={{fontSize:11,color:T.textMuted}}>搜索结果</span>
-              <button onClick={()=>setShowUnified(false)} style={{...ST.animBtn,padding:'0 6px',fontSize:10}}>✕</button>
+              <button onClick={()=>setShowUnified(false)} style={{...ST.animBtn,padding:'0 6px',fontSize:10}}>{'✕'}</button>
             </div>
             {unifiedResults.poets?.length > 0 && (
               <div style={{marginBottom:6}}>
@@ -267,7 +269,7 @@ export default function App() {
                     onMouseEnter={e=>e.currentTarget.style.background=T.bg}
                     onMouseLeave={e=>e.currentTarget.style.background='transparent'}
                     onClick={()=>{handlePoemClick(r);setShowUnified(false);setSearchQuery('')}}>
-                    <b>{r.title}</b> — {r.author}
+                    <b>{r.title}</b> {'—'} {r.author}
                     <span style={{float:'right',color:T.textMuted,fontSize:10}}>{r.dynasty}/{r.genre}</span>
                     <div style={{color:'#666',fontSize:10,marginTop:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{r.content?.slice(0,40)}...</div>
                   </div>
@@ -279,63 +281,35 @@ export default function App() {
             )}
           </div>
         )}
-            {searchResults.length > 0 ? searchResults.map(r => (
-              <div key={r.poetry_id} style={{padding:'6px 4px',borderBottom:'1px solid #f0eee8',fontSize:12,lineHeight:1.6}}>
-                <div style={{display:'flex',alignItems:'flex-start',gap:6}}>
-                  <input type="checkbox" checked={compareList.some(c=>c.poetry_id===r.poetry_id)} onChange={()=>{
-                    setCompareList(prev => prev.some(c=>c.poetry_id===r.poetry_id) ? prev.filter(c=>c.poetry_id!==r.poetry_id) : [...prev, r])
-                  }} style={{marginTop:2}} />
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{cursor:'pointer',wordBreak:'break-word'}} onClick={()=>alert(r.content)}>
-                      <b>{r.title}</b> — {r.author}
-                      <span style={{float:'right',fontSize:10,color:'#888',marginLeft:4}}>{r.dynasty}/{r.genre}</span>
-                    </div>
-                    <div style={{fontSize:11,color:'#666',wordBreak:'break-word',lineHeight:1.5,marginTop:2}}>
-                      {r.mood_tags?.join(' · ')}{r.mood_tags?.length && r.imagery_items?.length ? ' | ' : ''}{r.imagery_items?.slice(0,5).join(' · ')}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )) : <div style={{fontSize:12,color:'#aaa',padding:'8px 0'}}>无结果，试试单字如"酒""月"</div>}
-          </div>
-        )}
 
-        {/* 诗人选择 — 搜索式 */}
+        {/* 诗人 */}
         <div style={S.panel}>
           <div style={S.sectionTitle}>诗人</div>
-          <input type="text" value={poetSearch} onChange={e=>{setPoetSearch(e.target.value);if(e.target.value&&!showPoetList)setShowPoetList(true)}}
-            onFocus={()=>setShowPoetList(true)}
+          <input type="text" value={poetSearch} onChange={e=>setPoetSearch(e.target.value)}
             placeholder="搜索添加诗人..."
-            style={{...S.input, width:'100%', fontSize:T.fsSmall}} />
-          {showPoetList && poetSearch && (
-            <div style={{maxHeight:160, overflowY:'auto', marginTop:4, border:'1px solid '+T.border, borderRadius:3, padding:4}}>
-              {poets.filter(p => p.name.includes(poetSearch) && !selectedIds.includes(p.poet_id)).slice(0, 15).map(p =>
-                <div key={p.poet_id} style={{padding:'3px 6px',cursor:'pointer',fontSize:T.fsBody,borderRadius:3}}
-                  onMouseEnter={e=>e.currentTarget.style.background=T.bg}
-                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}
-                  onClick={()=>{togglePoet(p.poet_id);setPoetSearch('');setShowPoetList(false)}}>
-                  {p.name} <span style={{color:T.textMuted,fontSize:10}}>{p.dynasty}</span>
-                </div>
-              )}
-              {poets.filter(p => p.name.includes(poetSearch) && !selectedIds.includes(p.poet_id)).length === 0 && (
-                <div style={{padding:'3px 6px',fontSize:T.fsSmall,color:T.textMuted}}>无匹配诗人</div>
-              )}
-            </div>
-          )}
+            style={{...S.input, width:'100%', marginBottom:6, fontSize:T.fsSmall}} />
+          <div style={{maxHeight:180, overflowY:'auto', marginBottom:4}}>
+            {poets.filter(p => !poetSearch || p.name.includes(poetSearch)).map(p =>
+              <button key={p.poet_id} style={selectedIds.includes(p.poet_id) ? {
+                ...S.classicBtn, background: POET_COLORS[selectedIds.indexOf(p.poet_id) % POET_COLORS.length], color:'#fff', border:'none',
+              } : S.classicBtn}
+                onClick={()=>togglePoet(p.poet_id)}>{p.name}</button>
+            )}
+          </div>
           {selectedIds.length > 0 && (
-            <div style={{marginTop:6,fontSize:T.fsSmall,color:T.textMuted,lineHeight:1.8}}>
-              {selectedIds.map(id => (
-                <span key={id} style={{display:'inline-flex',alignItems:'center',gap:2,marginRight:4,padding:'1px 6px',background:T.bg,borderRadius:3}}>
-                  {poetName(id)}
-                  <span style={{cursor:'pointer',color:T.accent,fontWeight:600,fontSize:10,marginLeft:2}}
+            <div style={{marginTop:4,fontSize:T.fsSmall,color:T.textMuted}}>
+              已选 {selectedIds.length} 位: {selectedIds.map(id => {
+                const hasPoems = poemsMap.get(id)?.length > 0
+                return <span key={id}>{poetName(id)}
+                  <span style={{marginLeft:4,cursor:'pointer',color:T.accent,fontWeight:600,fontSize:10}}
                     onClick={()=>{
-                      if(!poemsMap.get(id)?.length){fetch(`/api/v1/poets/${id}/poetry`).then(r=>r.json()).then(d=>{if(d?.poems){setPoemsMap(m=>{const n=new Map(m);n.set(id,d.poems);return n});setViewingPoet(id)}})}else setViewingPoet(id)
-                    }}>📖</span>
-                  <span style={{cursor:'pointer',color:T.textMuted,fontSize:10,marginLeft:1}} onClick={()=>togglePoet(id)}>✕</span>
+                      if(!hasPoems){fetch(`/api/v1/poets/${id}/poetry`).then(r=>r.json()).then(d=>{if(d?.poems){setPoemsMap(m=>{const n=new Map(m);n.set(id,d.poems);return n});setViewingPoet(id)}})}else setViewingPoet(id)
+                    }}>[作品]</span>{' · '}
                 </span>
-              ))}
+              })}
             </div>
           )}
+          <div style={{fontSize:10,color:T.textMuted,marginTop:4}}>载入 {poets.length} 位唐宋诗人 · 搜索过滤</div>
         </div>
 
         {/* 动画 */}
