@@ -161,19 +161,19 @@ function FenceClickHandler({ fenceMode, onFenceClick }: { fenceMode: boolean; on
 function FenceResults({ results, lat, lon }: { results: PlaceName[]; lat: number; lon: number }) {
   const map = useMap()
   useEffect(() => {
-    if (!results.length) return
+    if (!results?.length) return
     const g = L.layerGroup()
-    // 中心标记
-    L.circleMarker([lat, lon], { radius: 8, color: '#FF6B35', fillColor: '#FF6B35', fillOpacity: 0.3, weight: 2 })
-      .bindPopup(`<b>查询中心</b><br/>${lat.toFixed(4)}, ${lon.toFixed(4)}<br/>半径80km`).addTo(g)
-    // 围栏圆
-    L.circle([lat, lon], { radius: 80000, color: '#FF6B35', fillColor: '#FF6B35', fillOpacity: 0.06, weight: 1.5 }).addTo(g)
-    // 结果
-    results.forEach(p => {
-      L.circleMarker([p.wgs84_lat, p.wgs84_lon], { radius: 5, fillColor: '#E91E63', color: '#fff', weight: 1.5, fillOpacity: 0.9 })
-        .bindPopup(`<b>${p.ancient_name}</b>（${p.modern_name}）<br/>距中心 ${p.distance_km?.toFixed(1)}km`).addTo(g)
-    })
-    g.addTo(map)
+    try {
+      L.circleMarker([lat, lon], { radius: 8, color: '#FF6B35', fillColor: '#FF6B35', fillOpacity: 0.3, weight: 2 })
+        .bindPopup(`<b>查询中心</b><br/>${lat.toFixed(4)}, ${lon.toFixed(4)}<br/>半径80km`).addTo(g)
+      L.circle([lat, lon], { radius: 80000, color: '#FF6B35', fillColor: '#FF6B35', fillOpacity: 0.06, weight: 1.5 }).addTo(g)
+      results.forEach(p => {
+        if (p.wgs84_lat == null || p.wgs84_lon == null) return
+        L.circleMarker([p.wgs84_lat, p.wgs84_lon], { radius: 5, fillColor: '#E91E63', color: '#fff', weight: 1.5, fillOpacity: 0.9 })
+          .bindPopup(`<b>${p.ancient_name}</b>（${p.modern_name}）<br/>距中心 ${p.distance_km?.toFixed(1)}km`).addTo(g)
+      })
+      g.addTo(map)
+    } catch (e) { console.error('FenceResults error:', e) }
     return () => { map.removeLayer(g) }
   }, [map, results, lat, lon])
   return null

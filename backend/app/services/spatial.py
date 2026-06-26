@@ -45,8 +45,8 @@ class SpatialQueryService:
                 place_id,
                 ancient_name,
                 modern_name,
-                province,
-                city,
+                province, city,
+                wgs84_lon, wgs84_lat,
                 ST_Distance(
                     geog::geography,
                     ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography
@@ -88,6 +88,8 @@ class SpatialQueryService:
                     "modern_name": row["modern_name"],
                     "province": row["province"],
                     "city": row["city"],
+                    "wgs84_lon": row["wgs84_lon"],
+                    "wgs84_lat": row["wgs84_lat"],
                     "distance_km": round(d, 2),
                 })
         results.sort(key=lambda x: x["distance_km"])
