@@ -197,8 +197,26 @@ export default function App() {
             <div>
               <div style={{fontSize:16,fontWeight:700,color:'#3a3a3a',lineHeight:1.2}}>古诗词文化互动平台</div>
               <div style={{fontSize:10,color:'#999',letterSpacing:1}}>PoetrySpace · 学术工具端</div>
-            </div>
-          </div>
+              {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
           <div style={{display:'flex',gap:4,marginTop:8}}>
             <input type="text" value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
               onKeyDown={e=>e.key==='Enter'&&doSearch(searchQuery)}
@@ -206,7 +224,16 @@ export default function App() {
               style={{flex:1,padding:'4px 8px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif'}} />
             <button onClick={()=>doSearch(searchQuery, searchFilters.dynasty||searchFilters.mood||searchFilters.season ? searchFilters : undefined)} style={{...S.accentBtn, padding:'4px 12px'}}>检索</button>
             <button onClick={()=>setShowFilters(v=>!v)} style={{...S.classicBtn, padding:'4px 10px'}}>{showFilters ? '✕' : '⚙'}</button>
-          </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
           {showFilters && (
             <div style={{display:'flex',gap:4,marginTop:4,flexWrap:'wrap'}}>
               <select value={searchFilters.dynasty} onChange={e=>setSearchFilters(f=>({...f,dynasty:e.target.value}))} style={{...S.input,fontSize:T.fsSmall,padding:'2px 6px',flex:1}}>
@@ -218,9 +245,27 @@ export default function App() {
               <select value={searchFilters.season} onChange={e=>setSearchFilters(f=>({...f,season:e.target.value}))} style={{...S.input,fontSize:T.fsSmall,padding:'2px 6px',flex:1}}>
                 <option value="">季节</option><option value="春">春</option><option value="夏">夏</option><option value="秋">秋</option><option value="冬">冬</option>
               </select>
-            </div>
-          )}
+              {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
         </div>
+      </div>
+    </div>
+          )}
+          {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
 
         {/* 检索结果（浮动在上层，不占流式位置） */}
         {showSearch && (
@@ -230,7 +275,16 @@ export default function App() {
             <div style={S.sectionTitle}>检索结果 ({searchTotal}条)
               <button onClick={()=>setShowSearch(false)} style={{...ST.animBtn,float:'right',padding:'0 6px',fontSize:10}}>关闭</button>
               {compareList.length>=2 && <button onClick={()=>setShowCompare(true)} style={{...ST.animBtn,float:'right',padding:'0 6px',fontSize:10,marginRight:4,background:'#5B4A3E',color:'#fff'}}>对比({compareList.length})</button>}
-            </div>
+              {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
             {searchResults.length > 0 ? searchResults.map(r => (
               <div key={r.poetry_id} style={{padding:'6px 4px',borderBottom:'1px solid #f0eee8',fontSize:12,lineHeight:1.6}}>
                 <div style={{display:'flex',alignItems:'flex-start',gap:6}}>
@@ -241,15 +295,69 @@ export default function App() {
                     <div style={{cursor:'pointer',wordBreak:'break-word'}} onClick={()=>alert(r.content)}>
                       <b>{r.title}</b> — {r.author}
                       <span style={{float:'right',fontSize:10,color:'#888',marginLeft:4}}>{r.dynasty}/{r.genre}</span>
-                    </div>
+                      {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
                     <div style={{fontSize:11,color:'#666',wordBreak:'break-word',lineHeight:1.5,marginTop:2}}>
                       {r.mood_tags?.join(' · ')}{r.mood_tags?.length && r.imagery_items?.length ? ' | ' : ''}{r.imagery_items?.slice(0,5).join(' · ')}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                      {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
+                    {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
+                  {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
+                {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
             )) : <div style={{fontSize:12,color:'#aaa',padding:'8px 0'}}>无结果，试试单字如"酒""月"</div>}
-          </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
         )}
 
         {/* 诗人选择（多选） */}
@@ -265,14 +373,97 @@ export default function App() {
               } : S.classicBtn}
                 onClick={()=>togglePoet(p.poet_id)}>{p.name}</button>
             )}
-          </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
           {selectedIds.length > 0 && (
             <div style={{marginTop:4,fontSize:T.fsSmall,color:T.textMuted}}>
               已选 {selectedIds.length} 位: {selectedIds.map(id => poetName(id)).join(' · ')}
-            </div>
+              {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
           )}
           <div style={{fontSize:10,color:T.textMuted,marginTop:4}}>载入 {poets.length} 位唐宋诗人 · 搜索过滤</div>
+          {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
         </div>
+      </div>
+    </div>
+
+        {/* 诗人作品 */}
+        {selectedIds.length > 0 && (
+          <div style={{...S.panel, maxHeight:180, overflowY:'auto'}}>
+            <div style={S.sectionTitle}>诗人作品</div>
+            {selectedIds.map(id => {
+              const poems = poemsMap.get(id) || []
+              const p = poets.find(pn => pn.poet_id === id)
+              if (!poems.length) return null
+              return (
+                <div key={id} style={{marginBottom:4}}>
+                  <div style={{fontSize:11,fontWeight:600,color:T.textTitle,marginBottom:2}}>{p?.name}</div>
+                  {poems.slice(0, 10).map(poem => (
+                    <div key={poem.title} style={{fontSize:11,lineHeight:1.8,padding:'1px 0 1px 8px',cursor:'pointer',borderLeft:'2px solid '+T.border, marginBottom:2}}
+                      onClick={() => {
+                        const el = document.getElementById('poem-view');
+                        if(el){el.innerHTML='<div style="font-size:14px;font-weight:600;margin-bottom:8px">'+poem.title+'</div><div style="font-size:13px;line-height:2;white-space:pre-wrap;font-family:serif">'+poem.content+'</div>'+(poem.mood_tags?.length?'<div style="font-size:11px;color:#888;margin-top:8px">意境: '+poem.mood_tags.join(' · ')+'</div>':'');
+                        document.getElementById('poem-overlay')!.style.display='flex';}
+                      }}>
+                      <span style={{color:T.textTitle}}>{poem.title}</span>
+                      <span style={{color:T.textMuted,marginLeft:4,fontSize:10}}>{poem.genre}</span>
+                      {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
+                  ))}
+                  {poems.length > 10 && <div style={{fontSize:10,color:T.textMuted,marginLeft:8}}>...共 {poems.length} 首</div>}
+                  {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
+              )
+            })}
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
+        )}
 
         {/* 动画 */}
         {lastEvents.length > 0 && (
@@ -282,15 +473,42 @@ export default function App() {
               <span style={{float:'right',fontWeight:400,fontSize:11,color:'#888'}}>
                 {animIndex!==undefined ? lastEvents[animIndex]?.event_year : lastEvents[0]?.event_year}~{lastEvents[lastEvents.length-1]?.event_year}
               </span>
-            </div>
+              {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
             <input type="range" style={ST.slider} min={0} max={Math.max(0,lastEvents.length-1)}
               value={animIndex??0} onChange={e=>{setAnimIndex(parseInt(e.target.value));setIsPlaying(false)}} />
             <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
               <button style={ST.animBtn} onClick={()=>{if(!isPlaying)setAnimIndex(p=>p===lastEvents.length-1?0:p??0);setIsPlaying(v=>!v)}}>{isPlaying?'⏸':'▶'}</button>
               {[1,2,4].map(s => <button key={s} style={{...ST.animBtn,background:speed===s?'#e8e0d4':'#fff'}} onClick={()=>setSpeed(s)}>{s}×</button>)}
               <span style={{fontSize:11,color:'#888'}}>{animIndex!==undefined?animIndex+1:0}/{lastEvents.length}</span>
-            </div>
-          </div>
+              {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
         )}
 
         {/* 图层 */}
@@ -311,14 +529,41 @@ export default function App() {
                 <option value="怀古">怀古</option><option value="送别">送别</option>
               </select>
             )}
-          </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
           <div style={S.layerItem}><input type="checkbox" checked={encounterLines.length>0} readOnly /><span>交游 ({encounterLines.length}条)</span></div>
           <div style={S.layerItem}>
             <button style={{...ST.animBtn, background:fenceMode?'#e8e0d4':'#fff', margin:0, fontSize:11}}
               onClick={toggleFenceMode}>{fenceMode ? '退出围栏模式' : '围栏查询'}</button>
             {fenceMode && <span style={{fontSize:11,color:'#E91E63',marginLeft:6}}>点地图查80km内</span>}
-          </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
         </div>
+      </div>
+    </div>
+          {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
 
         {/* AI 创作工具 */}
         <div style={S.panel}>
@@ -336,7 +581,16 @@ export default function App() {
               const el=document.getElementById('ai-results');
               if(el) el.innerHTML=(d.candidates||[]).map((c:any)=>'<span style="display:inline-block;padding:2px 8px;margin:2px;border-radius:8px;border:1px solid #e0dcd4;font-size:12px">'+c.word+' <small style="color:#888">'+c.category+'</small></span>').join('')||'<span style="font-size:11px;color:#aaa">无推荐</span>';
             }} style={ST.animBtn}>推荐</button>
-          </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
           <div id="ai-results" style={{minHeight:20,marginBottom:6}}></div>
 
           {/* 格律校验 */}
@@ -358,7 +612,16 @@ export default function App() {
               if(d.passed){el.innerHTML='<span style="font-size:12px;color:#4CAF50">格律无误</span>'}
               else{el.innerHTML='<div style="font-size:12px;color:#E91E63">发现 '+d.errors.length+' 处问题：</div>'+d.errors.map((e:any)=>'<div style="font-size:11px;color:#666;padding:2px 0"><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fdd;margin-right:4px;font-size:10px">'+e.type+'</span>'+String(e.message||'').slice(0,50)+'</div>').join('')}
             }} style={ST.animBtn}>校验</button>
-          </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
           <div id="rhythm-results" style={{minHeight:20,marginTop:4,marginBottom:6}}></div>
 
           {/* 仿写改写 */}
@@ -376,7 +639,16 @@ export default function App() {
               <option value="七绝">七绝</option><option value="七律">七律</option>
               <option value="五绝" selected>五绝</option>
             </select>
-          </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
           <textarea id="rw-input" placeholder="输入诗句或关键词" rows={2}
             style={{width:'100%',padding:'4px 6px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif',resize:'vertical'}} />
           <button onClick={async()=>{
@@ -409,7 +681,16 @@ export default function App() {
             <select id="mood-level" style={{width:60,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
               <option value="入门">入门</option><option value="进阶">进阶</option>
             </select>
-          </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
           <button onClick={async()=>{
             const mood=(document.getElementById('mood-select') as HTMLSelectElement).value;
             const season=(document.getElementById('mood-season') as HTMLSelectElement).value;
@@ -422,7 +703,16 @@ export default function App() {
               (d.framework?.tips?.length ? '<div style="font-size:11px;color:#555">创作提示：<ul style="margin:2px 0;padding-left:16px">'+d.framework.tips.map((t:string)=>'<li>'+t+'</li>').join('')+'</ul></div>' : '');
           }} style={{...ST.animBtn,width:'100%',marginTop:2}}>生成创作框架</button>
           <div id="mood-results" style={{minHeight:20,marginTop:6,fontSize:12,lineHeight:1.6}}></div>
+          {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
         </div>
+      </div>
+    </div>
 
         {/* 围栏信息 */}
         {fenceResults && (
@@ -430,17 +720,53 @@ export default function App() {
             <div style={S.sectionTitle}>围栏查询结果</div>
             <div style={{fontSize:12,lineHeight:1.6,color:'#888'}}>
               中心: {fenceResults.lat.toFixed(4)}, {fenceResults.lon.toFixed(4)}
-            </div>
+              {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
             <div style={{fontSize:12,lineHeight:1.6}}>
               范围内: {fenceResults.places.length} 个地名
-            </div>
+              {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
             {fenceResults.places.slice(0, 6).map(p => (
               <div key={p.place_id} style={{fontSize:11,padding:'2px 0',borderBottom:'1px solid #f0eee8'}}>
                 {p.ancient_name}（{p.modern_name}）{p.distance_km ? `${p.distance_km.toFixed(1)}km` : ''}
-              </div>
+                {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
             ))}
             <button style={{...ST.animBtn,marginTop:4}} onClick={()=>setFenceResults(undefined)}>清除</button>
-          </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
         )}
 
         {/* 数据导出 */}
@@ -458,9 +784,27 @@ export default function App() {
               <a key={btn.label} href={btn.url} target="_blank" rel="noopener"
                 style={{...ST.animBtn, textDecoration:'none', color:'#333', fontSize:11}}>{btn.label}</a>
             ))}
-          </div>
-          <div style={{fontSize:10,color:'#aaa',marginTop:4}}>UTF-8 CSV，Excel 打开建议"数据→自文本/CSV"</div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
         </div>
+      </div>
+    </div>
+          <div style={{fontSize:10,color:'#aaa',marginTop:4}}>UTF-8 CSV，Excel 打开建议"数据→自文本/CSV"</div>
+          {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
 
         {/* 统计与作品 */}
         <div style={{...S.panel, flex:1, borderBottom:'none', overflow:'auto'}}>
@@ -476,7 +820,16 @@ export default function App() {
                   <div style={{fontSize:11,lineHeight:1.6,color:'#666',marginLeft:4,marginBottom:4}}>
                     {evts.length} 事件 · 年份 {evts[0]?.event_year||'?'}~{evts[evts.length-1]?.event_year||'?'}
                     {poems.length > 0 && ' · ' + poems.length + ' 首作品'}
-                  </div>
+                    {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
                   {poems.length > 0 && (
                     <div style={{borderLeft:'2px solid '+T.border, paddingLeft:8, marginLeft:4}}>
                       {poems.slice(0, 8).map(poem => (
@@ -487,30 +840,102 @@ export default function App() {
                           {poem.mood_tags?.length > 0 && (
                             <span style={{color:T.textMuted, marginLeft:4, fontSize:10}}>{poem.mood_tags.slice(0,3).join(',')}</span>
                           )}
-                        </div>
+                          {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
                       ))}
                       {poems.length > 8 && <div style={{fontSize:10,color:T.textMuted,marginTop:2}}>共 {poems.length} 首</div>}
-                    </div>
+                      {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
                   )}
-                </div>
+                  {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
               )
             })}
-            </div>
-          ) : <div style={{fontSize:12,color:'#aaa'}}>选择诗人开始探索<br/>点击地图可进行围栏查询</div>}
+              {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
         </div>
+      </div>
+    </div>
+          ) : <div style={{fontSize:12,color:'#aaa'}}>选择诗人开始探索<br/>点击地图可进行围栏查询</div>}
+          {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
 
         <div style={ST.statusBar}>
           <span>诗人 {selectedIds.length}位 · 轨迹 {trajectoryPoets.reduce((s,p)=>s+p.events.length,0)}条 · 围栏 {fenceResults?.places.length||0}点</span>
           <span style={{fontSize:10,color:'#b8b0a8',marginLeft:'auto'}}>v0.2</span>
+          {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
         </div>
       </div>
+    </div>
+        {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
 
       <div style={ST.main}>
         <PoetryMap poets={trajectoryPoets} heatmap={showHeatmap?heatmap:[]}
           encounterLines={encounterLines} fenceResults={fenceResults}
           fenceMode={fenceMode} onFenceClick={handleFenceClick}
           searchResults={showSearch ? searchResults.map(r=>({title:r.title,author:r.author})) : []} />
+        {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
       </div>
+    </div>
 
       {/* 多诗对比浮层 */}
       {showCompare && compareList.length >= 2 && (
@@ -519,7 +944,16 @@ export default function App() {
             <div style={{display:'flex',justifyContent:'space-between',marginBottom:12}}>
               <h2 style={{fontSize:16,fontWeight:600,margin:0}}>诗词对比</h2>
               <button onClick={()=>setShowCompare(false)} style={{...ST.animBtn}}>关闭</button>
-            </div>
+              {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
             <div style={{display:'flex',gap:16,flexWrap:'wrap'}}>
               {compareList.map(r => (
                 <div key={r.poetry_id} style={{flex:'1 1 300px',border:'1px solid #e0dcd4',borderRadius:8,padding:12,background:'#fafaf8'}}>
@@ -528,12 +962,57 @@ export default function App() {
                   <div style={{fontSize:13,lineHeight:1.8,whiteSpace:'pre-wrap',fontFamily:'serif'}}>{r.content}</div>
                   {r.mood_tags?.length > 0 && <div style={{marginTop:8,fontSize:11,color:'#888'}}>意境: {r.mood_tags.join(' · ')}</div>}
                   {r.imagery_items?.length > 0 && <div style={{fontSize:11,color:'#888'}}>意象: {r.imagery_items.slice(0,5).join(' · ')}</div>}
-                </div>
-              ))}
-            </div>
-          </div>
+                  {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
         </div>
+      </div>
+    </div>
+              ))}
+              {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
+            {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
+          {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
+    </div>
       )}
+      {/* 诗词阅读浮层 */}
+      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
+        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
+        <div style={{background:'#FFFEF9', borderRadius:8, maxWidth:'80%', maxHeight:'80%', overflow:'auto', padding:24, boxShadow:'0 8px 30px rgba(0,0,0,.3)'}} onClick={e=>e.stopPropagation()}>
+          <div id="poem-view"></div>
+          <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
+            style={{...ST.animBtn, marginTop:12}}>关闭</button>
+        </div>
+      </div>
     </div>
   )
 }
