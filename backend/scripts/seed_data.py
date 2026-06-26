@@ -25,8 +25,11 @@ from app.models.poetry import Poetry, PoetryFeature
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "data"))
 from place_names.seed_places import PLACE_SEEDS
+from place_names.seed_places_extra import EXTRA_PLACES
 from poet_trajectories.seed_poets import POET_SEEDS, TRAJECTORY_SEEDS
+from poet_trajectories.seed_poets_extra import EXTRA_POETS
 from poetry_features.seed_poetry import POETRY_SEEDS
+from poetry_features.seed_poetry_extra import EXTRA_POETRY
 
 
 async def main():
@@ -44,7 +47,7 @@ async def main():
         # ── 1. 地名 ─────────────────────────
         print("\n[1/4] 古今地名...")
         place_map = {}
-        for row in PLACE_SEEDS:
+        for row in PLACE_SEEDS + EXTRA_PLACES:
             n = row[0]
             r = await session.execute(select(PlaceName).where(PlaceName.ancient_name == n))
             p = r.scalar_one_or_none()
@@ -63,7 +66,7 @@ async def main():
         # ── 2. 诗人 ─────────────────────────
         print("\n[2/4] 诗人...")
         poet_map = {}
-        for row in POET_SEEDS:
+        for row in POET_SEEDS + EXTRA_POETS:
             r = await session.execute(select(Poet).where(Poet.name == row["name"]))
             p = r.scalar_one_or_none()
             if p:
@@ -105,7 +108,7 @@ async def main():
         # ── 4. 诗词 ─────────────────────────
         print("\n[4/4] 诗词+六维度...")
         n = 0
-        for row in POETRY_SEEDS:
+        for row in POETRY_SEEDS + EXTRA_POETRY:
             p = poet_map.get(row["author"])
             if not p:
                 continue
