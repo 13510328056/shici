@@ -44,6 +44,7 @@ export default function App() {
   // 多诗人选择（最多10位）
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [poetsData, setPoetsData] = useState<Map<string, TrajectoryEvent[]>>(new Map())
+  const [poemsMap, setPoemsMap] = useState<Map<string, Array<{title:string;content:string;genre:string;mood_tags:string[]}>>>(new Map())
   // 单诗人动画（只对最后选中的生效）
   const [animIndex, setAnimIndex] = useState<number|undefined>(undefined)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -72,12 +73,15 @@ export default function App() {
       if (exists) {
         const next = prev.filter(id => id !== pid)
         setPoetsData(m => { const n = new Map(m); n.delete(pid); return n })
+        setPoemsMap(m => { const n = new Map(m); n.delete(pid); return n })
         return next
       }
-      if (prev.length >= 10) return prev // 最多10人同屏
-      // 加载轨迹
+      if (prev.length >= 10) return prev
       fetch(`/api/v1/poets/${pid}/trajectory`).then(r=>r.json()).then(d => {
         setPoetsData(m => { const n = new Map(m); n.set(pid, d.events || []); return n })
+      })
+      fetch(`/api/v1/poets/${pid}/poetry`).then(r=>r.json()).then(d => {
+        setPoemsMap(m => { const n = new Map(m); n.set(pid, d.poems || []); return n })
       })
       return [...prev, pid]
     })
@@ -458,20 +462,36 @@ export default function App() {
           <div style={{fontSize:10,color:'#aaa',marginTop:4}}>UTF-8 CSV，Excel 打开建议"数据→自文本/CSV"</div>
         </div>
 
-        {/* 统计 */}
+        {/* 统计与作品 */}
         <div style={{...S.panel, flex:1, borderBottom:'none', overflow:'auto'}}>
-          <div style={S.sectionTitle}>轨迹统计</div>
           {selectedIds.length > 0 ? (
             <div>
             {selectedIds.map((id, i) => {
               const evts = poetsData.get(id) || []
               const p = poets.find(p => p.poet_id === id)
+              const poems = poemsMap.get(id) || []
               return (
-                <div key={id} style={{marginBottom:8}}>
+                <div key={id} style={{marginBottom:10}}>
                   <div style={ST.tag(POET_COLORS[i % POET_COLORS.length])}>{p?.name}</div>
-                  <div style={{fontSize:11,lineHeight:1.6,color:'#666',marginLeft:4}}>
+                  <div style={{fontSize:11,lineHeight:1.6,color:'#666',marginLeft:4,marginBottom:4}}>
                     {evts.length} 事件 · 年份 {evts[0]?.event_year||'?'}~{evts[evts.length-1]?.event_year||'?'}
+                    {poems.length > 0 && ' · ' + poems.length + ' 首作品'}
                   </div>
+                  {poems.length > 0 && (
+                    <div style={{borderLeft:'2px solid '+T.border, paddingLeft:8, marginLeft:4}}>
+                      {poems.slice(0, 8).map(poem => (
+                        <div key={poem.title} style={{fontSize:11, lineHeight:1.6, padding:'2px 0', cursor:'pointer'}}
+                          onClick={() => alert(poem.content)}>
+                          <span style={{color:T.textTitle}}>{poem.title}</span>
+                          <span style={{color:T.textMuted, marginLeft:4}}>{poem.genre}</span>
+                          {poem.mood_tags?.length > 0 && (
+                            <span style={{color:T.textMuted, marginLeft:4, fontSize:10}}>{poem.mood_tags.slice(0,3).join(',')}</span>
+                          )}
+                        </div>
+                      ))}
+                      {poems.length > 8 && <div style={{fontSize:10,color:T.textMuted,marginTop:2}}>共 {poems.length} 首</div>}
+                    </div>
+                  )}
                 </div>
               )
             })}

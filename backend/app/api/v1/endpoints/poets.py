@@ -72,3 +72,34 @@ async def get_heatmap(
     service = SpatialQueryService(db)
     data = await service.get_poetry_heatmap_data(dynasty, mood)
     return {"count": len(data), "points": data}
+
+
+@router.get("/{poet_id}/poetry")
+async def get_poet_poetry(
+    poet_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """获取某位诗人的全部作品"""
+    from app.models.poetry import Poetry, PoetryFeature
+    from sqlalchemy import select as q
+
+    stmt = q(Poetry).where(Poetry.author_id == poet_id).order_by(Poetry.title)
+    poems = (await db.execute(stmt)).scalars().all()
+
+    results = []
+    for poem in poems:
+        feat = (await db.execute(
+            q(PoetryFeature).where(PoetryFeature.poetry_id == poem.poetry_id)
+        )).scalar_one_or_none()
+
+        results.append({
+            "poetry_id": str(poem.poetry_id),
+            "title": poem.title,
+            "content": poem.content,
+            "genre": poem.genre or '',
+            "dynasty": poem.dynasty,
+            "mood_tags": feat.mood_tags if feat else [],
+            "imagery_items": feat.imagery_items if feat else [],
+        })
+
+    return {"poems": results, "count": len(results)}

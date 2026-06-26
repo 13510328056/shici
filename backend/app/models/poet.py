@@ -39,6 +39,7 @@ class Poet(Base):
     death_year = Column(String(20), comment="去世年份")
     dynasty = Column(String(30), nullable=False, index=True)
     tags = ArrayColumn(comment="身份标签数组")
+    description = Column(String, comment="传记/生平描述")
     created_at = Column(DateTime, default=utcnow)
 
     trajectories = relationship("PoetTrajectory", back_populates="poet")
