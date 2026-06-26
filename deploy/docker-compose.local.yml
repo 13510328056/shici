@@ -1,0 +1,43 @@
+# 中国古诗词文化互动平台 — 本地开发环境
+# 用于 Windows 本机 Docker Desktop 部署
+
+services:
+
+  postgis:
+    image: postgis/postgis:15-3.4
+    container_name: poetryspace-postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: poetry_space
+      POSTGRES_USER: poetry
+      POSTGRES_PASSWORD: PoetrySpace2024!
+      TZ: Asia/Shanghai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U poetry -d poetry_space"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: poetryspace-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass RedisPass2024!
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgis_data:
+  redis_data:

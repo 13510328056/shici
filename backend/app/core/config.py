@@ -12,9 +12,9 @@ class Settings(BaseSettings):
     ENV: str = "development"  # development | staging | production
 
     # 数据库
-    DATABASE_URL: str = (
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/poetry_space"
-    )
+    # 开发环境默认用 SQLite（无需 Docker），生产环境用 PostgreSQL+PostGIS
+    # 切换方式：export DATABASE_URL="postgresql+asyncpg://poetry:xxx@localhost:5432/poetry_space"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./poetry_space_dev.db"
 
     # 搜索引擎
     ELASTICSEARCH_URL: str = "http://localhost:9200"
