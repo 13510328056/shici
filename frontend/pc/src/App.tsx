@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import PoetryMap from './components/Map/PoetryMap'
-import type { TrajectoryEvent, HeatmapPoint } from './types'
-import { getHeatmap } from './api'
-import { EVENT_COLORS } from './types'
+import type { PoetTrajectoryData } from './components/Map/PoetryMap'
+import { POET_COLORS } from './components/Map/PoetryMap'
+import type { TrajectoryEvent, HeatmapPoint, PlaceName } from './types'
+import { getHeatmap, fenceQuery } from './api'
 
 const S = {
   container: { display:'flex', width:'100vw', height:'100vh', fontFamily:'serif', color:'#2c2c2c', overflow:'hidden' } as const,
@@ -20,100 +21,88 @@ const S = {
   slider: { width:'100%', margin:'6px 0', accentColor:'#5B4A3E' } as const,
   animBtn: { padding:'2px 10px', margin:'0 4px', borderRadius:4, border:'1px solid #ccc', background:'#fff', fontSize:12, cursor:'pointer' } as const,
   chip: { display:'inline-flex', alignItems:'center', gap:4, padding:'2px 8px', margin:2, borderRadius:10, fontSize:11, background:'#f0eee8' } as const,
+  tag: (c:string) => ({ display:'inline-block', padding:'2px 8px', margin:2, borderRadius:10, fontSize:11, background:c+'22', color:c, fontWeight:600 } as const),
 }
 
 export default function App() {
   const [poets, setPoets] = useState<Array<{poet_id:string;name:string;dynasty:string}>>([])
-  const [selectedPoet, setSelectedPoet] = useState<string|null>(null)
-  const [trajectory, setTrajectory] = useState<TrajectoryEvent[]>([])
+  // 多诗人选择
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [poetsData, setPoetsData] = useState<Map<string, TrajectoryEvent[]>>(new Map())
+  // 单诗人动画（只对最后选中的生效）
+  const [animIndex, setAnimIndex] = useState<number|undefined>(undefined)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [speed, setSpeed] = useState(1)
+  const animRef = useRef<ReturnType<typeof setInterval>|null>(null)
+
+  // 热力
   const [heatmap, setHeatmap] = useState<HeatmapPoint[]>([])
   const [showHeatmap, setShowHeatmap] = useState(false)
 
-  // 动画状态
-  const [animIndex, setAnimIndex] = useState<number|undefined>(undefined)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [speed, setSpeed] = useState(1) // 1, 2, 4
-  const [yearRange, setYearRange] = useState<[number,number]>([600, 1300])
-  const animRef = useRef<ReturnType<typeof setInterval>|null>(null)
+  // 围栏
+  const [fenceResults, setFenceResults] = useState<{lat:number;lon:number;places:PlaceName[]}|undefined>(undefined)
 
-  // 交游状态
-  const [poetB, setPoetB] = useState<string|null>(null)
-  const [encounterProb, setEncounterProb] = useState<number|null>(null)
+  // 交游线段（暂存多诗人间的交游连线）
   const [encounterLines, setEncounterLines] = useState<Array<{from:[number,number];to:[number,number];probability:number}>>([])
 
-  // 加载诗人列表
   useEffect(() => {
     fetch('/api/v1/poets').then(r=>r.json()).then(d=>setPoets(d.poets||[])).catch(()=>{})
   }, [])
 
-  // 选择诗人
-  const handleSelectPoet = useCallback(async (pid: string) => {
-    if (selectedPoet === pid) { setSelectedPoet(null); setTrajectory([]); setAnimIndex(undefined); setIsPlaying(false); return }
-    setSelectedPoet(pid)
-    try {
-      const r = await fetch(`/api/v1/poets/${pid}/trajectory`)
-      const data = await r.json()
-      const evts: TrajectoryEvent[] = data.events || []
-      setTrajectory(evts)
-      setAnimIndex(undefined)
-      setIsPlaying(false)
-      if (evts.length > 0) {
-        const years = evts.filter(e => e.event_year).map(e => parseInt(e.event_year)).filter(n => !isNaN(n))
-        if (years.length > 0) setYearRange([Math.min(...years), Math.max(...years)])
+  // 选/取消选诗人
+  const togglePoet = useCallback(async (pid: string) => {
+    setSelectedIds(prev => {
+      const exists = prev.includes(pid)
+      if (exists) {
+        const next = prev.filter(id => id !== pid)
+        setPoetsData(m => { const n = new Map(m); n.delete(pid); return n })
+        return next
       }
-    } catch { setTrajectory([]) }
-  }, [selectedPoet])
+      if (prev.length >= 4) return prev // 最多4人同屏
+      // 加载轨迹
+      fetch(`/api/v1/poets/${pid}/trajectory`).then(r=>r.json()).then(d => {
+        setPoetsData(m => { const n = new Map(m); n.set(pid, d.events || []); return n })
+      })
+      return [...prev, pid]
+    })
+    setAnimIndex(undefined); setIsPlaying(false)
+  }, [])
 
-  // 动画控制
+  // 构建传给地图的诗人数据
+  const trajectoryPoets: PoetTrajectoryData[] = selectedIds.map((id, i) => {
+    const p = poets.find(p => p.poet_id === id)
+    return {
+      name: p?.name || id,
+      events: poetsData.get(id) || [],
+      color: POET_COLORS[i % POET_COLORS.length],
+      animIndex: id === selectedIds[selectedIds.length-1] ? animIndex : undefined,
+    }
+  })
+
+  // 动画控制（只对最后选中的生效）
+  const lastId = selectedIds[selectedIds.length-1]
+  const lastEvents = lastId ? poetsData.get(lastId) || [] : []
   useEffect(() => {
     if (animRef.current) { clearInterval(animRef.current); animRef.current = null }
-    if (!isPlaying || trajectory.length === 0) return
+    if (!isPlaying || !lastEvents.length) return
     const delay = Math.max(300, 1200 / speed)
     animRef.current = setInterval(() => {
       setAnimIndex(prev => {
         if (prev === undefined) return 0
-        if (prev >= trajectory.length - 1) { setIsPlaying(false); return trajectory.length - 1 }
+        if (prev >= lastEvents.length - 1) { setIsPlaying(false); return lastEvents.length - 1 }
         return prev + 1
       })
     }, delay)
     return () => { if (animRef.current) clearInterval(animRef.current) }
-  }, [isPlaying, speed, trajectory.length])
+  }, [isPlaying, speed, lastEvents.length])
 
-  const togglePlay = useCallback(() => {
-    if (!isPlaying) setAnimIndex(prev => prev === trajectory.length - 1 ? 0 : (prev ?? 0))
-    setIsPlaying(v => !v)
-  }, [isPlaying, trajectory.length])
-
-  // 交游计算
-  const calcEncounter = useCallback(async (pidB: string) => {
-    if (!selectedPoet) return
+  // 围栏查询
+  const handleFenceClick = useCallback(async (lat: number, lon: number) => {
     try {
-      const r = await fetch('/api/v1/poets/encounter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ poet_a_id: selectedPoet, poet_b_id: pidB }),
-      })
-      const d = await r.json()
-      setEncounterProb(d.probability)
-
-      // 获取两位诗人的最新轨迹坐标做连线
-      const [ra, rb] = await Promise.all([
-        fetch(`/api/v1/poets/${selectedPoet}/trajectory`).then(r=>r.json()),
-        fetch(`/api/v1/poets/${pidB}/trajectory`).then(r=>r.json()),
-      ])
-      const evtsA = (ra.events || []).filter((e:TrajectoryEvent) => e.wgs84_lon && e.wgs84_lat)
-      const evtsB = (rb.events || []).filter((e:TrajectoryEvent) => e.wgs84_lon && e.wgs84_lat)
-      if (evtsA.length && evtsB.length) {
-        const lastA = evtsA[Math.floor(evtsA.length/2)]
-        const lastB = evtsB[Math.floor(evtsB.length/2)]
-        setEncounterLines([{
-          from: [lastA.wgs84_lat!, lastA.wgs84_lon!],
-          to: [lastB.wgs84_lat!, lastB.wgs84_lon!],
-          probability: d.probability,
-        }])
-      }
+      const data = await fenceQuery(lon, lat)
+      setFenceResults({ lat, lon, places: data.places })
     } catch {}
-  }, [selectedPoet])
+  }, [])
 
   const toggleHeatmap = useCallback(async () => {
     setShowHeatmap(v => !v)
@@ -121,8 +110,34 @@ export default function App() {
     else setHeatmap([])
   }, [showHeatmap])
 
-  const validEvents = trajectory.filter(e => e.wgs84_lon && e.wgs84_lat)
-  const eventTypes = [...new Set(trajectory.map(e => e.event_type))]
+  // 交游：对选择的诗人两两计算
+  useEffect(() => {
+    if (selectedIds.length < 2) { setEncounterLines([]); return }
+    const calc = async () => {
+      const lines: Array<{from:[number,number];to:[number,number];probability:number}> = []
+      for (let i = 0; i < selectedIds.length - 1; i++) {
+        for (let j = i + 1; j < selectedIds.length; j++) {
+          try {
+            const r = await fetch('/api/v1/poets/encounter', {
+              method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({poet_a_id: selectedIds[i], poet_b_id: selectedIds[j]})
+            })
+            const d = await r.json()
+            const evtsA = (poetsData.get(selectedIds[i]) || []).filter(e => e.wgs84_lon && e.wgs84_lat)
+            const evtsB = (poetsData.get(selectedIds[j]) || []).filter(e => e.wgs84_lon && e.wgs84_lat)
+            if (evtsA.length && evtsB.length) {
+              const midA = evtsA[Math.floor(evtsA.length/2)]
+              const midB = evtsB[Math.floor(evtsB.length/2)]
+              lines.push({ from: [midA.wgs84_lat!, midA.wgs84_lon!], to: [midB.wgs84_lat!, midB.wgs84_lon!], probability: d.probability })
+            }
+          } catch {}
+        }
+      }
+      setEncounterLines(lines)
+    }
+    calc()
+  }, [selectedIds, poetsData])
+
   const poetName = (id: string) => poets.find(p => p.poet_id === id)?.name || id
 
   return (
@@ -133,93 +148,98 @@ export default function App() {
           <div style={S.hsub}>中国古诗词文化互动平台 | 学术工具端</div>
         </div>
 
-        {/* 诗人选择 */}
+        {/* 诗人选择（多选） */}
         <div style={S.panel}>
-          <div style={S.ptitle}>选择诗人</div>
+          <div style={S.ptitle}>选择诗人（最多4位，点击切换）</div>
           <div>{poets.map(p => (
-            <button key={p.poet_id} style={selectedPoet===p.poet_id?S.btnA:S.btn}
-              onClick={()=>handleSelectPoet(p.poet_id)}>{p.name}</button>
+            <button key={p.poet_id} style={selectedIds.includes(p.poet_id) ? {
+              ...S.btnA, background: POET_COLORS[selectedIds.indexOf(p.poet_id) % POET_COLORS.length],
+            } : S.btn}
+              onClick={()=>togglePoet(p.poet_id)}>{p.name}</button>
           ))}</div>
+          {selectedIds.length > 0 && (
+            <div style={{marginTop:6,fontSize:11,color:'#888'}}>
+              已选: {selectedIds.map(id => poetName(id)).join(' + ')}
+            </div>
+          )}
         </div>
 
-        {/* 时间轴 + 动画 */}
-        {trajectory.length > 0 && (
+        {/* 动画 */}
+        {lastEvents.length > 0 && (
           <div style={S.panel}>
             <div style={S.ptitle}>
-              时间轴
+              动画 · {poetName(lastId)}
               <span style={{float:'right',fontWeight:400,fontSize:11,color:'#888'}}>
-                {animIndex !== undefined ? trajectory[animIndex]?.event_year : trajectory[0]?.event_year}
-                {' ~ '}{trajectory[trajectory.length-1]?.event_year}
+                {animIndex!==undefined ? lastEvents[animIndex]?.event_year : lastEvents[0]?.event_year}~{lastEvents[lastEvents.length-1]?.event_year}
               </span>
             </div>
-            <input type="range" style={S.slider} min={0} max={Math.max(0, trajectory.length-1)}
-              value={animIndex ?? 0}
-              onChange={e => { setAnimIndex(parseInt(e.target.value)); setIsPlaying(false) }} />
+            <input type="range" style={S.slider} min={0} max={Math.max(0,lastEvents.length-1)}
+              value={animIndex??0} onChange={e=>{setAnimIndex(parseInt(e.target.value));setIsPlaying(false)}} />
             <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
-              <button style={S.animBtn} onClick={togglePlay}>{isPlaying ? '⏸' : '▶'}</button>
-              <button style={{...S.animBtn,background:speed===1?'#e8e0d4':'#fff'}} onClick={()=>setSpeed(1)}>1×</button>
-              <button style={{...S.animBtn,background:speed===2?'#e8e0d4':'#fff'}} onClick={()=>setSpeed(2)}>2×</button>
-              <button style={{...S.animBtn,background:speed===4?'#e8e0d4':'#fff'}} onClick={()=>setSpeed(4)}>4×</button>
-              <span style={{fontSize:11,color:'#888'}}>{animIndex !== undefined ? animIndex+1 : 0}/{trajectory.length}</span>
+              <button style={S.animBtn} onClick={()=>{if(!isPlaying)setAnimIndex(p=>p===lastEvents.length-1?0:p??0);setIsPlaying(v=>!v)}}>{isPlaying?'⏸':'▶'}</button>
+              {[1,2,4].map(s => <button key={s} style={{...S.animBtn,background:speed===s?'#e8e0d4':'#fff'}} onClick={()=>setSpeed(s)}>{s}×</button>)}
+              <span style={{fontSize:11,color:'#888'}}>{animIndex!==undefined?animIndex+1:0}/{lastEvents.length}</span>
             </div>
-          </div>
-        )}
-
-        {/* 交游概率 */}
-        {selectedPoet && (
-          <div style={S.panel}>
-            <div style={S.ptitle}>交游概率</div>
-            <div style={{display:'flex',gap:4,flexWrap:'wrap',marginBottom:4}}>
-              {poets.filter(p => p.poet_id !== selectedPoet).slice(0, 8).map(p => (
-                <button key={p.poet_id} style={poetB===p.poet_id?S.btnA:S.btn}
-                  onClick={()=>{setPoetB(p.poet_id);calcEncounter(p.poet_id)}}>{p.name}</button>
-              ))}
-            </div>
-            {encounterProb !== null && (
-              <div style={{fontSize:13,color:'#5B4A3E',fontWeight:600}}>
-                {poetName(selectedPoet)} ↔ {poetName(poetB||'')}：{(encounterProb*100).toFixed(1)}%
-              </div>
-            )}
           </div>
         )}
 
         {/* 图层 */}
         <div style={S.panel}>
-          <div style={S.ptitle}>图层</div>
+          <div style={S.ptitle}>图层控制</div>
           <div style={S.layerItem}><input type="checkbox" defaultChecked readOnly /><span>地名</span></div>
-          <div style={S.layerItem}><input type="checkbox" checked={!!selectedPoet} readOnly /><span>轨迹 {selectedPoet?'✓':''}</span></div>
+          <div style={S.layerItem}><input type="checkbox" checked={selectedIds.length>0} readOnly /><span>轨迹 ({selectedIds.length}人)</span></div>
           <div style={S.layerItem}><input type="checkbox" checked={showHeatmap} onChange={toggleHeatmap} /><span>热力</span></div>
-          <div style={S.layerItem}><input type="checkbox" checked={encounterLines.length>0} readOnly /><span>交游 {encounterLines.length>0?'✓':''}</span></div>
+          <div style={S.layerItem}><input type="checkbox" checked={encounterLines.length>0} readOnly /><span>交游 ({encounterLines.length}条)</span></div>
         </div>
+
+        {/* 围栏信息 */}
+        {fenceResults && (
+          <div style={S.panel}>
+            <div style={S.ptitle}>围栏查询结果</div>
+            <div style={{fontSize:12,lineHeight:1.6,color:'#888'}}>
+              中心: {fenceResults.lat.toFixed(4)}, {fenceResults.lon.toFixed(4)}
+            </div>
+            <div style={{fontSize:12,lineHeight:1.6}}>
+              范围内: {fenceResults.places.length} 个地名
+            </div>
+            {fenceResults.places.slice(0, 6).map(p => (
+              <div key={p.place_id} style={{fontSize:11,padding:'2px 0',borderBottom:'1px solid #f0eee8'}}>
+                {p.ancient_name}（{p.modern_name}）{p.distance_km ? `${p.distance_km.toFixed(1)}km` : ''}
+              </div>
+            ))}
+            <button style={{...S.animBtn,marginTop:4}} onClick={()=>setFenceResults(undefined)}>清除</button>
+          </div>
+        )}
 
         {/* 统计 */}
         <div style={{...S.panel, flex:1, borderBottom:'none', overflow:'auto'}}>
-          <div style={S.ptitle}>诗人档案</div>
-          {trajectory.length > 0 ? (
-            <div style={{fontSize:12,lineHeight:1.8}}>
-              <div>轨迹事件: {trajectory.length} 条</div>
-              <div>有效点位: {validEvents.length} 个</div>
-              <div>事件类型: {eventTypes.join(' · ')}</div>
-              <div style={{marginTop:4}}>类型分布:</div>
-              {eventTypes.map(t => (
-                <div key={t} style={S.chip}>
-                  <span style={{width:8,height:8,borderRadius:'50%',background:EVENT_COLORS[t]||'#999',display:'inline-block'}}/>
-                  {t}: {trajectory.filter(e => e.event_type === t).length}
+          <div style={S.ptitle}>轨迹统计</div>
+          {selectedIds.length > 0 ? (
+            <div>
+            {selectedIds.map((id, i) => {
+              const evts = poetsData.get(id) || []
+              const p = poets.find(p => p.poet_id === id)
+              return (
+                <div key={id} style={{marginBottom:8}}>
+                  <div style={S.tag(POET_COLORS[i % POET_COLORS.length])}>{p?.name}</div>
+                  <div style={{fontSize:11,lineHeight:1.6,color:'#666',marginLeft:4}}>
+                    {evts.length} 事件 · 年份 {evts[0]?.event_year||'?'}~{evts[evts.length-1]?.event_year||'?'}
+                  </div>
                 </div>
-              ))}
+              )
+            })}
             </div>
-          ) : <div style={{fontSize:12,color:'#aaa'}}>选择诗人查看轨迹</div>}
+          ) : <div style={{fontSize:12,color:'#aaa'}}>选择 1-4 位诗人<br/>点击地图可进行围栏查询</div>}
         </div>
 
         <div style={S.statusBar}>
-          <span>诗人 {poets.length} · 轨迹 {trajectory.length} · 热力 {heatmap.length}</span>
+          <span>诗人 {selectedIds.length}位 · 轨迹 {trajectoryPoets.reduce((s,p)=>s+p.events.length,0)}条 · 围栏 {fenceResults?.places.length||0}点</span>
         </div>
       </div>
 
       <div style={S.main}>
-        <PoetryMap trajectory={trajectory} heatmap={showHeatmap?heatmap:[]}
-          animIndex={animIndex !== undefined && isPlaying ? animIndex : undefined}
-          encounterLines={encounterLines} />
+        <PoetryMap poets={trajectoryPoets} heatmap={showHeatmap?heatmap:[]}
+          encounterLines={encounterLines} fenceResults={fenceResults} onFenceClick={handleFenceClick} />
       </div>
     </div>
   )
