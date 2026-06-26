@@ -1,0 +1,32 @@
+# 中国古诗词文化互动平台 — 后端依赖
+# FastAPI + PostGIS + SQLAlchemy + 其他基础组件
+# 版本待锁定，此处为初始候选
+
+# Web 框架
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+
+# 数据库
+sqlalchemy>=2.0.30
+asyncpg>=0.30.0
+geoalchemy2>=0.15.0
+alembic>=1.13.0
+
+# 认证
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# 工具
+pydantic>=2.7.0
+python-multipart>=0.0.9
+
+# 搜索引擎（客户端）
+elasticsearch>=8.13.0
+# opensearch-py>=2.6.0  # 若选用 OpenSearch
+
+# Redis
+redis>=5.0.0
+
+# 开发/测试
+pytest>=8.2.0
+httpx>=0.27.0
