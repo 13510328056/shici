@@ -470,29 +470,18 @@ export default function App() {
             {selectedIds.map((id, i) => {
               const evts = poetsData.get(id) || []
               const p = poets.find(p => p.poet_id === id)
-              const poems = poemsMap.get(id) || []
               return (
                 <div key={id} style={{marginBottom:10}}>
-                  <div style={ST.tag(POET_COLORS[i % POET_COLORS.length])}>{p?.name}</div>
+                  <div style={ST.tag(POET_COLORS[i % POET_COLORS.length])}>{p?.name}
+                    <span style={{marginLeft:8,cursor:'pointer',fontSize:10,fontWeight:400,color:'#fff',textDecoration:'underline',opacity:0.8}}
+                      onClick={(e)=>{e.stopPropagation();
+                        if(!poemsMap.get(id)?.length){fetch(`/api/v1/poets/${id}/poetry`).then(r=>r.json()).then(d=>{if(d?.poems){setPoemsMap(m=>{const n=new Map(m);n.set(id,d.poems);return n});setViewingPoet(id)}})}else setViewingPoet(id)
+                      }}>查看作品</span>
+                  </div>
                   <div style={{fontSize:11,lineHeight:1.6,color:'#666',marginLeft:4,marginBottom:4}}>
                     {evts.length} 事件 · 年份 {evts[0]?.event_year||'?'}~{evts[evts.length-1]?.event_year||'?'}
-                    {poems.length > 0 && ' · ' + poems.length + ' 首作品'}
+                    {poemsMap.get(id)?.length > 0 && (' · ' + poemsMap.get(id).length + ' 首')}
                   </div>
-                  {poems.length > 0 && (
-                    <div style={{borderLeft:'2px solid '+T.border, paddingLeft:8, marginLeft:4}}>
-                      {poems.slice(0, 8).map(poem => (
-                        <div key={poem.title} style={{fontSize:11, lineHeight:1.6, padding:'2px 0', cursor:'pointer'}}
-                          onClick={() => alert(poem.content)}>
-                          <span style={{color:T.textTitle}}>{poem.title}</span>
-                          <span style={{color:T.textMuted, marginLeft:4}}>{poem.genre}</span>
-                          {poem.mood_tags?.length > 0 && (
-                            <span style={{color:T.textMuted, marginLeft:4, fontSize:10}}>{poem.mood_tags.slice(0,3).join(',')}</span>
-                          )}
-                        </div>
-                      ))}
-                      {poems.length > 8 && <div style={{fontSize:10,color:T.textMuted,marginTop:2}}>共 {poems.length} 首</div>}
-                    </div>
-                  )}
                 </div>
               )
             })}
