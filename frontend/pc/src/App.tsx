@@ -269,7 +269,15 @@ export default function App() {
           </div>
           {selectedIds.length > 0 && (
             <div style={{marginTop:4,fontSize:T.fsSmall,color:T.textMuted}}>
-              已选 {selectedIds.length} 位: {selectedIds.map(id => poetName(id)).join(' · ')}
+              已选 {selectedIds.length} 位: {selectedIds.map(id => {
+                const hasPoems = poemsMap.get(id)?.length > 0
+                return <span key={id}>{poetName(id)}
+                  <span style={{marginLeft:4,cursor:'pointer',color:T.accent,fontWeight:600,fontSize:10}}
+                    onClick={()=>{
+                      if(!hasPoems){fetch(`/api/v1/poets/${id}/poetry`).then(r=>r.json()).then(d=>{if(d?.poems){setPoemsMap(m=>{const n=new Map(m);n.set(id,d.poems);return n});setViewingPoet(id)}})}else setViewingPoet(id)
+                    }}>[作品]</span>{' · '}
+                </span>
+              })}
             </div>
           )}
           <div style={{fontSize:10,color:T.textMuted,marginTop:4}}>载入 {poets.length} 位唐宋诗人 · 搜索过滤</div>
@@ -472,12 +480,7 @@ export default function App() {
               const p = poets.find(p => p.poet_id === id)
               return (
                 <div key={id} style={{marginBottom:10}}>
-                  <div style={ST.tag(POET_COLORS[i % POET_COLORS.length])}>{p?.name}
-                    <span style={{marginLeft:8,cursor:'pointer',fontSize:10,fontWeight:400,color:'#fff',textDecoration:'underline',opacity:0.8}}
-                      onClick={(e)=>{e.stopPropagation();
-                        if(!poemsMap.get(id)?.length){fetch(`/api/v1/poets/${id}/poetry`).then(r=>r.json()).then(d=>{if(d?.poems){setPoemsMap(m=>{const n=new Map(m);n.set(id,d.poems);return n});setViewingPoet(id)}})}else setViewingPoet(id)
-                      }}>查看作品</span>
-                  </div>
+                  <div style={ST.tag(POET_COLORS[i % POET_COLORS.length])}>{p?.name}</div>
                   <div style={{fontSize:11,lineHeight:1.6,color:'#666',marginLeft:4,marginBottom:4}}>
                     {evts.length} 事件 · 年份 {evts[0]?.event_year||'?'}~{evts[evts.length-1]?.event_year||'?'}
                     {poemsMap.get(id)?.length > 0 && (' · ' + poemsMap.get(id).length + ' 首')}
