@@ -422,6 +422,39 @@ function Legend() {
   return null
 }
 
+// ─── 主题路线图层 ────────────────────────────
+function RouteLayer({ route }: { route: any }) {
+  const map = useMap()
+  useEffect(() => {
+    if (!route?.stops?.length) return
+    const g = L.layerGroup()
+    const pts: [number, number][] = route.stops.map((s: any) => [s.lat, s.lon])
+
+    // 连线
+    L.polyline(pts, { color: route.color || '#FF6B35', weight: 3, opacity: 0.7, dashArray: '8, 4' }).addTo(g)
+
+    // 带序号的站点标记
+    route.stops.forEach((s: any, i: number) => {
+      const num = i + 1
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="width:26px;height:26px;border-radius:50%;background:${route.color || '#FF6B35'};color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff">${num}</div>`,
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
+      })
+      L.marker([s.lat, s.lon], { icon })
+        .bindPopup(`<b>${num}. ${s.place}</b><br/>${s.desc || ''}`)
+        .addTo(g)
+    })
+
+    g.addTo(map)
+    // 缩放到所有站点
+    map.fitBounds(L.latLngBounds(pts).pad(0.15))
+    return () => { map.removeLayer(g) }
+  }, [map, route])
+  return null
+}
+
 // ─── 主组件 ───────────────────────────────
 export interface PoetTrajectoryData {
   name: string
@@ -439,12 +472,13 @@ interface PoetryMapProps {
   fenceResults?: { lat: number; lon: number; places: PlaceName[] }
   fenceMode?: boolean
   onFenceClick?: (lat: number, lon: number) => void
+  activeRoute?: any
 }
 
 export default function PoetryMap({
   places = [], poets = [], heatmap = [], encounterLines = [],
   searchResults = [],
-  fenceResults, fenceMode = false, onFenceClick,
+  fenceResults, fenceMode = false, onFenceClick, activeRoute,
 }: PoetryMapProps) {
   return (
     <div style={{ width:'100%', height:'100%', position:'relative' }}>
@@ -476,6 +510,7 @@ export default function PoetryMap({
             <SearchResultMarkers results={searchResults} />
           </LayersControl.Overlay>
         )}
+        {activeRoute && <RouteLayer route={activeRoute} />}
         <DistanceMeasure />
         <ScreenshotButton />
         <Legend />

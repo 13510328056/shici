@@ -32,6 +32,7 @@ export default function App() {
   const [searching, setSearching] = useState(false)
   const [compareList, setCompareList] = useState<Array<{title:string;content:string;author?:string;genre?:string;mood_tags?:string[];dynasty?:string}>>([])
   const [showCompare, setShowCompare] = useState(false)
+  const [activeRoute, setActiveRoute] = useState<any>(null)
 
   const [poets, setPoets] = useState<Array<{poet_id:string;name:string;dynasty:string}>>([])
   const [poetSearch, setPoetSearch] = useState('')
@@ -377,7 +378,7 @@ export default function App() {
 
         {/* 文旅交互 */}
         <TourismPanel onRouteSelect={(route) => {
-          console.log('Route selected:', route?.name)
+          setActiveRoute(route)
         }} />
 
         {/* AI 创作工具 */}
@@ -470,7 +471,8 @@ export default function App() {
         <PoetryMap poets={trajectoryPoets} heatmap={showHeatmap?heatmap:[]}
           encounterLines={encounterLines} fenceResults={fenceResults}
           fenceMode={fenceMode} onFenceClick={handleFenceClick}
-          searchResults={showUnified ? unifiedResults?.poems?.map((r:any)=>({title:r.title,author:r.author})) || [] : []} />
+          searchResults={showUnified ? unifiedResults?.poems?.map((r:any)=>({title:r.title,author:r.author})) || [] : []}
+          activeRoute={activeRoute} />
       </div>
 
       {/* 诗人作品浮层 */}
