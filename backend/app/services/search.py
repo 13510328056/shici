@@ -47,6 +47,7 @@ class SearchService:
             select(Poetry)
             .join(PoetryFeature, PoetryFeature.poetry_id == Poetry.poetry_id)
             .join(Poet, Poet.poet_id == Poetry.author_id)
+            .outerjoin(PlaceName, PlaceName.place_id == PoetryFeature.geo_creation_place_id)
             .options(joinedload(Poetry.features), joinedload(Poetry.author))
         )
 

@@ -1,6 +1,6 @@
 /** 文旅交互面板 — 主题路线 / 景点诗词 / 打卡分享 */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { theme as T, sharedStyles as S } from '../theme'
 
 const ST = {
@@ -46,6 +46,7 @@ export default function TourismPanel({ onRouteSelect }: { onRouteSelect?: (route
   const [checkins, setCheckins] = useState<string[]>(loadCheckins)
   const [tab, setTab] = useState<'route' | 'place' | 'checkin'>('route')
   const [lastCheckin, setLastCheckin] = useState<string | null>(null)
+  const placeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     fetch('/api/v1/tourism/routes').then(r => r.json()).then(d => setRoutes(d.routes || [])).catch(() => {})
@@ -137,7 +138,12 @@ export default function TourismPanel({ onRouteSelect }: { onRouteSelect?: (route
         <div>
           <div style={{ display: 'flex', gap: 4, marginBottom: 6 }}>
             <input type="text" placeholder="输入景点名（如：长安）"
-              value={place} onChange={e => loadPlacePoems(e.target.value)}
+              value={place} onChange={e => {
+                const v = e.target.value
+                setPlace(v)
+                if (placeTimer.current) clearTimeout(placeTimer.current)
+                placeTimer.current = setTimeout(() => loadPlacePoems(v), 300)
+              }}
               style={{ flex: 1, padding: '3px 6px', border: '1px solid #d0cdc4', borderRadius: 4, fontSize: 11, fontFamily: 'serif' }} />
           </div>
           {poems.length > 0 && (

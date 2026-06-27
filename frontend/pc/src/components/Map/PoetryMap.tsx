@@ -299,10 +299,6 @@ function ScreenshotButton() {
       btn.title = '截图下载（保存为PNG）'
       btn.style.cssText = 'width:34px;height:34px;background:#fff;border:2px solid rgba(0,0,0,0.2);border-radius:4px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center'
       btn.onclick = () => {
-        const c = map.getContainer()
-        // 用canvg方式截图：创建canvas并绘制SVG
-        // 提示：浏览器截图无法捕获地图瓦片（CORS限制）
-        // 推荐使用浏览器自带"截图"功能或操作系统截图工具
         alert('地图截图建议使用浏览器自带截图功能（Ctrl+Shift+S）\n因瓦片地图CORS限制，程序化截图无法包含底图。')
       }
       return btn
