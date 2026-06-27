@@ -1,5 +1,5 @@
-# 中国古诗词文化互动平台 — 本地开发环境
-# 用于 Windows 本机 Docker Desktop 部署
+# PoetrySpace — 本地开发环境 Docker Compose
+# 完整服务栈：PostGIS + Redis + API + Web
 
 services:
 
@@ -10,7 +10,7 @@ services:
     environment:
       POSTGRES_DB: poetry_space
       POSTGRES_USER: poetry
-      POSTGRES_PASSWORD: PoetrySpace2024!
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-PoetrySpace2024!}
       TZ: Asia/Shanghai
     ports:
       - "5432:5432"
@@ -31,12 +31,51 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes --requirepass RedisPass2024!
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-RedisPass2024!}
     healthcheck:
       test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: poetryspace-api
+    restart: unless-stopped
+    environment:
+      ENV: development
+      DATABASE_URL: postgresql+asyncpg://poetry:${POSTGRES_PASSWORD:-PoetrySpace2024!}@postgis:5432/poetry_space
+      REDIS_URL: redis://:${REDIS_PASSWORD:-RedisPass2024!}@redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
+      CORS_ORIGINS: http://localhost:15173,http://localhost
+    ports:
+      - "18001:8000"
+    depends_on:
+      postgis:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - ../backend:/app  # 开发模式：挂载代码热更新
+
+  web:
+    build:
+      context: ../frontend/pc
+      dockerfile: Dockerfile
+    container_name: poetryspace-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      api:
+        condition: service_healthy
 
 volumes:
   postgis_data:

@@ -5,6 +5,9 @@ import { POET_COLORS } from './components/Map/PoetryMap'
 import type { TrajectoryEvent, HeatmapPoint, PlaceName } from './types'
 import { getHeatmap, fenceQuery } from './api'
 import { theme as T, sharedStyles as S } from './theme'
+import AIToolsPanel from './components/AIToolsPanel'
+import PoetryOverlay from './components/PoetryOverlay'
+import PoemReadingOverlay from './components/PoemReadingOverlay'
 
 const ST = {
   container: { display:'flex', width:'100vw', height:'100vh', fontFamily:'"Noto Serif SC","Source Han Serif SC",serif', color:T.text, overflow:'hidden', background:T.bg } as const,
@@ -40,10 +43,12 @@ export default function App() {
   // 热力
   const [heatmap, setHeatmap] = useState<HeatmapPoint[]>([])
   const [showHeatmap, setShowHeatmap] = useState(false)
+  const [loading, setLoading] = useState({ heatmap: false, fence: false })
 
   // 围栏
   const [fenceMode, setFenceMode] = useState(false)
   const [viewingPoet, setViewingPoet] = useState<string|null>(null) // 正在查看作品的诗人ID
+  const [showPoemReading, setShowPoemReading] = useState(false)
   const [fenceResults, setFenceResults] = useState<{lat:number;lon:number;places:PlaceName[]}|undefined>(undefined)
 
   // 交游线段（暂存多诗人间的交游连线）
@@ -115,17 +120,22 @@ export default function App() {
   }, [])
 
   const handleFenceClick = useCallback(async (lat: number, lon: number) => {
+    setLoading(v => ({...v, fence: true}))
     try {
       const data = await fenceQuery(lon, lat)
       setFenceResults({ lat, lon, places: data.places })
       setFenceMode(false)
     } catch {}
+    setLoading(v => ({...v, fence: false}))
   }, [])
 
   const toggleHeatmap = useCallback(async () => {
     setShowHeatmap(v => !v)
-    if (!showHeatmap) { try { const d=await getHeatmap(); setHeatmap(d.points||[]) } catch {} }
-    else setHeatmap([])
+    if (!showHeatmap) {
+      setLoading(v => ({...v, heatmap: true}))
+      try { const d=await getHeatmap(); setHeatmap(d.points||[]) } catch {}
+      setLoading(v => ({...v, heatmap: false}))
+    } else setHeatmap([])
   }, [showHeatmap])
 
   // 交游：对选择的诗人两两计算
@@ -173,6 +183,7 @@ export default function App() {
     setTimeout(() => {
       const el = document.getElementById('poem-view')
       if(el) el.innerHTML='<div style="font-size:14px;font-weight:600;margin-bottom:8px;color:#C23B22">'+poem.title+'</div><div style="font-size:13px;line-height:2;white-space:pre-wrap;font-family:serif">'+poem.content+'</div>'+(poem.mood_tags?.length?'<div style="font-size:11px;color:#888;margin-top:8px">意境: '+poem.mood_tags.join(' · ')+'</div>':'')
+      setShowPoemReading(true)
     }, 100)
   }, [poets])
 
@@ -316,7 +327,7 @@ export default function App() {
           <div style={S.layerItem}><input type="checkbox" defaultChecked readOnly /><span>地名</span></div>
           <div style={S.layerItem}><input type="checkbox" checked={selectedIds.length>0} readOnly /><span>轨迹 ({selectedIds.length}人)</span></div>
           <div style={S.layerItem}>
-            <input type="checkbox" checked={showHeatmap} onChange={toggleHeatmap} /><span>热力</span>
+            <input type="checkbox" checked={showHeatmap} onChange={toggleHeatmap} /><span>热力{loading.heatmap ? ' (计算中...)' : ''}</span>
             {showHeatmap && (
               <select id="heat-filter" style={{fontSize:10,padding:'1px 4px',borderRadius:4,border:'1px solid #d0cdc4',marginLeft:4}}
                 onChange={async(e)=>{
@@ -334,112 +345,12 @@ export default function App() {
             <button style={{...ST.animBtn, background:fenceMode?'#e8e0d4':'#fff', margin:0, fontSize:11}}
               onClick={toggleFenceMode}>{fenceMode ? '退出围栏模式' : '围栏查询'}</button>
             {fenceMode && <span style={{fontSize:11,color:'#E91E63',marginLeft:6}}>点地图查80km内</span>}
+            {loading.fence && <span style={{fontSize:11,color:'#888',marginLeft:6}}>查询中...</span>}
           </div>
         </div>
 
         {/* AI 创作工具 */}
-        <div style={S.panel}>
-          <div style={S.sectionTitle}>AI 创作辅助</div>
-
-          {/* 对仗推荐 */}
-          <div style={{fontSize:11,color:'#888',marginBottom:4}}>对仗推荐</div>
-          <div style={{display:'flex',gap:4,marginBottom:6}}>
-            <input type="text" id="ai-input" placeholder="输入字词"
-              style={{flex:1,padding:'3px 6px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif'}} />
-            <button onClick={async()=>{
-              const v=(document.getElementById('ai-input') as HTMLInputElement).value;
-              if(!v)return;
-              const d=await fetch('/api/v1/ai/antithesis/recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input_text:v})}).then(r=>r.json());
-              const el=document.getElementById('ai-results');
-              if(el) el.innerHTML=(d.candidates||[]).map((c:any)=>'<span style="display:inline-block;padding:2px 8px;margin:2px;border-radius:8px;border:1px solid #e0dcd4;font-size:12px">'+c.word+' <small style="color:#888">'+c.category+'</small></span>').join('')||'<span style="font-size:11px;color:#aaa">无推荐</span>';
-            }} style={ST.animBtn}>推荐</button>
-          </div>
-          <div id="ai-results" style={{minHeight:20,marginBottom:6}}></div>
-
-          {/* 格律校验 */}
-          <div style={{fontSize:11,color:'#888',marginBottom:4}}>格律校验</div>
-          <textarea id="rhythm-input" placeholder="输入诗句" rows={2}
-            style={{width:'100%',padding:'4px 6px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif',resize:'vertical'}} />
-          <div style={{display:'flex',gap:4,marginTop:4}}>
-            <select id="rhythm-genre" style={{padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
-              <option value="七绝">七绝</option><option value="七律">七律</option>
-              <option value="五绝" selected>五绝</option><option value="五律">五律</option>
-            </select>
-            <button onClick={async()=>{
-              const c=(document.getElementById('rhythm-input') as HTMLTextAreaElement).value;
-              const g=(document.getElementById('rhythm-genre') as HTMLSelectElement).value;
-              if(!c)return;
-              const d=await fetch('/api/v1/ai/rhythm/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:c,genre:g,rhyme_system:'平水韵'})}).then(r=>r.json());
-              const el=document.getElementById('rhythm-results');
-              if(!el)return;
-              if(d.passed){el.innerHTML='<span style="font-size:12px;color:#4CAF50">格律无误</span>'}
-              else{el.innerHTML='<div style="font-size:12px;color:#E91E63">发现 '+d.errors.length+' 处问题：</div>'+d.errors.map((e:any)=>'<div style="font-size:11px;color:#666;padding:2px 0"><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#fdd;margin-right:4px;font-size:10px">'+e.type+'</span>'+String(e.message||'').slice(0,50)+'</div>').join('')}
-            }} style={ST.animBtn}>校验</button>
-          </div>
-          <div id="rhythm-results" style={{minHeight:20,marginTop:4,marginBottom:6}}></div>
-
-          {/* 仿写改写 */}
-          <div style={{fontSize:11,color:'#888',marginBottom:4}}>仿写改写</div>
-          <div style={{display:'flex',gap:4,flexWrap:'wrap',marginBottom:4}}>
-            <select id="rw-mode" style={{flex:1,minWidth:60,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
-              <option value="style">风格仿写</option><option value="expand">短句扩写</option>
-              <option value="convert">体裁互转</option><option value="perspective">视角改写</option>
-            </select>
-            <select id="rw-style" style={{width:80,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
-              <option value="唐诗雄浑">唐诗雄浑</option><option value="宋词婉约">宋词婉约</option>
-              <option value="边塞豪放">边塞豪放</option>
-            </select>
-            <select id="rw-genre" style={{width:60,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
-              <option value="七绝">七绝</option><option value="七律">七律</option>
-              <option value="五绝" selected>五绝</option>
-            </select>
-          </div>
-          <textarea id="rw-input" placeholder="输入诗句或关键词" rows={2}
-            style={{width:'100%',padding:'4px 6px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif',resize:'vertical'}} />
-          <button onClick={async()=>{
-            const mode=(document.getElementById('rw-mode') as HTMLSelectElement).value;
-            const style=(document.getElementById('rw-style') as HTMLSelectElement).value;
-            const genre=(document.getElementById('rw-genre') as HTMLSelectElement).value;
-            const input=(document.getElementById('rw-input') as HTMLTextAreaElement).value;
-            let url='', body={};
-            if(mode==='style'){url='/api/v1/ai/rewrite/style';body={content:input,style,genre}}
-            else if(mode==='expand'){url='/api/v1/ai/rewrite/expand';body={input,genre}}
-            else if(mode==='convert'){url='/api/v1/ai/rewrite/convert';body={content:input,from_genre:genre,to_genre:genre==='五绝'?'七绝':'五绝'}}
-            else{url='/api/v1/ai/rewrite/perspective';body={content:input,perspective:style==='唐诗雄浑'?'隐士':'游子'}}
-            try{
-              const d=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
-              const el=document.getElementById('rw-results');
-              if(el) el.innerHTML='<div style="font-size:12px;line-height:1.8;color:#333;padding:6px;background:#f5f0ea;border-radius:4px">'+(d.result||d.error||'无结果')+'</div>'+(d.note?'<div style="font-size:10px;color:#888;margin-top:2px">'+d.note+'</div>':'');
-            }catch(e){}
-          }} style={{...ST.animBtn,width:'100%',marginTop:4}}>生成</button>
-          <div id="rw-results" style={{minHeight:20,marginTop:4,marginBottom:4}}></div>
-
-          {/* 意境匹配 */}
-          <div style={{fontSize:11,color:'#888',marginBottom:4}}>意境匹配创作</div>
-          <div style={{display:'flex',gap:4,flexWrap:'wrap',marginBottom:4}}>
-            <select id="mood-select" style={{flex:1,minWidth:80,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
-              {['山水','送别','思乡','边塞','田园','怀古','登临','闺怨'].map(m => <option key={m} value={m} selected={m==='山水'}>{m}</option>)}
-            </select>
-            <select id="mood-season" style={{width:60,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
-              <option value="">四季</option><option value="春">春</option><option value="夏">夏</option><option value="秋">秋</option><option value="冬">冬</option>
-            </select>
-            <select id="mood-level" style={{width:60,padding:'2px 4px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}}>
-              <option value="入门">入门</option><option value="进阶">进阶</option>
-            </select>
-          </div>
-          <button onClick={async()=>{
-            const mood=(document.getElementById('mood-select') as HTMLSelectElement).value;
-            const season=(document.getElementById('mood-season') as HTMLSelectElement).value;
-            const level=(document.getElementById('mood-level') as HTMLSelectElement).value;
-            const d=await fetch('/api/v1/ai/mood/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mood_tag:mood,season,level})}).then(r=>r.json());
-            const el=document.getElementById('mood-results');
-            if(!el)return;
-            el.innerHTML='<div style="font-size:12px;font-weight:600;margin-bottom:4px">【'+d.mood+'】'+d.description+'</div>'+
-              '<div style="font-size:11px;color:#666;margin-bottom:4px">推荐意象：'+d.recommended_imagery.join('、')+'</div>'+
-              (d.framework?.tips?.length ? '<div style="font-size:11px;color:#555">创作提示：<ul style="margin:2px 0;padding-left:16px">'+d.framework.tips.map((t:string)=>'<li>'+t+'</li>').join('')+'</ul></div>' : '');
-          }} style={{...ST.animBtn,width:'100%',marginTop:2}}>生成创作框架</button>
-          <div id="mood-results" style={{minHeight:20,marginTop:6,fontSize:12,lineHeight:1.6}}></div>
-        </div>
+        <AIToolsPanel />
 
         {/* 围栏信息 */}
         {fenceResults && (
@@ -525,64 +436,27 @@ export default function App() {
           searchResults={showUnified ? unifiedResults?.poems?.map((r:any)=>({title:r.title,author:r.author})) || [] : []} />
       </div>
 
-      {/* 诗人作品浮层 — 古风卷轴 */}
+      {/* 诗人作品浮层 */}
       {viewingPoet && (() => {
         const poems = poemsMap.get(viewingPoet) || []
         const p = poets.find(pn => pn.poet_id === viewingPoet)
         return (
-          <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(44,44,44,0.6)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}}
-            onClick={()=>setViewingPoet(null)}>
-            <div style={{background:'#F8F4EE',border:'1px solid #C4B5A0',borderRadius:4,width:'72%',maxWidth:720,height:'82%',display:'flex',flexDirection:'column',boxShadow:'0 12px 50px rgba(0,0,0,.4)',position:'relative'}} onClick={e=>e.stopPropagation()}>
-              {/* 卷轴顶轴 */}
-              <div style={{height:4,background:'linear-gradient(90deg,#8B7355,#C4B5A0,#8B7355)',borderRadius:'2px 2px 0 0'}} />
-              {/* 标题区 */}
-              <div style={{padding:'20px 28px 12px',borderBottom:'1px solid #D4C5A9',textAlign:'center',position:'relative'}}>
-                <div style={{fontSize:18,fontWeight:600,color:'#5B4A3E',letterSpacing:2,fontFamily:'serif'}}>{p?.name || ''}<span style={{fontSize:14,color:'#8B7355',marginLeft:8}}>诗文集</span></div>
-                <div style={{fontSize:11,color:'#999',marginTop:4}}>共收录诗词 {poems.length} 首</div>
-                <button onClick={()=>setViewingPoet(null)} style={{position:'absolute',top:20,right:20,padding:'4px 12px',border:'1px solid #C4B5A0',background:'#FFFEF9',borderRadius:3,fontSize:11,cursor:'pointer',color:'#5B4A3E',fontFamily:'serif'}}>闭卷 ✕</button>
-              </div>
-              {/* 诗作列表 — 仿古书简 */}
-              <div style={{flex:1,overflow:'auto',padding:'12px 24px'}}>
-                {poems.map((poem, idx) => (
-                  <div key={poem.title} style={{padding:'10px 14px',margin:'6px 0',border:'1px solid #E5DDD0',borderRadius:3,cursor:'pointer',background:'#FFFEF9',transition:'all 0.2s'}}
-                    onClick={() => {
-                      const el = document.getElementById('poem-view');
-                      if(el) el.innerHTML='<div style=\"font-size:16px;font-weight:600;color:#5B4A3E;margin-bottom:8px;letter-spacing:1px\">'+poem.title+'</div><div style=\"font-size:13px;color:#888;margin-bottom:10px\">'+poem.genre+(poem.mood_tags?.length?' · '+poem.mood_tags.join(' · '):'')+'</div><div style=\"font-size:14px;line-height:2.2;white-space:pre-wrap;font-family:serif;color:#2c2c2c\">'+poem.content+'</div>';
-                      const ov=document.getElementById('poem-overlay');if(ov)ov.style.display='flex';
-                    }}>
-                    <div style={{display:'flex',alignItems:'baseline',gap:8}}>
-                      <span style={{fontSize:11,color:'#C4B5A0',fontWeight:600,minWidth:24}}>{String(idx+1).padStart(2,'0')}</span>
-                      <span style={{fontSize:14,fontWeight:600,color:'#5B4A3E',fontFamily:'serif'}}>{poem.title}</span>
-                      <span style={{fontSize:11,color:'#B8A88C',marginLeft:'auto'}}>{poem.genre}</span>
-                    </div>
-                    <div style={{fontSize:11,color:'#999',marginLeft:32,marginTop:2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{poem.content.slice(0,50)}...</div>
-                  </div>
-                ))}
-              </div>
-              {/* 卷轴底轴 */}
-              <div style={{height:4,background:'linear-gradient(90deg,#8B7355,#C4B5A0,#8B7355)',borderRadius:'0 0 2px 2px'}} />
-            </div>
-          </div>
+          <PoetryOverlay
+            poetName={p?.name || ''}
+            poems={poems}
+            onClose={() => setViewingPoet(null)}
+            onSelectPoem={(poem) => {
+              const el = document.getElementById('poem-view');
+              if (el) el.innerHTML = `<div style="font-size:16px;font-weight:600;color:#5B4A3E;margin-bottom:8px;letter-spacing:1px">${poem.title}</div><div style="font-size:13px;color:#888;margin-bottom:10px">${poem.genre || ''}${poem.mood_tags?.length ? ' · ' + poem.mood_tags.join(' · ') : ''}</div><div style="font-size:14px;line-height:2.2;white-space:pre-wrap;font-family:serif;color:#2c2c2c">${poem.content}</div>`
+              setShowPoemReading(true)
+            }}
+          />
         )
       })()}
 
-      {/* 诗词阅读浮层 — 古风书卷 */}
-      <div id="poem-overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(44,44,44,0.6)',zIndex:9999,alignItems:'center',justifyContent:'center'}}
-        onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}>
-        <div style={{background:'#F8F4EE',border:'1px solid #C4B5A0',borderRadius:4,maxWidth:'80%',maxHeight:'80%',overflow:'auto',padding:0,boxShadow:'0 12px 50px rgba(0,0,0,.4)',width:600}} onClick={e=>e.stopPropagation()}>
-          <div style={{height:4,background:'linear-gradient(90deg,#8B7355,#C4B5A0,#8B7355)'}} />
-          <div style={{padding:'28px 32px 20px'}}>
-            <div id="poem-view"></div>
-          </div>
-          <div style={{textAlign:'center',padding:'0 32px 20px'}}>
-            <button onClick={()=>{const el=document.getElementById('poem-overlay');if(el)el.style.display='none';}}
-              style={{padding:'6px 24px',border:'1px solid #C4B5A0',background:'#FFFEF9',borderRadius:3,fontSize:12,cursor:'pointer',color:'#5B4A3E',fontFamily:'serif',letterSpacing:1}}>合卷</button>
-          </div>
-          <div style={{height:4,background:'linear-gradient(90deg,#8B7355,#C4B5A0,#8B7355)'}} />
-        </div>
-      </div>
+      {/* 诗词阅读浮层 */}
+      <PoemReadingOverlay visible={showPoemReading} onClose={() => setShowPoemReading(false)} />
 
-      {/* 多诗对比浮层 */}
     </div>
   )
 }

@@ -8,6 +8,24 @@ const api = axios.create({
   timeout: 10000,
 })
 
+// 响应拦截器 — 统一错误处理
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response) {
+      const { status, data } = error.response
+      if (status === 401 || status === 403) {
+        console.warn('[API] 认证错误:', status, data?.detail || '')
+      } else if (status === 500) {
+        console.error('[API] 服务器错误:', data?.detail || data?.error || '未知错误')
+      }
+    } else if (error.request) {
+      console.error('[API] 网络错误: 无法连接到服务器')
+    }
+    return Promise.reject(error)
+  }
+)
+
 /** 搜索地名（古今模糊查询） */
 export async function searchPlaces(q: string) {
   const res = await api.get('/places/search', { params: { q } })

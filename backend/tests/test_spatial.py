@@ -43,7 +43,9 @@ class TestSpatialQueryService:
         """围栏查询正常路径"""
         mock_result = MagicMock()
         mock_result.mappings.return_value.all.return_value = [
-            {"place_id": "1", "ancient_name": "长安", "distance_km": 5.0}
+            {"place_id": "1", "ancient_name": "长安", "modern_name": "西安",
+             "province": "陕西", "city": "西安",
+             "wgs84_lon": 108.94, "wgs84_lat": 34.26}
         ]
         mock_db.execute = AsyncMock(return_value=mock_result)
 
