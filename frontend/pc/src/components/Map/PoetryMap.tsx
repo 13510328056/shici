@@ -53,6 +53,13 @@ function PlaceMarkers({ places }: { places: PlaceName[] }) {
 }
 
 // ─── 多诗人轨迹 ────────────────────────────
+const RIDER_ICON = L.divIcon({
+  className: '',
+  html: '<div style="font-size:28px;line-height:1;text-align:center;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));animation:hop 0.6s ease-in-out infinite alternate">🏇</div>',
+  iconSize: [32, 32],
+  iconAnchor: [16, 28],
+})
+
 function MultiTrajectoryLayer({
   poets,
 }: {
@@ -60,6 +67,16 @@ function MultiTrajectoryLayer({
 }) {
   const map = useMap()
   const ref = useRef<L.LayerGroup | null>(null)
+
+  // 注入 CSS 动画
+  useEffect(() => {
+    if (!document.getElementById('rider-anim')) {
+      const style = document.createElement('style')
+      style.id = 'rider-anim'
+      style.textContent = '@keyframes hop{0%{transform:translateY(0)}100%{transform:translateY(-6px)}}'
+      document.head.appendChild(style)
+    }
+  }, [])
 
   useEffect(() => {
     if (ref.current) map.removeLayer(ref.current)
@@ -72,6 +89,7 @@ function MultiTrajectoryLayer({
       const end = animIndex !== undefined ? animIndex + 1 : valid.length
       const visible = valid.slice(0, end)
 
+      // 轨迹线
       if (visible.length > 1) {
         const pts = visible.map(e => [e.wgs84_lat, e.wgs84_lon] as [number, number])
         L.polyline(pts, { color, weight: 2.5, opacity: 0.7 })
@@ -80,15 +98,24 @@ function MultiTrajectoryLayer({
         pts.forEach(p => allBounds.push(L.latLng(p)))
       }
 
+      // 事件标记（骑马小人动画）
       visible.forEach((e, i) => {
-        const curr = animIndex !== undefined && i === animIndex
-        const evColor = EVENT_COLORS[e.event_type] || '#999'
-        L.circleMarker([e.wgs84_lat, e.wgs84_lon], {
-          radius: curr ? 10 : 6, fillColor: curr ? '#FFD700' : evColor,
-          color: curr ? '#333' : '#fff', weight: curr ? 3 : 1.5, fillOpacity: 0.9,
-        })
-          .bindPopup(`<b>${name}</b> · ${e.event_year} ${e.event_type}<br/>${e.ancient_place||''}${e.stay_duration_days ? `<br/>停留${e.stay_duration_days}天` : ''}`)
-          .addTo(g)
+        const isCurrent = animIndex !== undefined && i === animIndex
+        if (isCurrent && e.wgs84_lat && e.wgs84_lon) {
+          // 当前帧：骑马小人
+          L.marker([e.wgs84_lat, e.wgs84_lon], { icon: RIDER_ICON, zIndexOffset: 1000 })
+            .bindPopup(`<b>${name}</b> · ${e.event_year} ${e.event_type}<br/>${e.ancient_place||''}`, { offset: [0, -20] })
+            .addTo(g)
+        } else {
+          // 普通帧：圆点
+          const evColor = EVENT_COLORS[e.event_type] || '#999'
+          L.circleMarker([e.wgs84_lat, e.wgs84_lon], {
+            radius: 6, fillColor: evColor,
+            color: '#fff', weight: 1.5, fillOpacity: 0.9,
+          })
+            .bindPopup(`<b>${name}</b> · ${e.event_year} ${e.event_type}<br/>${e.ancient_place||''}${e.stay_duration_days ? `<br/>停留${e.stay_duration_days}天` : ''}`)
+            .addTo(g)
+        }
         allBounds.push(L.latLng(e.wgs84_lat, e.wgs84_lon))
       })
     })
