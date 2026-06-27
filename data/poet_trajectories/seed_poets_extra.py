@@ -128,4 +128,7 @@ EXTRA_POETS = [
     {"name": "朱淑真", "birth_year": "1135", "death_year": "1180", "dynasty": "宋", "tags": ["女词人", "断肠集"]},
     {"name": "吴淑姬", "birth_year": "1125", "death_year": "1175", "dynasty": "宋", "tags": ["女词人"]},
     {"name": "张孝祥", "birth_year": "1132", "death_year": "1170", "dynasty": "宋", "tags": ["豪放派", "爱国"]},
+
+    # ─── 魏晋 ────────────────────────
+    {"name": "曹操", "birth_year": "155", "death_year": "220", "dynasty": "魏晋", "tags": ["建安风骨", "政治家", "军事家"]},
 ]

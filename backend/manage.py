@@ -40,6 +40,17 @@ async def cmd_seed():
     from poetry_features.seed_poetry import POETRY_SEEDS
     from poetry_features.seed_poetry_extra import EXTRA_POETRY
 
+    # 曹操专属数据
+    try:
+        sys.path.insert(0, str(Path(__file__).parent.parent / "data"))
+        from caocao.seed_caocao import CAO_POET, CAO_TRAJECTORIES, CAO_POEMS
+        HAS_CAOCAO = True
+    except ImportError:
+        HAS_CAOCAO = False
+        CAO_POET = None
+        CAO_TRAJECTORIES = []
+        CAO_POEMS = []
+
     print("[seed] == 种子数据导入 ==")
 
     async with async_session_factory() as session:
@@ -65,7 +76,10 @@ async def cmd_seed():
         # 2. 诗人
         print("[seed 2/4] 诗人...")
         poet_map = {}
-        for row in POET_SEEDS + EXTRA_POETS:
+        all_poets = list(POET_SEEDS) + list(EXTRA_POETS)
+        if HAS_CAOCAO and CAO_POET:
+            all_poets.append(CAO_POET)
+        for row in all_poets:
             r = await session.execute(select(Poet).where(Poet.name == row["name"]))
             p = r.scalar_one_or_none()
             if p:
@@ -82,7 +96,8 @@ async def cmd_seed():
         # 3. 轨迹
         print("[seed 3/4] 轨迹...")
         n = 0
-        for row in TRAJECTORY_SEEDS:
+        all_trajectories = list(TRAJECTORY_SEEDS) + list(CAO_TRAJECTORIES)
+        for row in all_trajectories:
             poet, year, place_name, lon, lat, evt, stay, src = row
             p = poet_map.get(poet)
             if not p:
@@ -107,7 +122,8 @@ async def cmd_seed():
         # 4. 诗词
         print("[seed 4/4] 诗词+六维标注...")
         n = 0
-        for row in POETRY_SEEDS + EXTRA_POETRY:
+        all_poetry = list(POETRY_SEEDS) + list(EXTRA_POETRY) + list(CAO_POEMS)
+        for row in all_poetry:
             p = poet_map.get(row["author"])
             if not p:
                 continue
