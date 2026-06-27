@@ -23,12 +23,11 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite+aiosqlite:///./poetry_space_dev.db"
 
     # 搜索引擎
-    ELASTICSEARCH_URL: str = "http://localhost:9200"
+    # ELASTICSEARCH_URL: str = "http://localhost:9200"  # 预留
 
-    # Redis
-    REDIS_URL: str = "redis://localhost:6379/0"
+    # REDIS_URL: str = "redis://localhost:6379/0"  # 预留
 
-    # JWT
+    # JWT（预留，当前未启用认证）
     SECRET_KEY: str = "dev-secret-key-change-in-production"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24小时
 

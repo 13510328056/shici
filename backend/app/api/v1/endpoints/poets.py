@@ -15,17 +15,37 @@ router = APIRouter()
 
 
 @router.get("")
-async def list_poets(db: AsyncSession = Depends(get_db)):
-    """获取所有诗人列表"""
+async def list_poets(
+    limit: Optional[int] = Query(None, description="返回条数上限"),
+    offset: Optional[int] = Query(0, ge=0, description="分页偏移"),
+    dynasty: Optional[str] = Query(None, description="朝代过滤"),
+    db: AsyncSession = Depends(get_db),
+):
+    """获取诗人列表（支持分页、朝代过滤）"""
     from app.models.poet import Poet
-    from sqlalchemy import select
-    result = await db.execute(select(Poet).order_by(Poet.dynasty, Poet.name))
+    from sqlalchemy import select, func
+
+    # 总数
+    count_q = select(func.count()).select_from(Poet)
+    if dynasty:
+        count_q = count_q.where(Poet.dynasty == dynasty)
+    total = (await db.execute(count_q)).scalar() or 0
+
+    # 查询
+    q = select(Poet).order_by(Poet.dynasty, Poet.name)
+    if dynasty:
+        q = q.where(Poet.dynasty == dynasty)
+    if limit:
+        q = q.limit(limit).offset(offset)
+
+    result = await db.execute(q)
     poets = result.scalars().all()
     return {
         "poets": [
             {"poet_id": str(p.poet_id), "name": p.name, "dynasty": p.dynasty}
             for p in poets
-        ]
+        ],
+        "total": total,
     }
 
 
