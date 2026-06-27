@@ -9,10 +9,10 @@ from typing import Optional
 
 from openpyxl import Workbook
 import shapefile
-from sqlalchemy import select, text
+from sqlalchemy import select, text, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.place_name import PlaceName
+from app.models.place_name import PlaceName, PlaceNameChange
 from app.models.poet import Poet, PoetTrajectory, PoetEncounter
 from app.models.poetry import Poetry, PoetryFeature
 
@@ -230,25 +230,52 @@ class ExportService:
         )
 
     async def export_stats_json(self) -> dict:
-        """导出统计数据（JSON格式，用于学术引用）"""
-        poet_count = (await self.db.execute(select(Poet))).scalars().all().__len__()
-        place_count = (await self.db.execute(select(PlaceName))).scalars().all().__len__()
-        poetry_count = (await self.db.execute(select(Poetry))).scalars().all().__len__()
-        traj_count = (await self.db.execute(select(PoetTrajectory))).scalars().all().__len__()
+        """导出统计数据（JSON格式，匹配前端 StatsData 接口）"""
+        # 各实体计数
+        models = {
+            "poets": Poet, "places": PlaceName, "poetry": Poetry,
+            "trajectories": PoetTrajectory, "features": PoetryFeature,
+            "encounters": PoetEncounter, "name_changes": PlaceNameChange,
+        }
+        counts = {}
+        for name, model in models.items():
+            cnt = (await self.db.execute(select(func.count()).select_from(model))).scalar()
+            counts[name] = cnt
 
-        # 朝代分布
-        dynasty_sql = text("SELECT dynasty, COUNT(*) as cnt FROM poets GROUP BY dynasty ORDER BY cnt DESC")
-        dynasty_dist = [dict(r) for r in (await self.db.execute(dynasty_sql)).mappings().all()]
+        # 朝代分布 → flat dict
+        dynasties = {}
+        r = await self.db.execute(
+            select(Poet.dynasty, func.count()).group_by(Poet.dynasty).order_by(func.count().desc())
+        )
+        for dynasty, cnt in r:
+            dynasties[dynasty] = cnt
+
+        # 体裁分布
+        genres = {}
+        r = await self.db.execute(
+            select(Poetry.genre, func.count()).group_by(Poetry.genre).order_by(func.count().desc())
+        )
+        for genre, cnt in r:
+            if genre:
+                genres[genre] = cnt
+
+        # 创作地 TOP 20
+        top_places = []
+        r = await self.db.execute(text("""
+            SELECT pn.ancient_name, COUNT(*) as cnt
+            FROM poetry_features pf
+            JOIN place_names pn ON pn.place_id = pf.geo_creation_place_id
+            GROUP BY pf.geo_creation_place_id
+            ORDER BY cnt DESC LIMIT 20
+        """))
+        for row in r:
+            top_places.append({"place": row[0], "count": row[1]})
 
         return {
-            'export_time': datetime.utcnow().isoformat(),
-            'data_summary': {
-                'poets': poet_count,
-                'places': place_count,
-                'poetry': poetry_count,
-                'trajectories': traj_count,
-            },
-            'dynasty_distribution': dynasty_dist,
+            "counts": counts,
+            "dynasties": dynasties,
+            "genres": genres,
+            "top_places": top_places,
         }
 
     async def export_places_excel(self) -> bytes:

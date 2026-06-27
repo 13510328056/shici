@@ -62,7 +62,7 @@ export default function App() {
   const [encounterLines, setEncounterLines] = useState<Array<{from:[number,number];to:[number,number];probability:number}>>([])
 
   useEffect(() => {
-    fetch('/api/v1/poets').then(r=>r.json()).then(d=>setPoets(d.poets||[])).catch(()=>{})
+    fetch('/api/v1/poets').then(r=>r.json()).then(d=>setPoets(d.poets||[])).catch(()=>console.warn('[API] 获取诗人列表失败'))
   }, [])
 
   // 选/取消选诗人
@@ -471,7 +471,7 @@ export default function App() {
         <PoetryMap poets={trajectoryPoets} heatmap={showHeatmap?heatmap:[]}
           encounterLines={encounterLines} fenceResults={fenceResults}
           fenceMode={fenceMode} onFenceClick={handleFenceClick}
-          searchResults={showUnified ? unifiedResults?.poems?.map((r:any)=>({title:r.title,author:r.author})) || [] : []}
+          searchResults={showUnified ? unifiedResults?.poems?.map((r:any)=>({title:r.title,author:r.author,wgs84_lat:r.wgs84_lat,wgs84_lon:r.wgs84_lon,place_name:r.place_name})) || [] : []}
           activeRoute={activeRoute} />
       </div>
 

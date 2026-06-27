@@ -133,10 +133,18 @@ class SearchService:
         result = await self.db.execute(query)
         rows = result.unique().scalars().all()
 
-        # 转换结果
+        # 转换结果（含创作地坐标）
         results = []
         for poem in rows:
             feat = poem.features
+            lat = lng = None
+            place_name = ""
+            if feat and feat.geo_creation_place_id:
+                pn = (await self.db.execute(
+                    select(PlaceName).where(PlaceName.place_id == feat.geo_creation_place_id)
+                )).scalar_one_or_none()
+                if pn:
+                    lat, lng, place_name = pn.wgs84_lat, pn.wgs84_lon, pn.ancient_name
             results.append({
                 "poetry_id": str(poem.poetry_id),
                 "title": poem.title,
@@ -148,7 +156,9 @@ class SearchService:
                 "season": feat.season if feat else [],
                 "mood_tags": feat.mood_tags if feat else [],
                 "imagery_items": feat.imagery_items if feat else [],
-                "place_name": "",
+                "place_name": place_name,
+                "wgs84_lat": lat,
+                "wgs84_lon": lng,
             })
 
         return {

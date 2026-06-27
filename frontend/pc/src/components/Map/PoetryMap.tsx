@@ -264,23 +264,28 @@ function FenceResults({ results, lat, lon }: { results: PlaceName[]; lat: number
 }
 
 // ─── 搜索结果点位 ─────────────────────────
-function SearchResultMarkers({ results }: { results: Array<{ title: string; author: string }> }) {
+interface SearchResult { title: string; author: string; wgs84_lat?: number; wgs84_lon?: number; place_name?: string }
+
+function SearchResultMarkers({ results }: { results: SearchResult[] }) {
   const map = useMap()
   useEffect(() => {
     if (!results.length) return
     const g = L.layerGroup()
+    const hasCoords = results.some(r => r.wgs84_lat && r.wgs84_lon)
+
     results.slice(0, 50).forEach((r, i) => {
-      // 在随机偏移位置生成标记（搜索结果无坐标，用可视化展示）
-      // 实际项目应使用真实坐标，这里用地图中心周围随机偏移
-      const center = map.getCenter()
-      const offset = 0.5
-      const lat = center.lat + (Math.random() - 0.5) * offset * 2
-      const lng = center.lng + (Math.random() - 0.5) * offset * 2
+      let lat: number, lng: number
+      if (hasCoords && r.wgs84_lat && r.wgs84_lon) {
+        lat = r.wgs84_lat; lng = r.wgs84_lon  // 真实坐标
+      } else {
+        const c = map.getCenter()
+        lat = c.lat + (Math.random() - 0.5); lng = c.lng + (Math.random() - 0.5)  // 随机
+      }
       const hue = (i * 37) % 360
       L.circleMarker([lat, lng], {
-        radius: 4 + (i % 3) * 2, fillColor: `hsl(${hue}, 70%, 55%)`,
+        radius: 5, fillColor: `hsl(${hue}, 70%, 55%)`,
         color: '#fff', weight: 1, fillOpacity: 0.8,
-      }).bindPopup(`<b>${r.title}</b> — ${r.author}`).addTo(g)
+      }).bindPopup(`<b>${r.title}</b> — ${r.author}${r.place_name ? `<br/>📍 ${r.place_name}` : ''}`).addTo(g)
     })
     g.addTo(map)
     return () => { map.removeLayer(g) }
@@ -467,7 +472,7 @@ interface PoetryMapProps {
   places?: PlaceName[]
   poets?: PoetTrajectoryData[]
   heatmap?: HeatmapPoint[]
-  searchResults?: Array<{ title: string; author: string }>
+  searchResults?: SearchResult[]
   encounterLines?: Array<{ from: [number,number]; to: [number,number]; probability: number }>
   fenceResults?: { lat: number; lon: number; places: PlaceName[] }
   fenceMode?: boolean
