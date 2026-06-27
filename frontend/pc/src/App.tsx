@@ -37,6 +37,9 @@ export default function App() {
   const [compareList, setCompareList] = useState<Array<{title:string;content:string;author?:string;genre?:string;mood_tags?:string[];dynasty?:string}>>([])
   const [showCompare, setShowCompare] = useState(false)
   const [activeRoute, setActiveRoute] = useState<any>(null)
+  const [gotoLat, setGotoLat] = useState('')
+  const [gotoLng, setGotoLng] = useState('')
+  const [gotoKey, setGotoKey] = useState(0) // trigger flyTo
 
   const [poets, setPoets] = useState<Array<{poet_id:string;name:string;dynasty:string}>>([])
   const [poetSearch, setPoetSearch] = useState('')
@@ -385,6 +388,20 @@ export default function App() {
           </div>
         </div>
 
+        {/* 坐标工具 */}
+        <div style={S.panel}>
+          <div style={S.sectionTitle}>📍 坐标定位</div>
+          <div style={{display:'flex',gap:4,alignItems:'center'}}>
+            <input type="number" step="0.0001" placeholder="纬度" value={gotoLat}
+              onChange={e=>setGotoLat(e.target.value)}
+              style={{flex:1,padding:'3px 6px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}} />
+            <input type="number" step="0.0001" placeholder="经度" value={gotoLng}
+              onChange={e=>setGotoLng(e.target.value)}
+              style={{flex:1,padding:'3px 6px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:11}} />
+            <button style={ST.animBtn} onClick={()=>setGotoKey(k=>k+1)}>前往</button>
+          </div>
+        </div>
+
         {/* 文旅交互 */}
         <TourismPanel onRouteSelect={(route) => {
           setActiveRoute(route)
@@ -481,7 +498,8 @@ export default function App() {
           encounterLines={encounterLines} fenceResults={fenceResults}
           fenceMode={fenceMode} onFenceClick={handleFenceClick}
           searchResults={showUnified ? unifiedResults?.poems?.map((r:any)=>({title:r.title,author:r.author,wgs84_lat:r.wgs84_lat,wgs84_lon:r.wgs84_lon,place_name:r.place_name})) || [] : []}
-          activeRoute={activeRoute} isMobile={isMobile} />
+          activeRoute={activeRoute} isMobile={isMobile}
+          gotoLat={gotoLat} gotoLng={gotoLng} gotoKey={gotoKey} />
       </div>
 
       {/* 诗人作品浮层 */}

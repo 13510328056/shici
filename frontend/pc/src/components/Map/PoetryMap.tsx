@@ -3,7 +3,7 @@
  * 支持：多诗人轨迹叠加 / 围栏查询 / 动画 / 热力 / 交游网络
  */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { MapContainer, TileLayer, LayersControl, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -309,6 +309,54 @@ function ScreenshotButton() {
   return null
 }
 
+// ─── 坐标跳转 ──────────────────────────────
+function GotoHandler({ lat, lng, trigger }: { lat?: string; lng?: string; trigger?: number }) {
+  const map = useMap()
+  useEffect(() => {
+    if (!lat || !lng || !trigger) return
+    const la = parseFloat(lat), lo = parseFloat(lng)
+    if (isNaN(la) || isNaN(lo)) return
+    map.flyTo([la, lo], 8, { duration: 1.5 })
+  }, [map, trigger])
+  return null
+}
+
+// ─── 矩形框选 ──────────────────────────────
+function BoxSelectMode() {
+  const map = useMap()
+  const [active, setActive] = useState(false)
+
+  useEffect(() => {
+    if (!active) return
+    map.getContainer().style.cursor = 'crosshair'
+    map.on('boxzoom', (e: any) => {
+      const b = e.boxZoomBounds
+      if (b) {
+        L.popup()
+          .setLatLng(b.getCenter())
+          .setContent(`<b>框选范围</b><br/>${b.getSouthWest().lat.toFixed(2)},${b.getSouthWest().lng.toFixed(2)} ~ ${b.getNorthEast().lat.toFixed(2)},${b.getNorthEast().lng.toFixed(2)}`)
+          .openOn(map)
+      }
+    })
+    return () => {
+      map.getContainer().style.cursor = ''
+      map.off('boxzoom')
+    }
+  }, [map, active])
+
+  return (
+    <div style={{ position:'absolute', bottom:80, left:10, zIndex:1000 }}>
+      <button onClick={() => setActive(v => !v)}
+        style={{
+          padding:'6px 10px', background: active ? '#5B4A3E' : '#fff', color: active ? '#fff' : '#333',
+          border:'2px solid #5B4A3E', borderRadius:4, fontSize:11, cursor:'pointer',
+        }}>
+        {active ? '退出框选 (Shift+拖拽)' : '□ 框选'}
+      </button>
+    </div>
+  )
+}
+
 // ─── 距离测量工具 ─────────────────────────
 // 点击起点→点击终点→显示距离（km）
 let _measureCleanup: (() => void) | null = null
@@ -469,12 +517,16 @@ interface PoetryMapProps {
   onFenceClick?: (lat: number, lon: number) => void
   activeRoute?: any
   isMobile?: boolean
+  gotoLat?: string
+  gotoLng?: string
+  gotoKey?: number
 }
 
 export default function PoetryMap({
   places = [], poets = [], heatmap = [], encounterLines = [],
   searchResults = [],
   fenceResults, fenceMode = false, onFenceClick, activeRoute, isMobile,
+  gotoLat, gotoLng, gotoKey,
 }: PoetryMapProps) {
   return (
     <div style={{ width:'100%', height:'100%', position:'relative' }}>
@@ -507,6 +559,8 @@ export default function PoetryMap({
           </LayersControl.Overlay>
         )}
         {activeRoute && <RouteLayer route={activeRoute} />}
+        <GotoHandler lat={gotoLat} lng={gotoLng} trigger={gotoKey} />
+        {!isMobile && <BoxSelectMode />}
         {!isMobile && <DistanceMeasure />}
         {!isMobile && <ScreenshotButton />}
         {!isMobile && <Legend />}
