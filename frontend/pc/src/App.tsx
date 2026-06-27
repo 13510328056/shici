@@ -386,6 +386,20 @@ export default function App() {
             {fenceMode && <span style={{fontSize:11,color:'#E91E63',marginLeft:6}}>点地图查80km内</span>}
             {loading.fence && <span style={{fontSize:11,color:'#888',marginLeft:6}}>查询中...</span>}
           </div>
+          <div style={S.layerItem}>
+            <button style={{...ST.animBtn, margin:0, fontSize:11}}
+              onClick={()=>{setSelectedIds(prev => {
+                if (prev.length > 0) return []  // 清除
+                // 加载所有唐代诗人
+                const tang = poets.filter(p => p.dynasty === '唐').slice(0, 5).map(p => {
+                  if (!prev.includes(p.poet_id)) togglePoet(p.poet_id)
+                  return p.poet_id
+                })
+                return tang.length ? tang : prev
+              })}}
+            >跨朝代·唐</button>
+            <span style={{fontSize:10,color:'#888',marginLeft:4}}>一键加载</span>
+          </div>
         </div>
 
         {/* 坐标工具 */}

@@ -96,6 +96,66 @@ async def get_heatmap(
     return {"count": len(data), "points": data}
 
 
+@router.get("/stats")
+async def get_poet_stats(
+    poet_id: Optional[str] = Query(None, description="诗人ID，不传则返回全局统计"),
+    db: AsyncSession = Depends(get_db),
+):
+    """诗人统计数据 — 游历城市 / 作品分布 / 事件时长"""
+    from app.models.poet import Poet, PoetTrajectory
+    from app.models.poetry import Poetry, PoetryFeature
+    from app.models.place_name import PlaceName
+    from sqlalchemy import select, func, text
+
+    if poet_id:
+        # 单诗人统计
+        # 游历城市
+        city_sql = text("""
+            SELECT COUNT(DISTINCT t.ancient_place) FROM poet_trajectories t
+            WHERE t.poet_id = :pid AND t.ancient_place IS NOT NULL
+        """)
+        city_count = (await db.execute(city_sql, {"pid": poet_id})).scalar() or 0
+
+        # 各城市作品数
+        poems_sql = text("""
+            SELECT pn.ancient_name, COUNT(*) as cnt
+            FROM poetry p
+            JOIN poetry_features pf ON pf.poetry_id = p.poetry_id
+            JOIN place_names pn ON pn.place_id = pf.geo_creation_place_id
+            WHERE p.author_id = :pid
+            GROUP BY pn.place_id ORDER BY cnt DESC LIMIT 10
+        """)
+        poems_by_city = [{"city": r[0], "count": r[1]} for r in (await db.execute(poems_sql, {"pid": poet_id})).all()]
+
+        # 各事件类型时长
+        dur_sql = text("""
+            SELECT event_type, SUM(stay_duration_days) as total_days, COUNT(*) as events
+            FROM poet_trajectories WHERE poet_id = :pid AND stay_duration_days IS NOT NULL
+            GROUP BY event_type ORDER BY total_days DESC
+        """)
+        duration_by_type = [{"type": r[0], "days": r[1], "events": r[2]} for r in (await db.execute(dur_sql, {"pid": poet_id})).all()]
+
+        # 总作品数
+        total_poems = (await db.execute(
+            select(func.count()).select_from(Poetry).where(Poetry.author_id == poet_id)
+        )).scalar() or 0
+
+        return {
+            "poet_id": poet_id,
+            "total_cities": city_count,
+            "total_poems": total_poems,
+            "poems_by_city": poems_by_city,
+            "duration_by_type": duration_by_type,
+        }
+    else:
+        # 全局统计
+        r = await db.execute(
+            select(Poet.dynasty, func.count()).group_by(Poet.dynasty).order_by(func.count().desc())
+        )
+        dynasty_dist = [{"dynasty": d, "count": c} for d, c in r.all()]
+        return {"dynasty_distribution": dynasty_dist}
+
+
 @router.get("/{poet_id}/poetry")
 async def get_poet_poetry(
     poet_id: str,
