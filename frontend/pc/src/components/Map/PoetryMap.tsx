@@ -55,9 +55,9 @@ function PlaceMarkers({ places }: { places: PlaceName[] }) {
 // ─── 多诗人轨迹 ────────────────────────────
 const RIDER_ICON = L.divIcon({
   className: '',
-  html: '<div style="font-size:28px;line-height:1;text-align:center;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));animation:hop 0.6s ease-in-out infinite alternate">🏇</div>',
+  html: '<div style="font-size:26px;line-height:1;text-align:center;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))">🏇</div>',
   iconSize: [32, 32],
-  iconAnchor: [16, 28],
+  iconAnchor: [16, 24],
 })
 
 function MultiTrajectoryLayer({
@@ -66,27 +66,41 @@ function MultiTrajectoryLayer({
   poets: Array<{ name: string; events: TrajectoryEvent[]; color: string; animIndex?: number }>
 }) {
   const map = useMap()
-  const ref = useRef<L.LayerGroup | null>(null)
+  const bgRef = useRef<L.LayerGroup | null>(null)
+  const riderRef = useRef<L.Marker | null>(null)
+  const animRef = useRef<number>(0)
+  const prevIdx = useRef<number | undefined>(undefined)
 
-  // 注入 CSS 动画
+  // 注入 CSS 动画（平滑 hop + 阴影脉动）
   useEffect(() => {
-    if (!document.getElementById('rider-anim')) {
-      const style = document.createElement('style')
-      style.id = 'rider-anim'
-      style.textContent = '@keyframes hop{0%{transform:translateY(0)}100%{transform:translateY(-6px)}}'
-      document.head.appendChild(style)
+    if (!document.getElementById('rider-style')) {
+      const s = document.createElement('style')
+      s.id = 'rider-style'
+      s.textContent = `
+        @keyframes ride{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+        @keyframes gallop{0%,100%{transform:translateY(0) scaleX(1)}25%{transform:translateY(-4px) scaleX(1.05)}50%{transform:translateY(0) scaleX(1)}75%{transform:translateY(-3px) scaleX(0.95)}}
+        .rider-marker{animation:gallop 0.5s ease-in-out infinite}
+      `
+      document.head.appendChild(s)
     }
   }, [])
 
   useEffect(() => {
-    if (ref.current) map.removeLayer(ref.current)
+    // ── 清空背景层 ──
+    if (bgRef.current) map.removeLayer(bgRef.current)
     const g = L.layerGroup()
     const allBounds: L.LatLng[] = []
 
-    poets.forEach(({ name, events, color, animIndex }) => {
-      const valid = events.filter(e => e.wgs84_lon && e.wgs84_lat) as Array<TrajectoryEvent & { wgs84_lon: number; wgs84_lat: number }>
+    // 最后一个诗人的 animIndex 控制动画
+    const last = poets[poets.length - 1]
+    const animIdx = last?.animIndex
+
+    poets.forEach(({ name, events, color }) => {
+      const valid = events.filter(e => e.wgs84_lon && e.wgs84_lat) as Array<
+        TrajectoryEvent & { wgs84_lon: number; wgs84_lat: number }
+      >
       if (!valid.length) return
-      const end = animIndex !== undefined ? animIndex + 1 : valid.length
+      const end = animIdx !== undefined && name === last?.name ? animIdx + 1 : valid.length
       const visible = valid.slice(0, end)
 
       // 轨迹线
@@ -98,33 +112,86 @@ function MultiTrajectoryLayer({
         pts.forEach(p => allBounds.push(L.latLng(p)))
       }
 
-      // 事件标记（骑马小人动画）
+      // 普通事件圆点（不含当前帧）
       visible.forEach((e, i) => {
-        const isCurrent = animIndex !== undefined && i === animIndex
-        if (isCurrent && e.wgs84_lat && e.wgs84_lon) {
-          // 当前帧：骑马小人
-          L.marker([e.wgs84_lat, e.wgs84_lon], { icon: RIDER_ICON, zIndexOffset: 1000 })
-            .bindPopup(`<b>${name}</b> · ${e.event_year} ${e.event_type}<br/>${e.ancient_place||''}`, { offset: [0, -20] })
-            .addTo(g)
-        } else {
-          // 普通帧：圆点
-          const evColor = EVENT_COLORS[e.event_type] || '#999'
-          L.circleMarker([e.wgs84_lat, e.wgs84_lon], {
-            radius: 6, fillColor: evColor,
-            color: '#fff', weight: 1.5, fillOpacity: 0.9,
-          })
-            .bindPopup(`<b>${name}</b> · ${e.event_year} ${e.event_type}<br/>${e.ancient_place||''}${e.stay_duration_days ? `<br/>停留${e.stay_duration_days}天` : ''}`)
-            .addTo(g)
-        }
+        if (name === last?.name && animIdx !== undefined && i === animIdx) return // 当前帧由 rider 负责
+        const evColor = EVENT_COLORS[e.event_type] || '#999'
+        L.circleMarker([e.wgs84_lat, e.wgs84_lon], {
+          radius: 5, fillColor: evColor,
+          color: '#fff', weight: 1.5, fillOpacity: 0.7,
+        })
+          .bindPopup(`<b>${name}</b> · ${e.event_year} ${e.event_type}<br/>${e.ancient_place||''}${e.stay_duration_days ? `<br/>停留${e.stay_duration_days}天` : ''}`)
+          .addTo(g)
         allBounds.push(L.latLng(e.wgs84_lat, e.wgs84_lon))
       })
     })
 
     g.addTo(map)
-    ref.current = g
+    bgRef.current = g
     if (allBounds.length > 1) map.fitBounds(L.latLngBounds(allBounds).pad(0.1))
     return () => { map.removeLayer(g) }
-  }, [map, poets])
+  }, [map, poets]) // 仅依赖 poets 整体变化
+
+  // ── 独立骑手动画：位置平滑插值 + 马跑动效 ──
+  useEffect(() => {
+    const last = poets[poets.length - 1]
+    if (!last) return
+    const valid = last.events.filter(e => e.wgs84_lon && e.wgs84_lat) as Array<
+      TrajectoryEvent & { wgs84_lon: number; wgs84_lat: number }
+    >
+    const idx = last.animIndex
+
+    // 无动画或越界 → 移除骑手
+    if (idx === undefined || idx >= valid.length || idx < 0) {
+      if (riderRef.current) { map.removeLayer(riderRef.current); riderRef.current = null }
+      prevIdx.current = idx
+      return
+    }
+
+    const target = valid[idx]
+    const fromIdx = prevIdx.current !== undefined ? Math.min(prevIdx.current, valid.length - 1) : idx
+    const source = valid[fromIdx] || target
+
+    // 创建骑手标记（如没有）
+    if (!riderRef.current) {
+      riderRef.current = L.marker([source.wgs84_lat, source.wgs84_lon], {
+        icon: RIDER_ICON, zIndexOffset: 1000,
+      }).addTo(map)
+      // 给 marker 根元素加动画 class
+      riderRef.current.bindPopup(
+        `<b>${last.name}</b> · ${target.event_year} ${target.event_type}<br/>${target.ancient_place||''}`,
+        { offset: [0, -24] },
+      )
+    }
+
+    // 平滑插值到目标位置
+    const fromLat = source.wgs84_lat, fromLng = source.wgs84_lon
+    const toLat = target.wgs84_lat, toLng = target.wgs84_lon
+    const duration = 350 // ms，与 setInterval 的 delay 匹配
+    const start = performance.now()
+
+    cancelAnimationFrame(animRef.current)
+
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / duration, 1)
+      // ease-in-out cubic
+      const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+      const lat = fromLat + (toLat - fromLat) * ease
+      const lng = fromLng + (toLng - fromLng) * ease
+      riderRef.current?.setLatLng([lat, lng])
+      if (t < 1) animRef.current = requestAnimationFrame(tick)
+    }
+    animRef.current = requestAnimationFrame(tick)
+
+    // 标记元素加 gallop 动画
+    if (riderRef.current?.getElement()) {
+      const el = riderRef.current.getElement() as HTMLElement
+      el.classList.add('rider-marker')
+    }
+
+    prevIdx.current = idx
+    return () => { cancelAnimationFrame(animRef.current) }
+  }, [map, ...poets.map(p => p.animIndex)]) // 仅 animIndex 变化时触发
 
   return null
 }
