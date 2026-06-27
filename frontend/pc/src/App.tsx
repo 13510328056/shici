@@ -10,6 +10,7 @@ import TourismPanel from './components/TourismPanel'
 import PoetryOverlay from './components/PoetryOverlay'
 import PoemReadingOverlay from './components/PoemReadingOverlay'
 import PoemCompareView from './components/PoemCompareView'
+import StatsChart from './components/StatsChart'
 
 const ST = {
   container: { display:'flex', width:'100vw', height:'100vh', fontFamily:'"Noto Serif SC","Source Han Serif SC",serif', color:T.text, overflow:'hidden', background:T.bg } as const,
@@ -427,6 +428,12 @@ export default function App() {
           <div style={{fontSize:10,color:'#aaa',marginTop:4}}>
             支持 CSV、Excel、GIS shp，统计数据以 JSON 下载。
           </div>
+        </div>
+
+        {/* 统计图表 */}
+        <div style={S.panel}>
+          <div style={S.sectionTitle}>📊 数据统计</div>
+          <StatsChart />
         </div>
 
         {/* 统计与作品 */}
