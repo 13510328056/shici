@@ -1,7 +1,15 @@
 /** 诗词阅读浮层 — 古风书卷 */
 
+interface PoemData {
+  title: string
+  content: string
+  genre?: string
+  mood_tags?: string[]
+}
+
 interface Props {
   visible: boolean
+  poem: PoemData | null
   onClose: () => void
 }
 
@@ -26,14 +34,30 @@ const styles = {
   },
 }
 
-export default function PoemReadingOverlay({ visible, onClose }: Props) {
+export default function PoemReadingOverlay({ visible, poem, onClose }: Props) {
   return (
     <div style={{ display: visible ? 'flex' : 'none', ...styles.backdrop }}
       onClick={onClose}>
       <div style={styles.scroll} onClick={e => e.stopPropagation()}>
         <div style={styles.axis} />
         <div style={styles.content}>
-          <div id="poem-view" />
+          {poem ? (
+            <>
+              <div style={{ fontSize: 16, fontWeight: 600, color: '#5B4A3E', marginBottom: 8, letterSpacing: 1 }}>
+                {poem.title}
+              </div>
+              {poem.genre || poem.mood_tags?.length ? (
+                <div style={{ fontSize: 13, color: '#888', marginBottom: 10 }}>
+                  {poem.genre || ''}{poem.mood_tags?.length ? ' · ' + poem.mood_tags.join(' · ') : ''}
+                </div>
+              ) : null}
+              <div style={{ fontSize: 14, lineHeight: 2.2, whiteSpace: 'pre-wrap', fontFamily: 'serif', color: '#2c2c2c' }}>
+                {poem.content}
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize: 13, color: '#aaa', textAlign: 'center', padding: 20 }}>暂无内容</div>
+          )}
         </div>
         <div style={styles.footer}>
           <button onClick={onClose} style={styles.closeBtn}>合卷</button>

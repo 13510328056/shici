@@ -60,6 +60,7 @@ export default function App() {
   const [fenceMode, setFenceMode] = useState(false)
   const [viewingPoet, setViewingPoet] = useState<string|null>(null) // 正在查看作品的诗人ID
   const [showPoemReading, setShowPoemReading] = useState(false)
+  const [readingPoem, setReadingPoem] = useState<{title:string;content:string;genre?:string;mood_tags?:string[]} | null>(null)
   const [fenceResults, setFenceResults] = useState<{lat:number;lon:number;places:PlaceName[]}|undefined>(undefined)
 
   // 交游线段（暂存多诗人间的交游连线）
@@ -82,10 +83,10 @@ export default function App() {
       if (prev.length >= 10) return prev
       fetch(`/api/v1/poets/${pid}/trajectory`).then(r=>r.json()).then(d => {
         setPoetsData(m => { const n = new Map(m); n.set(pid, d.events || []); return n })
-      })
+      }).catch(() => console.warn('[API] 获取轨迹失败'))
       fetch(`/api/v1/poets/${pid}/poetry`).then(r=>r.json()).then(d => {
         setPoemsMap(m => { const n = new Map(m); n.set(pid, d.poems || []); return n })
-      })
+      }).catch(() => console.warn('[API] 获取作品失败'))
       return [...prev, pid]
     })
     setAnimIndex(undefined); setIsPlaying(false)
@@ -121,8 +122,11 @@ export default function App() {
     return () => { if (animRef.current) clearInterval(animRef.current) }
   }, [isPlaying, speed, lastEvents.length])
 
-  // 组件卸载时清理搜索防抖定时器
-  useEffect(() => () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current) }, [])
+  // 组件卸载时清理所有定时器
+  useEffect(() => () => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    if (animRef.current) clearInterval(animRef.current)
+  }, [])
 
   // 围栏查询
   const toggleFenceMode = useCallback(() => {
@@ -184,18 +188,15 @@ export default function App() {
       if (prev.includes(poet.poet_id)) return prev
       fetch('/api/v1/poets/' + poet.poet_id + '/trajectory').then(r=>r.json()).then(d => {
         setPoetsData(m => { const n = new Map(m); n.set(poet.poet_id, d.events || []); return n })
-      })
+      }).catch(() => console.warn('[API] 获取轨迹失败'))
       fetch('/api/v1/poets/' + poet.poet_id + '/poetry').then(r=>r.json()).then(d => {
         if (d?.poems) setPoemsMap(m => { const n = new Map(m); n.set(poet.poet_id, d.poems); return n })
-      })
+      }).catch(() => console.warn('[API] 获取作品失败'))
       return [...prev, poet.poet_id]
     })
     setViewingPoet(poet.poet_id)
-    setTimeout(() => {
-      const el = document.getElementById('poem-view')
-      if(el) el.innerHTML='<div style="font-size:14px;font-weight:600;margin-bottom:8px;color:#C23B22">'+poem.title+'</div><div style="font-size:13px;line-height:2;white-space:pre-wrap;font-family:serif">'+poem.content+'</div>'+(poem.mood_tags?.length?'<div style="font-size:11px;color:#888;margin-top:8px">意境: '+poem.mood_tags.join(' · ')+'</div>':'')
-      setShowPoemReading(true)
-    }, 100)
+    setReadingPoem({ title: poem.title, content: poem.content, genre: poem.genre, mood_tags: poem.mood_tags })
+    setShowPoemReading(true)
   }, [poets])
 
   const poetName = (id: string) => poets.find(p => p.poet_id === id)?.name || id
@@ -493,8 +494,7 @@ export default function App() {
             poems={poems}
             onClose={() => setViewingPoet(null)}
             onSelectPoem={(poem) => {
-              const el = document.getElementById('poem-view');
-              if (el) el.innerHTML = `<div style="font-size:16px;font-weight:600;color:#5B4A3E;margin-bottom:8px;letter-spacing:1px">${poem.title}</div><div style="font-size:13px;color:#888;margin-bottom:10px">${poem.genre || ''}${poem.mood_tags?.length ? ' · ' + poem.mood_tags.join(' · ') : ''}</div><div style="font-size:14px;line-height:2.2;white-space:pre-wrap;font-family:serif;color:#2c2c2c">${poem.content}</div>`
+              setReadingPoem({ title: poem.title, content: poem.content, genre: poem.genre, mood_tags: poem.mood_tags })
               setShowPoemReading(true)
             }}
           />
@@ -502,7 +502,7 @@ export default function App() {
       })()}
 
       {/* 诗词阅读浮层 */}
-      <PoemReadingOverlay visible={showPoemReading} onClose={() => setShowPoemReading(false)} />
+      <PoemReadingOverlay visible={showPoemReading} poem={readingPoem} onClose={() => { setShowPoemReading(false); setReadingPoem(null) }} />
 
       {/* 浮动汉堡按钮（移动端） */}
       {isMobile && (

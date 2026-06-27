@@ -271,16 +271,11 @@ function SearchResultMarkers({ results }: { results: SearchResult[] }) {
   useEffect(() => {
     if (!results.length) return
     const g = L.layerGroup()
-    const hasCoords = results.some(r => r.wgs84_lat && r.wgs84_lon)
+    // 仅显示有真实坐标的结果，无坐标的不在地图显示
+    const withCoords = results.filter(r => r.wgs84_lat && r.wgs84_lon)
 
-    results.slice(0, 50).forEach((r, i) => {
-      let lat: number, lng: number
-      if (hasCoords && r.wgs84_lat && r.wgs84_lon) {
-        lat = r.wgs84_lat; lng = r.wgs84_lon  // 真实坐标
-      } else {
-        const c = map.getCenter()
-        lat = c.lat + (Math.random() - 0.5); lng = c.lng + (Math.random() - 0.5)  // 随机
-      }
+    withCoords.slice(0, 50).forEach((r, i) => {
+      const lat = r.wgs84_lat!, lng = r.wgs84_lon!
       const hue = (i * 37) % 360
       L.circleMarker([lat, lng], {
         radius: 5, fillColor: `hsl(${hue}, 70%, 55%)`,
@@ -306,29 +301,9 @@ function ScreenshotButton() {
       btn.onclick = () => {
         const c = map.getContainer()
         // 用canvg方式截图：创建canvas并绘制SVG
-        const svg = c.querySelector('svg')?.cloneNode(true) as SVGElement
-        if (!svg) return
-        const rect = c.getBoundingClientRect()
-        const canvas = document.createElement('canvas')
-        canvas.width = rect.width * 2
-        canvas.height = rect.height * 2
-        const ctx = canvas.getContext('2d')
-        if (!ctx) return
-        ctx.scale(2, 2)
-        // 渲染背景
-        ctx.fillStyle = '#fff'
-        ctx.fillRect(0, 0, rect.width, rect.height)
-        // 使用XML序列化SVG绘制到canvas
-        const data = new XMLSerializer().serializeToString(svg)
-        const img = new Image()
-        img.onload = () => {
-          ctx.drawImage(img, 0, 0)
-          const a = document.createElement('a')
-          a.download = 'poetryspace-map.png'
-          a.href = canvas.toDataURL('image/png')
-          a.click()
-        }
-        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(data)))
+        // 提示：浏览器截图无法捕获地图瓦片（CORS限制）
+        // 推荐使用浏览器自带"截图"功能或操作系统截图工具
+        alert('地图截图建议使用浏览器自带截图功能（Ctrl+Shift+S）\n因瓦片地图CORS限制，程序化截图无法包含底图。')
       }
       return btn
     }
@@ -340,6 +315,8 @@ function ScreenshotButton() {
 
 // ─── 距离测量工具 ─────────────────────────
 // 点击起点→点击终点→显示距离（km）
+let _measureCleanup: (() => void) | null = null
+
 function DistanceMeasure() {
   const map = useMap()
   useEffect(() => {
@@ -349,18 +326,25 @@ function DistanceMeasure() {
         btn.innerHTML = '📏'
         btn.title = '距离测量（点击起点→终点）'
         btn.style.cssText = 'width:34px;height:34px;background:#fff;border:2px solid rgba(0,0,0,0.2);border-radius:4px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center'
-        btn.onclick = () => startMeasure(map)
+        btn.onclick = () => {
+          if (_measureCleanup) _measureCleanup()
+          _measureCleanup = startMeasure(map)
+        }
         return btn
       },
     })
     const ctrl = new MeasureControl({ position: 'topleft' })
     ctrl.addTo(map)
-    return () => { map.removeControl(ctrl) }
+    return () => {
+      map.removeControl(ctrl)
+      if (_measureCleanup) _measureCleanup()
+      _measureCleanup = null
+    }
   }, [map])
   return null
 }
 
-function startMeasure(map: L.Map) {
+function startMeasure(map: L.Map): () => void {
   const points: L.LatLng[] = []
   const markers: L.Marker[] = []
   const lines: L.Polyline[] = []
@@ -404,6 +388,16 @@ function startMeasure(map: L.Map) {
   tip.addTo(map)
   const clearTip = () => { map.removeControl(tip); document.removeEventListener('keydown', escHandler as any) }
   setTimeout(() => { if (active) clearTip() }, 5000)
+
+  // 返回清理函数
+  return () => {
+    active = false
+    markers.forEach(m => map.removeLayer(m))
+    lines.forEach(l => map.removeLayer(l))
+    map.off('click', clickHandler as any)
+    document.removeEventListener('keydown', escHandler as any)
+    clearTip()
+  }
 }
 
 // ─── 图例 ─────────────────────────────────
