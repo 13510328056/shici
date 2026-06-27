@@ -260,7 +260,7 @@ function startMeasure(map: L.Map) {
 
   map.on('click', clickHandler)
   document.addEventListener('keydown', escHandler as any)
-  const tip = L.control({ position: 'bottomcenter' })
+  const tip = (L.control as any)({ position: 'bottomleft' })
   tip.onAdd = () => {
     const d = L.DomUtil.create('div')
     d.id = 'measure-tip'
@@ -276,7 +276,7 @@ function startMeasure(map: L.Map) {
 function Legend() {
   const map = useMap()
   useEffect(() => {
-    const ctrl = L.control({ position: 'bottomleft' })
+    const ctrl = (L.control as any)({ position: 'bottomleft' })
     ctrl.onAdd = () => {
       const d = L.DomUtil.create('div')
       d.innerHTML = `<div style="background:#fff;padding:8px 12px;border-radius:6px;box-shadow:0 1px 5px rgba(0,0,0,.2);font-size:12px;line-height:1.8">

@@ -2,7 +2,13 @@
 应用配置 — 环境变量驱动，分层环境管理
 """
 
+import logging
+
 from pydantic_settings import BaseSettings
+
+logger = logging.getLogger(__name__)
+
+DEV_SECRET_WARNING = "dev-secret-key-change-in-production"
 
 
 class Settings(BaseSettings):
@@ -43,3 +49,11 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# 启动时检查：生产环境下禁止使用默认密钥
+if settings.ENV in ("production", "staging") and settings.SECRET_KEY == DEV_SECRET_WARNING:
+    logger.warning(
+        "⚠️  SECRET_KEY 仍为默认值 '%s'！生产环境必须修改！\n"
+        "    请通过环境变量或在 .env 中设置 SECRET_KEY=你的随机密钥",
+        DEV_SECRET_WARNING,
+    )

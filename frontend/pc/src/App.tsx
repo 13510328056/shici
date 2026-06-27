@@ -18,28 +18,11 @@ const ST = {
   tag: (c:string) => ({ display:'inline-block', padding:'2px 8px', margin:2, borderRadius:3, fontSize:T.fsSmall, background:c+'22', color:c, fontWeight:600 } as const),
 } as const
 
-// ─── 搜索结果类型 ──────────────────────────
-interface SearchResult {
-  poetry_id: string; title: string; content: string; author: string;
-  dynasty: string; genre: string; mood_tags: string[];
-  imagery_items: string[]; place_name: string | null; creation_year: string | null;
-}
-
 export default function App() {
   // 检索状态
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
-  const [searchTotal, setSearchTotal] = useState(0)
-  const [searching, setSearching] = useState(false)
-  const [showSearch, setShowSearch] = useState(false)
-  const [searchFilters, setSearchFilters] = useState({ dynasty: '', mood: '', season: '' })
-  const [showFilters, setShowFilters] = useState(false)
   const [unifiedResults, setUnifiedResults] = useState<any>(null)
   const [showUnified, setShowUnified] = useState(false)
-
-  // 多诗对比
-  const [compareList, setCompareList] = useState<SearchResult[]>([])
-  const [showCompare, setShowCompare] = useState(false)
 
   const [poets, setPoets] = useState<Array<{poet_id:string;name:string;dynasty:string}>>([])
   const [poetSearch, setPoetSearch] = useState('')
@@ -52,6 +35,7 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
   const animRef = useRef<ReturnType<typeof setInterval>|null>(null)
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>|null>(null)
 
   // 热力
   const [heatmap, setHeatmap] = useState<HeatmapPoint[]>([])
@@ -121,6 +105,9 @@ export default function App() {
     return () => { if (animRef.current) clearInterval(animRef.current) }
   }, [isPlaying, speed, lastEvents.length])
 
+  // 组件卸载时清理搜索防抖定时器
+  useEffect(() => () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current) }, [])
+
   // 围栏查询
   const toggleFenceMode = useCallback(() => {
     setFenceMode(v => !v)
@@ -140,26 +127,6 @@ export default function App() {
     if (!showHeatmap) { try { const d=await getHeatmap(); setHeatmap(d.points||[]) } catch {} }
     else setHeatmap([])
   }, [showHeatmap])
-
-  // ── 多维检索 ────────────────────────────
-  const doSearch = useCallback(async (q: string, filters?: { dynasty?: string; mood?: string; season?: string }) => {
-    if (!q.trim() && !filters?.mood && !filters?.dynasty) return
-    setSearching(true)
-    try {
-      const params = new URLSearchParams()
-      if (q.trim()) params.set('keyword', q.trim())
-      if (filters?.dynasty) params.set('dynasty', filters.dynasty)
-      if (filters?.mood) params.set('mood_tag', filters.mood)
-      if (filters?.season) params.set('season', filters.season)
-      params.set('page_size', '30')
-      const r = await fetch(`/api/v1/search/poetry?${params}`)
-      const d = await r.json()
-      setSearchResults(d.results || [])
-      setSearchTotal(d.total || 0)
-      setShowSearch(true)
-    } catch { setSearchResults([]) }
-    setSearching(false)
-  }, [])
 
   // 交游：对选择的诗人两两计算
   useEffect(() => {
@@ -224,12 +191,20 @@ export default function App() {
           </div>
           <div style={{display:'flex',gap:4,marginTop:8}}>
             <input type="text" value={searchQuery}
-              onChange={async e=>{
-                setSearchQuery(e.target.value);
-                const v=e.target.value.trim();
-                if(v.length>=1){
-                  try{const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(v));const d=await r.json();setUnifiedResults(d);setShowUnified(true)}catch(e){}
-                } else setShowUnified(false)
+              onChange={e=>{
+                const v=e.target.value;
+                setSearchQuery(v);
+                const trimmed=v.trim();
+                if(searchTimerRef.current) clearTimeout(searchTimerRef.current);
+                if(trimmed.length<1){setShowUnified(false);return}
+                searchTimerRef.current=setTimeout(async ()=>{
+                  try{
+                    const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(trimmed));
+                    const d=await r.json();
+                    setUnifiedResults(d);
+                    setShowUnified(true)
+                  }catch(e){}
+                },300)
               }}
               onFocus={async ()=>{if(searchQuery.trim().length>=1){try{const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(searchQuery.trim()));const d=await r.json();setUnifiedResults(d);setShowUnified(true)}catch(e){}}}}
               placeholder="搜索诗人或诗词..."
@@ -251,7 +226,7 @@ export default function App() {
             {unifiedResults.poets?.length > 0 && (
               <div style={{marginBottom:6}}>
                 <div style={{fontSize:11,fontWeight:600,color:T.textTitle,marginBottom:2}}>诗人 ({unifiedResults.poets.length})</div>
-                {unifiedResults.poets.map(p =>
+                {unifiedResults.poets.map((p: any) =>
                   <div key={p.poet_id} style={{padding:'3px 6px',cursor:'pointer',fontSize:11,borderRadius:3}}
                     onMouseEnter={e=>e.currentTarget.style.background=T.bg}
                     onMouseLeave={e=>e.currentTarget.style.background='transparent'}
@@ -264,7 +239,7 @@ export default function App() {
             {unifiedResults.poems?.length > 0 && (
               <div>
                 <div style={{fontSize:11,fontWeight:600,color:T.textTitle,marginBottom:2}}>诗词 ({unifiedResults.poems.length})</div>
-                {unifiedResults.poems.map(r =>
+                {unifiedResults.poems.map((r: any) =>
                   <div key={r.poetry_id} style={{padding:'4px 6px',cursor:'pointer',fontSize:11,borderRadius:3,borderBottom:'1px solid '+T.divider}}
                     onMouseEnter={e=>e.currentTarget.style.background=T.bg}
                     onMouseLeave={e=>e.currentTarget.style.background='transparent'}
@@ -487,21 +462,30 @@ export default function App() {
 
         {/* 数据导出 */}
         <div style={S.panel}>
-          <div style={S.sectionTitle}>数据导出 (CSV)</div>
+          <div style={S.sectionTitle}>数据导出（CSV / Excel / shp）</div>
           <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>
             {[
-              {label:'地名', url:'/api/v1/export/places'},
-              {label:'诗人', url:'/api/v1/export/poets'},
-              {label:'轨迹', url:'/api/v1/export/trajectories'},
-              {label:'诗词', url:'/api/v1/export/poetry'},
-              {label:'交游', url:'/api/v1/export/encounters'},
-              {label:'统计', url:'/api/v1/export/stats'},
+              {label:'地名 CSV', url:'/api/v1/export/places?format=csv'},
+              {label:'地名 XLSX', url:'/api/v1/export/places?format=excel'},
+              {label:'地名 shp', url:'/api/v1/export/places?format=shp'},
+              {label:'诗人 CSV', url:'/api/v1/export/poets?format=csv'},
+              {label:'诗人 XLSX', url:'/api/v1/export/poets?format=excel'},
+              {label:'轨迹 CSV', url:'/api/v1/export/trajectories?format=csv'},
+              {label:'轨迹 XLSX', url:'/api/v1/export/trajectories?format=excel'},
+              {label:'轨迹 shp', url:'/api/v1/export/trajectories?format=shp'},
+              {label:'诗词 CSV', url:'/api/v1/export/poetry?format=csv'},
+              {label:'诗词 XLSX', url:'/api/v1/export/poetry?format=excel'},
+              {label:'交游 CSV', url:'/api/v1/export/encounters?format=csv'},
+              {label:'交游 XLSX', url:'/api/v1/export/encounters?format=excel'},
+              {label:'统计 JSON', url:'/api/v1/export/stats'},
             ].map(btn => (
               <a key={btn.label} href={btn.url} target="_blank" rel="noopener"
                 style={{...ST.animBtn, textDecoration:'none', color:'#333', fontSize:11}}>{btn.label}</a>
             ))}
           </div>
-          <div style={{fontSize:10,color:'#aaa',marginTop:4}}>UTF-8 CSV，Excel 打开建议"数据→自文本/CSV"</div>
+          <div style={{fontSize:10,color:'#aaa',marginTop:4}}>
+            支持 CSV、Excel、GIS shp，统计数据以 JSON 下载。
+          </div>
         </div>
 
         {/* 统计与作品 */}
@@ -516,7 +500,10 @@ export default function App() {
                   <div style={ST.tag(POET_COLORS[i % POET_COLORS.length])}>{p?.name}</div>
                   <div style={{fontSize:11,lineHeight:1.6,color:'#666',marginLeft:4,marginBottom:4}}>
                     {evts.length} 事件 · 年份 {evts[0]?.event_year||'?'}~{evts[evts.length-1]?.event_year||'?'}
-                    {poemsMap.get(id)?.length > 0 && (' · ' + poemsMap.get(id).length + ' 首')}
+                    {(() => {
+                      const count = poemsMap.get(id)?.length || 0
+                      return count > 0 ? ' · ' + count + ' 首' : null
+                    })()}
                   </div>
                 </div>
               )
@@ -535,7 +522,7 @@ export default function App() {
         <PoetryMap poets={trajectoryPoets} heatmap={showHeatmap?heatmap:[]}
           encounterLines={encounterLines} fenceResults={fenceResults}
           fenceMode={fenceMode} onFenceClick={handleFenceClick}
-          searchResults={showSearch ? searchResults.map(r=>({title:r.title,author:r.author})) : []} />
+          searchResults={showUnified ? unifiedResults?.poems?.map((r:any)=>({title:r.title,author:r.author})) || [] : []} />
       </div>
 
       {/* 诗人作品浮层 — 古风卷轴 */}
@@ -596,28 +583,6 @@ export default function App() {
       </div>
 
       {/* 多诗对比浮层 */}
-      {showCompare && compareList.length >= 2 && (
-        <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.4)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setShowCompare(false)}>
-          <div style={{background:'#fff',borderRadius:8,maxWidth:'80%',maxHeight:'80%',overflow:'auto',padding:20,boxShadow:'0 4px 20px rgba(0,0,0,.2)'}} onClick={e=>e.stopPropagation()}>
-            <div style={{display:'flex',justifyContent:'space-between',marginBottom:12}}>
-              <h2 style={{fontSize:16,fontWeight:600,margin:0}}>诗词对比</h2>
-              <button onClick={()=>setShowCompare(false)} style={{...ST.animBtn}}>关闭</button>
-            </div>
-            <div style={{display:'flex',gap:16,flexWrap:'wrap'}}>
-              {compareList.map(r => (
-                <div key={r.poetry_id} style={{flex:'1 1 300px',border:'1px solid #e0dcd4',borderRadius:8,padding:12,background:'#fafaf8'}}>
-                  <div style={{fontSize:14,fontWeight:600}}>{r.title}</div>
-                  <div style={{fontSize:12,color:'#888',marginBottom:8}}>{r.author} · {r.dynasty} · {r.genre}</div>
-                  <div style={{fontSize:13,lineHeight:1.8,whiteSpace:'pre-wrap',fontFamily:'serif'}}>{r.content}</div>
-                  {r.mood_tags?.length > 0 && <div style={{marginTop:8,fontSize:11,color:'#888'}}>意境: {r.mood_tags.join(' · ')}</div>}
-                  {r.imagery_items?.length > 0 && <div style={{fontSize:11,color:'#888'}}>意象: {r.imagery_items.slice(0,5).join(' · ')}</div>}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   )
 }

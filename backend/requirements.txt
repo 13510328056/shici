@@ -21,6 +21,8 @@ python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
 
 # 工具
+openpyxl>=3.0.0
+pyshp>=2.4.0
 pydantic>=2.7.0
 python-multipart>=0.0.9
 

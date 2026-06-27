@@ -1,15 +1,17 @@
 """
-地名映射服务 API — 古今地名查询 / 坐标转换 / 围栏检索
+地名映射服务 API — 古今地名查询 / 坐标转换 / 围栏检索 / 地名沿革
 需求依据：3.2.1 古今地名映射数据库
 """
 
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.services.spatial import SpatialQueryService
+from app.models.place_name import PlaceName, PlaceNameChange
 
 router = APIRouter()
 
@@ -18,12 +20,37 @@ router = APIRouter()
 async def search_places(
     q: str = Query(..., description="古地名或现代地名关键词"),
     dynasty: Optional[str] = Query(None, description="朝代过滤"),
+    limit: Optional[int] = Query(20, description="返回条数上限"),
     db: AsyncSession = Depends(get_db),
 ):
     """古今地名模糊查询 — 按古名或现名检索"""
-    # TODO: 对接 ES 或数据库模糊查询
-    # 当前为 PoC 桩
-    return {"query": q, "dynasty": dynasty, "results": []}
+    stmt = select(PlaceName).where(
+        or_(
+            PlaceName.ancient_name.ilike(f"%{q}%"),
+            PlaceName.modern_name.ilike(f"%{q}%"),
+        )
+    ).limit(limit)
+    result = await db.execute(stmt)
+    places = result.scalars().all()
+    return {
+        "query": q,
+        "dynasty": dynasty,
+        "count": len(places),
+        "results": [
+            {
+                "place_id": str(p.place_id),
+                "ancient_name": p.ancient_name,
+                "modern_name": p.modern_name,
+                "province": p.province,
+                "city": p.city,
+                "district": p.district,
+                "wgs84_lon": p.wgs84_lon,
+                "wgs84_lat": p.wgs84_lat,
+                "admin_level": p.admin_level,
+            }
+            for p in places
+        ],
+    }
 
 
 @router.get("/fence")
@@ -50,5 +77,24 @@ async def place_timeline(
     db: AsyncSession = Depends(get_db),
 ):
     """地名沿革时间线 — 古今名称变更历史"""
-    # TODO: 从 place_name_changes 表查询
-    return {"place_id": place_id, "changes": []}
+    stmt = (
+        select(PlaceNameChange)
+        .where(PlaceNameChange.place_id == place_id)
+        .order_by(PlaceNameChange.change_year)
+    )
+    result = await db.execute(stmt)
+    changes = result.scalars().all()
+    return {
+        "place_id": place_id,
+        "count": len(changes),
+        "changes": [
+            {
+                "id": str(c.id),
+                "change_year": c.change_year,
+                "old_name": c.old_name,
+                "new_name": c.new_name,
+                "source": c.source,
+            }
+            for c in changes
+        ],
+    }
