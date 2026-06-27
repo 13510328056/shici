@@ -12,7 +12,7 @@ import PoemReadingOverlay from './components/PoemReadingOverlay'
 
 const ST = {
   container: { display:'flex', width:'100vw', height:'100vh', fontFamily:'"Noto Serif SC","Source Han Serif SC",serif', color:T.text, overflow:'hidden', background:T.bg } as const,
-  sidebar: { width:340, minWidth:340, height:'100vh', borderRight:`1px solid ${T.border}`, display:'flex', flexDirection:'column', background:T.sidebarBg, position:'relative' as const },
+  sidebar: { width:340, minWidth:340, height:'100vh', borderRight:`1px solid ${T.border}`, display:'flex', flexDirection:'column', background:T.sidebarBg, position:'relative' as const, overflowY:'auto' as const },
   header: { padding:T.headerPadding, borderBottom:`1px solid ${T.border}`, background:T.headerBg } as const,
   main: { flex:1, position:'relative' as const },
   statusBar: { height:28, borderTop:`1px solid ${T.border}`, display:'flex', alignItems:'center', padding:'0 16px', fontSize:T.fsSmall, color:T.textMuted, background:T.statusBg } as const,
@@ -354,14 +354,13 @@ export default function App() {
           </div>
         </div>
 
-        {/* AI 创作工具 */}
-        <AIToolsPanel />
-
         {/* 文旅交互 */}
         <TourismPanel onRouteSelect={(route) => {
-          // 选中路线时更新状态（地图显示路线由 PoetryMap 处理）
           console.log('Route selected:', route?.name)
         }} />
+
+        {/* AI 创作工具 */}
+        <AIToolsPanel />
 
         {/* 围栏信息 */}
         {fenceResults && (
