@@ -6,6 +6,7 @@ import type { TrajectoryEvent, HeatmapPoint, PlaceName } from './types'
 import { getHeatmap, fenceQuery } from './api'
 import { theme as T, sharedStyles as S } from './theme'
 import AIToolsPanel from './components/AIToolsPanel'
+import TourismPanel from './components/TourismPanel'
 import PoetryOverlay from './components/PoetryOverlay'
 import PoemReadingOverlay from './components/PoemReadingOverlay'
 
@@ -355,6 +356,12 @@ export default function App() {
 
         {/* AI 创作工具 */}
         <AIToolsPanel />
+
+        {/* 文旅交互 */}
+        <TourismPanel onRouteSelect={(route) => {
+          // 选中路线时更新状态（地图显示路线由 PoetryMap 处理）
+          console.log('Route selected:', route?.name)
+        }} />
 
         {/* 围栏信息 */}
         {fenceResults && (
