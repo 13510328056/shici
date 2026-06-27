@@ -119,3 +119,15 @@ async def get_place_poems(
 
     return {"place": {"ancient_name": place.ancient_name, "modern_name": place.modern_name},
             "poems": results, "count": len(results)}
+
+
+@router.post("/checkin")
+async def checkin_place(body: dict):
+    """记录打卡（当前为 localStorage 方案，此端点为预留）"""
+    return {"status": "ok", "message": "Checkin saved locally"}
+
+
+@router.get("/checkins")
+async def get_checkins():
+    return {"checkins": [], "total": 0, "note": "Checkins stored client-side in localStorage"}
+

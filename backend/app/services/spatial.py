@@ -139,13 +139,31 @@ class SpatialQueryService:
         if not traj_a or not traj_b:
             return {"probability": 0, "overlap_years": [], "detail": "missing trajectory"}
 
-        # 时间重叠
-        years_a = {t["event_year"] for t in traj_a if t.get("event_year")}
-        years_b = {t["event_year"] for t in traj_b if t.get("event_year")}
-        overlap_years = years_a & years_b
+        # 时间重叠（使用停留时长）
+        def total_duration(traj):
+            return sum(t.get("stay_duration_days") or 365 for t in traj)
 
-        if not overlap_years:
+        def overlap_duration(a, b):
+            years_a = {t["event_year"] for t in a if t.get("event_year")}
+            years_b = {t["event_year"] for t in b if t.get("event_year")}
+            overlap_yrs = years_a & years_b
+            if not overlap_yrs:
+                return 0, set()
+            # 取重叠年份中两人的停留天数之和
+            days = 0
+            for y in overlap_yrs:
+                days_a = sum(t.get("stay_duration_days") or 365 for t in a if t.get("event_year") == y)
+                days_b = sum(t.get("stay_duration_days") or 365 for t in b if t.get("event_year") == y)
+                days += min(days_a, days_b)
+            return days, overlap_yrs
+
+        overlap_days, overlap_years = overlap_duration(traj_a, traj_b)
+        if overlap_days == 0:
             return {"probability": 0, "overlap_years": [], "detail": "no temporal overlap"}
+
+        t1 = total_duration(traj_a)
+        t2 = total_duration(traj_b)
+        time_ratio = overlap_days / max(t1 + t2 - overlap_days, 1)
 
         # 空间重叠（Haversine 围栏检查）
         overlap_points = []
@@ -167,10 +185,6 @@ class SpatialQueryService:
                     })
 
         # 公式：P = (重叠时间 / (T₁+T₂-重叠时间)) × (重叠面积 / (A₁+A₂-重叠面积))
-        time_union = len(years_a | years_b)
-        time_overlap = len(overlap_years)
-        time_ratio = time_overlap / max(time_union, 1)
-
         space_ratio = len(overlap_points) / max(len(traj_a) * len(traj_b), 1)
         probability = time_ratio * space_ratio
 
@@ -180,6 +194,10 @@ class SpatialQueryService:
             "overlap_count": len(overlap_points),
             "total_events_a": len(traj_a),
             "total_events_b": len(traj_b),
+            "total_duration_a_days": t1,
+            "total_duration_b_days": t2,
+            "overlap_duration_days": overlap_days,
+            "time_ratio": round(time_ratio, 4),
             "detail": "calculated (Haversine fallback)"
             if not self._use_postgis
             else "calculated (PostGIS)",

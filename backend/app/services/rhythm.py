@@ -409,8 +409,18 @@ for group, chars in RHYME_SETS.items():
         CHAR_RHYME[ch] = group
 
 
-def get_pingze(char: str) -> Optional[int]:
-    """获取单字平仄 1=平 -1=仄 0=可平可仄 None=未知"""
+# ─── 中华新韵（基于普通话四声：一二声=平，三四声=仄）───
+# 注意：完整新韵字典需配合拼音数据，当前为 PINGZE 回退
+# TODO: 接入拼音数据后替换为 XINYUN 字典
+XINYUN_ENABLED = False  # 设为 True 时启用新韵
+
+def get_pingze(char: str, rhyme_system: str = "平水韵") -> Optional[int]:
+    """获取单字平仄 1=平 -1=仄 0=可平可仄 None=未知
+    支持 rhyme_system: 平水韵 / 中华新韵
+    """
+    if rhyme_system == "中华新韵" and XINYUN_ENABLED:
+        # 预留新韵查找
+        return PINGZE.get(char)  # 暂回退到平水韵
     return PINGZE.get(char)
 
 

@@ -271,11 +271,23 @@ class ExportService:
         for row in r:
             top_places.append({"place": row[0], "count": row[1]})
 
+        # 时间线：按创作年份统计（前50年）
+        timeline = []
+        r = await self.db.execute(text("""
+            SELECT pf.creation_year, COUNT(*) as cnt
+            FROM poetry_features pf
+            WHERE pf.creation_year IS NOT NULL AND pf.creation_year != ''
+            GROUP BY pf.creation_year ORDER BY pf.creation_year LIMIT 50
+        """))
+        for row in r:
+            timeline.append({"year": row[0], "count": row[1]})
+
         return {
             "counts": counts,
             "dynasties": dynasties,
             "genres": genres,
             "top_places": top_places,
+            "timeline": timeline,
         }
 
     async def export_places_excel(self) -> bytes:
