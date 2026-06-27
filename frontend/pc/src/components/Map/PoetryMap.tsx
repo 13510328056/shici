@@ -478,12 +478,13 @@ interface PoetryMapProps {
   fenceMode?: boolean
   onFenceClick?: (lat: number, lon: number) => void
   activeRoute?: any
+  isMobile?: boolean
 }
 
 export default function PoetryMap({
   places = [], poets = [], heatmap = [], encounterLines = [],
   searchResults = [],
-  fenceResults, fenceMode = false, onFenceClick, activeRoute,
+  fenceResults, fenceMode = false, onFenceClick, activeRoute, isMobile,
 }: PoetryMapProps) {
   return (
     <div style={{ width:'100%', height:'100%', position:'relative' }}>
@@ -516,9 +517,9 @@ export default function PoetryMap({
           </LayersControl.Overlay>
         )}
         {activeRoute && <RouteLayer route={activeRoute} />}
-        <DistanceMeasure />
-        <ScreenshotButton />
-        <Legend />
+        {!isMobile && <DistanceMeasure />}
+        {!isMobile && <ScreenshotButton />}
+        {!isMobile && <Legend />}
       </MapContainer>
     </div>
   )
