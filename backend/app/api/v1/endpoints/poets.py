@@ -77,21 +77,36 @@ async def get_heatmap(
 @router.get("/{poet_id}/poetry")
 async def get_poet_poetry(
     poet_id: str,
+    limit: Optional[int] = Query(None, description="返回条数上限，不传则返回全部"),
+    offset: Optional[int] = Query(0, ge=0, description="分页偏移"),
     db: AsyncSession = Depends(get_db),
 ):
-    """获取某位诗人的全部作品"""
+    """获取某位诗人的作品（支持分页，使用 JOIN 消除 N+1）"""
     from app.models.poetry import Poetry, PoetryFeature
-    from sqlalchemy import select as q
+    from sqlalchemy import select, func as sa_func
+    from sqlalchemy.orm import joinedload
 
-    stmt = q(Poetry).where(Poetry.author_id == poet_id).order_by(Poetry.title)
-    poems = (await db.execute(stmt)).scalars().all()
+    # 总数（一次 count 查询）
+    total = (await db.execute(
+        select(sa_func.count()).select_from(Poetry).where(Poetry.author_id == poet_id)
+    )).scalar() or 0
+
+    # 分页查询 + JOIN PoetryFeature（一次查询消除 N+1）
+    stmt = (
+        select(Poetry)
+        .where(Poetry.author_id == poet_id)
+        .options(joinedload(Poetry.features))
+        .order_by(Poetry.title)
+        .offset(offset)
+    )
+    if limit:
+        stmt = stmt.limit(limit)
+
+    poems = (await db.execute(stmt)).unique().scalars().all()
 
     results = []
     for poem in poems:
-        feat = (await db.execute(
-            q(PoetryFeature).where(PoetryFeature.poetry_id == poem.poetry_id)
-        )).scalar_one_or_none()
-
+        feat = poem.features
         results.append({
             "poetry_id": str(poem.poetry_id),
             "title": poem.title,
@@ -102,4 +117,4 @@ async def get_poet_poetry(
             "imagery_items": feat.imagery_items if feat else [],
         })
 
-    return {"poems": results, "count": len(results)}
+    return {"poems": results, "count": len(results), "total": total}

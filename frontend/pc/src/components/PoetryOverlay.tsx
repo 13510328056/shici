@@ -10,6 +10,7 @@ interface Poem {
 interface Props {
   poetName: string
   poems: Poem[]
+  total?: number
   onClose: () => void
   onSelectPoem: (poem: Poem) => void
 }
@@ -44,10 +45,21 @@ const styles = {
   index: { fontSize: 11, color: '#C4B5A0', fontWeight: 600, minWidth: 24 },
   poemTitle: { fontSize: 14, fontWeight: 600, color: '#5B4A3E', fontFamily: 'serif' },
   genre: { fontSize: 11, color: '#B8A88C', marginLeft: 'auto' as const },
-  excerpt: { fontSize: 11, color: '#999', marginLeft: 32, marginTop: 2, whiteSpace: 'nowrap' as const, overflow: 'hidden' as const, textOverflow: 'ellipsis' as const },
+  excerpt: { fontSize: 11, color: '#666', marginLeft: 32, marginTop: 3, lineHeight: 1.5 } as const,
+  moodTag: {
+    display: 'inline-block', fontSize: 9, padding: '0 5px', margin: '0 2px',
+    borderRadius: 6, background: '#EDE7DB', color: '#8B7355',
+  } as const,
+  empty: { textAlign: 'center' as const, padding: 40, fontSize: 12, color: '#aaa' } as const,
 }
 
-export default function PoetryOverlay({ poetName, poems, onClose, onSelectPoem }: Props) {
+/** 取内容前 60 字作为摘要 */
+function excerpt(content: string): string {
+  const clean = content.replace(/[，。！？、；：""（）《》]/g, ' ').trim()
+  return clean.length > 60 ? clean.slice(0, 60) + '……' : clean
+}
+
+export default function PoetryOverlay({ poetName, poems, total, onClose, onSelectPoem }: Props) {
   return (
     <div style={styles.backdrop} onClick={onClose}>
       <div style={styles.scroll} onClick={e => e.stopPropagation()}>
@@ -56,21 +68,30 @@ export default function PoetryOverlay({ poetName, poems, onClose, onSelectPoem }
           <div style={styles.title}>
             {poetName}<span style={{ fontSize: 14, color: '#8B7355', marginLeft: 8 }}>诗文集</span>
           </div>
-          <div style={styles.subtitle}>共收录诗词 {poems.length} 首</div>
+          <div style={styles.subtitle}>
+            收录诗词 {poems.length} 首{total && total > poems.length ? `（共 ${total} 首，显示前 ${poems.length} 首）` : ''}
+          </div>
           <button onClick={onClose} style={styles.closeBtn}>闭卷 ✕</button>
         </div>
         <div style={styles.list}>
-          {poems.map((poem, idx) => (
-            <div key={poem.title} style={styles.poemCard}
-              onClick={() => onSelectPoem(poem)}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                <span style={styles.index}>{String(idx + 1).padStart(2, '0')}</span>
-                <span style={styles.poemTitle}>{poem.title}</span>
-                <span style={styles.genre}>{poem.genre}</span>
+          {poems.length === 0 ? (
+            <div style={styles.empty}>暂无收录作品</div>
+          ) : (
+            poems.map((poem, idx) => (
+              <div key={poem.title + idx} style={styles.poemCard}
+                onClick={() => onSelectPoem(poem)}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={styles.index}>{String(idx + 1).padStart(2, '0')}</span>
+                  <span style={styles.poemTitle}>{poem.title}</span>
+                  <span style={styles.genre}>{poem.genre}</span>
+                  {poem.mood_tags?.slice(0, 3).map(t => (
+                    <span key={t} style={styles.moodTag}>{t}</span>
+                  ))}
+                </div>
+                <div style={styles.excerpt}>{excerpt(poem.content)}</div>
               </div>
-              <div style={styles.excerpt}>{poem.content.slice(0, 50)}...</div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
         <div style={{ ...styles.axis, borderRadius: '0 0 2px 2px' }} />
       </div>

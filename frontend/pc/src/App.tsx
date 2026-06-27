@@ -295,8 +295,9 @@ export default function App() {
                 <span key={id} style={{display:'inline-flex',alignItems:'center',gap:2,marginRight:4,padding:'1px 6px',background:T.bg,borderRadius:3}}>
                   {poetName(id)}
                   <span style={{cursor:'pointer',color:T.accent,fontWeight:600,fontSize:10,marginLeft:2}}
-                    onClick={()=>{
-                      if(!poemsMap.get(id)?.length){fetch(`/api/v1/poets/${id}/poetry`).then(r=>r.json()).then(d=>{if(d?.poems){setPoemsMap(m=>{const n=new Map(m);n.set(id,d.poems);return n});setViewingPoet(id)}})}else setViewingPoet(id)
+                    onClick={async()=>{
+                      try{const r=await fetch(`/api/v1/poets/${id}/poetry`);const d=await r.json();if(d?.poems){setPoemsMap(m=>{const n=new Map(m);n.set(id,d.poems);return n})}}catch{}
+                      setViewingPoet(id)
                     }}>[作品]</span>
                   <span style={{cursor:'pointer',color:T.textMuted,fontSize:10,marginLeft:2}} onClick={()=>togglePoet(id)}>✕</span>
                 </span>
