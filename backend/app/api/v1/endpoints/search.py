@@ -64,15 +64,15 @@ async def search_all(
     results = {"poets": [], "poems": []}
 
     if keyword:
-        from sqlalchemy import text as sqltext
-        poet_sql = sqltext("SELECT poet_id, name, dynasty FROM poets WHERE name LIKE :kw LIMIT 10")
-        poet_rows = (await db.execute(poet_sql, {"kw": f"%{keyword}%"})).mappings().all()
+        # 诗人搜索（ORM 方式）
+        poet_query = select(Poet).where(Poet.name.ilike(f"%{keyword}%")).limit(10)
+        poet_rows = (await db.execute(poet_query)).scalars().all()
         results["poets"] = [
-            {"poet_id": str(r["poet_id"]), "name": r["name"], "dynasty": r["dynasty"]}
-            for r in poet_rows
+            {"poet_id": str(p.poet_id), "name": p.name, "dynasty": p.dynasty}
+            for p in poet_rows
         ]
 
-        # 搜索诗词（带地点坐标）
+        # 搜索诗词
         s = SearchService(db)
         poem_data = await s.search(keyword=keyword, page_size=15)
         results["poems"] = poem_data.get("results", [])

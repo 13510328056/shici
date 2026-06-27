@@ -26,6 +26,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [unifiedResults, setUnifiedResults] = useState<any>(null)
   const [showUnified, setShowUnified] = useState(false)
+  const [searching, setSearching] = useState(false)
 
   const [poets, setPoets] = useState<Array<{poet_id:string;name:string;dynasty:string}>>([])
   const [poetSearch, setPoetSearch] = useState('')
@@ -208,6 +209,7 @@ export default function App() {
                 const trimmed=v.trim();
                 if(searchTimerRef.current) clearTimeout(searchTimerRef.current);
                 if(trimmed.length<1){setShowUnified(false);return}
+                setSearching(true)
                 searchTimerRef.current=setTimeout(async ()=>{
                   try{
                     const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(trimmed));
@@ -215,6 +217,7 @@ export default function App() {
                     setUnifiedResults(d);
                     setShowUnified(true)
                   }catch(e){}
+                  setSearching(false)
                 },300)
               }}
               onFocus={async ()=>{if(searchQuery.trim().length>=1){try{const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(searchQuery.trim()));const d=await r.json();setUnifiedResults(d);setShowUnified(true)}catch(e){}}}}
@@ -231,7 +234,7 @@ export default function App() {
             position:'absolute', left:0, right:0, zIndex:100, background:'#FFFEF9', boxShadow:'0 4px 12px rgba(0,0,0,.15)',
             borderBottom:'2px solid #5B4A3E'}}>
             <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
-              <span style={{fontSize:11,color:T.textMuted}}>搜索结果</span>
+              <span style={{fontSize:11,color:T.textMuted}}>{searching ? '搜索中...' : '搜索结果'}</span>
               <button onClick={()=>setShowUnified(false)} style={{...ST.animBtn,padding:'0 6px',fontSize:10}}>{'✕'}</button>
             </div>
             {unifiedResults.poets?.length > 0 && (
