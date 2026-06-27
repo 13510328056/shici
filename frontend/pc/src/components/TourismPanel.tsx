@@ -44,8 +44,8 @@ export default function TourismPanel({ onRouteSelect }: { onRouteSelect?: (route
   const [place, setPlace] = useState('')
   const [poems, setPoems] = useState<PoemResult[]>([])
   const [checkins, setCheckins] = useState<string[]>(loadCheckins)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [tab, setTab] = useState<'route' | 'place' | 'checkin'>('route')
+  const [lastCheckin, setLastCheckin] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/v1/tourism/routes').then(r => r.json()).then(d => setRoutes(d.routes || [])).catch(() => {})
@@ -70,6 +70,8 @@ export default function TourismPanel({ onRouteSelect }: { onRouteSelect?: (route
   const handleCheckin = (placeName: string) => {
     const updated = saveCheckin(placeName)
     setCheckins(updated)
+    setLastCheckin(placeName)
+    setTimeout(() => setLastCheckin(null), 2000)
   }
 
   return (
@@ -118,8 +120,11 @@ export default function TourismPanel({ onRouteSelect }: { onRouteSelect?: (route
                   ))}
                   <button style={{ ...ST.animBtn, fontSize: 10, marginTop: 4 }}
                     onClick={(e) => { e.stopPropagation(); handleCheckin(r.name) }}>
-                    📍 打卡这条路线
+                    📍 {lastCheckin === r.name ? '已打卡 ✓' : '打卡这条路线'}
                   </button>
+                  {lastCheckin === r.name && (
+                    <div style={{ fontSize: 10, color: '#4CAF50', marginTop: 2 }}>已记录！切换到「打卡」Tab 查看</div>
+                  )}
                 </div>
               )}
             </div>
