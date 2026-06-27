@@ -61,13 +61,18 @@ export interface HeatmapPoint {
 /** 地图图层类型 */
 export type MapLayerType = 'places' | 'poets' | 'poetry' | 'heatmap' | 'encounter'
 
-/** 事件类型颜色映射 */
+/** 事件类型颜色映射（须与 PoetryMap.tsx eventColor() 一致） */
 export const EVENT_COLORS: Record<string, string> = {
   '出生': '#2196F3',
-  '科举': '#4CAF50',
-  '仕宦': '#FF9800',
+  '去世': '#2196F3',
+  '科举': '#00BCD4',
+  '仕宦': '#1565C0',
+  '政治': '#1565C0',
   '贬谪': '#F44336',
-  '游览': '#9C27B0',
-  '创作': '#00BCD4',
-  '雅集': '#FFEB3B',
+  '游览': '#4CAF50',
+  '交游': '#4CAF50',
+  '创作': '#9C27B0',
+  '雅集': '#FFD700',
+  '军事': '#FF5722',
+  '隐居': '#795548',
 }
