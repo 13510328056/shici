@@ -49,7 +49,7 @@ export default function TourismPanel({ onRouteSelect }: { onRouteSelect?: (route
   const placeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    fetch('/api/v1/tourism/routes').then(r => r.json()).then(d => setRoutes(d.routes || [])).catch(() => {})
+    fetch('/api/v1/tourism/routes').then(r => r.json()).then(d => setRoutes(d.routes || [])).catch(() => console.warn("加载失败"))
   }, [])
 
   const loadPlacePoems = async (name: string) => {
@@ -183,9 +183,9 @@ export default function TourismPanel({ onRouteSelect }: { onRouteSelect?: (route
               onClick={() => {
                 const text = '我在 PoetrySpace 打卡了：' + checkins.join('、')
                 if (navigator.share) {
-                  navigator.share({ title: 'PoetrySpace 打卡', text }).catch(() => {})
+                  navigator.share({ title: 'PoetrySpace 打卡', text }).catch(() => console.warn("加载失败"))
                 } else {
-                  navigator.clipboard.writeText(text).then(() => alert('已复制打卡信息！')).catch(() => {})
+                  navigator.clipboard.writeText(text).then(() => alert('已复制打卡信息！')).catch(() => console.warn("加载失败"))
                 }
               }}>
               📤 分享打卡记录

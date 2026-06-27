@@ -37,6 +37,7 @@ export default function App() {
   const [compareList, setCompareList] = useState<Array<{title:string;content:string;author?:string;genre?:string;mood_tags?:string[];dynasty?:string}>>([])
   const [showCompare, setShowCompare] = useState(false)
   const [activeRoute, setActiveRoute] = useState<any>(null)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [gotoLat, setGotoLat] = useState('')
   const [gotoLng, setGotoLng] = useState('')
   const [gotoKey, setGotoKey] = useState(0) // trigger flyTo
@@ -131,6 +132,13 @@ export default function App() {
     if (animRef.current) clearInterval(animRef.current)
   }, [])
 
+  // 错误提示 3 秒自动消失
+  useEffect(() => {
+    if (!errorMsg) return
+    const t = setTimeout(() => setErrorMsg(null), 3000)
+    return () => clearTimeout(t)
+  }, [errorMsg])
+
   // 围栏查询
   const toggleFenceMode = useCallback(() => {
     setFenceMode(v => !v)
@@ -143,7 +151,7 @@ export default function App() {
       const data = await fenceQuery(lon, lat)
       setFenceResults({ lat, lon, places: data.places })
       setFenceMode(false)
-    } catch {}
+    } catch { setErrorMsg('围栏查询失败，请重试') }
     setLoading(v => ({...v, fence: false}))
   }, [])
 
@@ -151,7 +159,7 @@ export default function App() {
     setShowHeatmap(v => !v)
     if (!showHeatmap) {
       setLoading(v => ({...v, heatmap: true}))
-      try { const d=await getHeatmap(); setHeatmap(d.points||[]) } catch {}
+      try { const d=await getHeatmap(); setHeatmap(d.points||[]) } catch { setErrorMsg('热力图加载失败') }
       setLoading(v => ({...v, heatmap: false}))
     } else setHeatmap([])
   }, [showHeatmap])
@@ -176,7 +184,7 @@ export default function App() {
               const midB = evtsB[Math.floor(evtsB.length/2)]
               lines.push({ from: [midA.wgs84_lat!, midA.wgs84_lon!], to: [midB.wgs84_lat!, midB.wgs84_lon!], probability: d.probability })
             }
-          } catch {}
+          } catch { setErrorMsg("请求失败") }
         }
       }
       setEncounterLines(lines)
@@ -234,11 +242,11 @@ export default function App() {
                     const d=await r.json();
                     setUnifiedResults(d);
                     setShowUnified(true)
-                  }catch(e){}
+                  }catch(e){ setErrorMsg("请求失败") }
                   setSearching(false)
                 },300)
               }}
-              onFocus={async ()=>{if(searchQuery.trim().length>=1){try{const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(searchQuery.trim()));const d=await r.json();setUnifiedResults(d);setShowUnified(true)}catch(e){}}}}
+              onFocus={async ()=>{if(searchQuery.trim().length>=1){try{const r=await fetch('/api/v1/search/all?keyword='+encodeURIComponent(searchQuery.trim()));const d=await r.json();setUnifiedResults(d);setShowUnified(true)}catch(e){ setErrorMsg("请求失败") }}}}
               placeholder="搜索诗人或诗词..."
               style={{flex:1,padding:'4px 8px',border:'1px solid #d0cdc4',borderRadius:4,fontSize:12,fontFamily:'serif'}} />
             <button style={{...S.classicBtn,padding:'4px 8px',fontSize:11}}
@@ -535,6 +543,18 @@ export default function App() {
 
       {/* 诗词阅读浮层 */}
       <PoemReadingOverlay visible={showPoemReading} poem={readingPoem} onClose={() => { setShowPoemReading(false); setReadingPoem(null) }} />
+
+      {/* 全局错误提示 Toast */}
+      {errorMsg && (
+        <div style={{
+          position:'fixed', bottom:80, left:'50%', transform:'translateX(-50%)',
+          zIndex:9999, background:'#E91E63', color:'#fff', padding:'8px 20px',
+          borderRadius:8, fontSize:12, boxShadow:'0 3px 10px rgba(0,0,0,.3)',
+          fontFamily:'serif',
+        }}>
+          {errorMsg}
+        </div>
+      )}
 
       {/* 浮动汉堡按钮（移动端） */}
       {isMobile && (

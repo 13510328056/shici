@@ -1,7 +1,7 @@
 /** API 客户端 */
 
 import axios from 'axios'
-import type { PlaceName, PoetTrajectory, HeatmapPoint } from '../types'
+import type { PlaceName, HeatmapPoint } from '../types'
 
 const api = axios.create({
   baseURL: '/api/v1',
@@ -27,10 +27,6 @@ api.interceptors.response.use(
 )
 
 /** 搜索地名（古今模糊查询） */
-export async function searchPlaces(q: string) {
-  const res = await api.get('/places/search', { params: { q } })
-  return res.data.results as PlaceName[]
-}
 
 /** 围栏查询：给定坐标+半径内所有地名 */
 export async function fenceQuery(lon: number, lat: number, radius = 80) {
@@ -39,12 +35,6 @@ export async function fenceQuery(lon: number, lat: number, radius = 80) {
 }
 
 /** 诗人轨迹 */
-export async function getPoetTrajectory(poetId: string, yearStart?: string, yearEnd?: string) {
-  const res = await api.get(`/poets/${poetId}/trajectory`, {
-    params: { year_start: yearStart, year_end: yearEnd },
-  })
-  return res.data as PoetTrajectory
-}
 
 /** 诗词热力 */
 export async function getHeatmap(dynasty?: string, mood?: string) {
@@ -53,9 +43,5 @@ export async function getHeatmap(dynasty?: string, mood?: string) {
 }
 
 /** 诗人列表（获取所有诗人） */
-export async function listPoets() {
-  const res = await api.get('/poets')
-  return res.data as { poets: Array<{ poet_id: string; name: string; dynasty: string }> }
-}
 
 export default api

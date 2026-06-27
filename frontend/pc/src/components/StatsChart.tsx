@@ -56,7 +56,7 @@ export default function StatsChart() {
   const [data, setData] = useState<StatsData | null>(null)
 
   useEffect(() => {
-    fetch('/api/v1/export/stats').then(r => r.json()).then(d => setData(d)).catch(() => {})
+    fetch('/api/v1/export/stats').then(r => r.json()).then(d => setData(d)).catch(() => console.warn("统计数据加载失败"))
   }, [])
 
   if (!data) return <div style={{ fontSize: 11, color: '#aaa', padding: 8 }}>加载中...</div>
