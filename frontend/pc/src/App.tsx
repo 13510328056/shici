@@ -9,6 +9,7 @@ import AIToolsPanel from './components/AIToolsPanel'
 import TourismPanel from './components/TourismPanel'
 import PoetryOverlay from './components/PoetryOverlay'
 import PoemReadingOverlay from './components/PoemReadingOverlay'
+import PoemCompareView from './components/PoemCompareView'
 
 const ST = {
   container: { display:'flex', width:'100vw', height:'100vh', fontFamily:'"Noto Serif SC","Source Han Serif SC",serif', color:T.text, overflow:'hidden', background:T.bg } as const,
@@ -28,6 +29,8 @@ export default function App() {
   const [unifiedResults, setUnifiedResults] = useState<any>(null)
   const [showUnified, setShowUnified] = useState(false)
   const [searching, setSearching] = useState(false)
+  const [compareList, setCompareList] = useState<Array<{title:string;content:string;author?:string;genre?:string;mood_tags?:string[];dynasty?:string}>>([])
+  const [showCompare, setShowCompare] = useState(false)
 
   const [poets, setPoets] = useState<Array<{poet_id:string;name:string;dynasty:string}>>([])
   const [poetSearch, setPoetSearch] = useState('')
@@ -253,14 +256,31 @@ export default function App() {
             )}
             {unifiedResults.poems?.length > 0 && (
               <div>
-                <div style={{fontSize:11,fontWeight:600,color:T.textTitle,marginBottom:2}}>诗词 ({unifiedResults.poems.length})</div>
+                <div style={{fontSize:11,fontWeight:600,color:T.textTitle,marginBottom:2}}>
+                  诗词 ({unifiedResults.poems.length})
+                  {compareList.length > 1 && (
+                    <span style={{float:'right',fontWeight:400,fontSize:10,color:T.accent,cursor:'pointer'}}
+                      onClick={()=>setShowCompare(true)}>
+                      📖 对比 ({compareList.length}首)
+                    </span>
+                  )}
+                </div>
                 {unifiedResults.poems.map((r: any) =>
                   <div key={r.poetry_id} style={{padding:'4px 6px',cursor:'pointer',fontSize:11,borderRadius:3,borderBottom:'1px solid '+T.divider}}
                     onMouseEnter={e=>e.currentTarget.style.background=T.bg}
                     onMouseLeave={e=>e.currentTarget.style.background='transparent'}
                     onClick={()=>{handlePoemClick(r);setShowUnified(false);setSearchQuery('')}}>
-                    <b>{r.title}</b> {'—'} {r.author}
-                    <span style={{float:'right',color:T.textMuted,fontSize:10}}>{r.dynasty}/{r.genre}</span>
+                    <div style={{display:'flex',alignItems:'center',gap:4}}>
+                      <span style={{flex:1}}><b>{r.title}</b> {'—'} {r.author}</span>
+                      <span style={{fontSize:9,color:T.accent,cursor:'pointer',whiteSpace:'nowrap'}}
+                        onClick={(e)=>{e.stopPropagation();setCompareList(prev=>{
+                          if(prev.find(p=>p.title===r.title))return prev;
+                          return [...prev,{title:r.title,content:r.content,author:r.author,genre:r.genre,mood_tags:r.mood_tags,dynasty:r.dynasty}]
+                        })}}>
+                        +对比
+                      </span>
+                    </div>
+                    <span style={{color:T.textMuted,fontSize:10}}>{r.dynasty}/{r.genre}</span>
                     <div style={{color:'#666',fontSize:10,marginTop:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{r.content?.slice(0,40)}...</div>
                   </div>
                 )}
@@ -466,6 +486,11 @@ export default function App() {
 
       {/* 诗词阅读浮层 */}
       <PoemReadingOverlay visible={showPoemReading} onClose={() => setShowPoemReading(false)} />
+
+      {/* 多诗对比浮层 */}
+      {showCompare && (
+        <PoemCompareView poems={compareList} onClose={() => setShowCompare(false)} />
+      )}
 
     </div>
   )
