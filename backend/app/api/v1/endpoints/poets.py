@@ -86,11 +86,13 @@ async def calculate_encounter(
 async def get_heatmap(
     dynasty: Optional[str] = Query(None, description="朝代过滤"),
     mood: Optional[str] = Query(None, description="意境标签过滤"),
+    year_start: Optional[str] = Query(None, description="起始年份"),
+    year_end: Optional[str] = Query(None, description="结束年份"),
     db: AsyncSession = Depends(get_db),
 ):
-    """诗词热力分布数据 — 需求 4.1.5"""
+    """诗词热力分布数据 — 支持时间范围过滤 需求 4.1.5"""
     service = SpatialQueryService(db)
-    data = await service.get_poetry_heatmap_data(dynasty, mood)
+    data = await service.get_poetry_heatmap_data(dynasty, mood, year_start, year_end)
     return {"count": len(data), "points": data}
 
 

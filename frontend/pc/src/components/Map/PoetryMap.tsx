@@ -33,6 +33,27 @@ const TILES = {
     attr: '&copy; 高德地图',
     subdomains: ['wprd01', 'wprd02', 'wprd03', 'wprd04'],
   },
+  // 古风底图（水墨风格替代） — 使用 CartoDB Dark Matter 模拟古风
+  antique: {
+    name: '古风底图',
+    url: 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',
+    attr: '&copy; CartoDB',
+    subdomains: ['a', 'b', 'c', 'd'],
+  },
+}
+
+// 事件类型 → 颜色映射（标准化）
+function eventColor(evtType: string): string {
+  if (['出生','去世'].includes(evtType)) return '#2196F3'       // 蓝
+  if (evtType === '科举') return '#00BCD4'                       // 青
+  if (['仕宦','政治'].includes(evtType)) return '#1565C0'        // 深蓝
+  if (evtType === '贬谪') return '#F44336'                       // 红
+  if (['游览','交游'].includes(evtType)) return '#4CAF50'        // 绿
+  if (evtType === '雅集') return '#FFD700'                       // 金黄
+  if (evtType === '军事') return '#FF5722'                       // 橙
+  if (evtType === '隐居') return '#795548'                       // 棕
+  if (evtType === '创作') return '#9C27B0'                       // 紫
+  return EVENT_COLORS[evtType] || '#999'
 }
 
 // ─── 地名 ─────────────────────────────────
@@ -89,9 +110,9 @@ function MultiTrajectoryLayer({
       }
 
       visible.forEach(e => {
-        const evColor = EVENT_COLORS[e.event_type] || '#999'
+        const ec = eventColor(e.event_type)
         L.circleMarker([e.wgs84_lat, e.wgs84_lon], {
-          radius: 5, fillColor: evColor,
+          radius: 5, fillColor: ec,
           color: '#fff', weight: 1.5, fillOpacity: 0.7,
         })
           .bindPopup(`<b>${name}</b> · ${e.event_year} ${e.event_type}<br/>${e.ancient_place||''}${e.stay_duration_days ? `<br/>停留${e.stay_duration_days}天` : ''}`)
@@ -267,6 +288,51 @@ function SearchResultMarkers({ results }: { results: Array<{ title: string; auth
   return null
 }
 
+// ─── 截图工具 ──────────────────────────────
+function ScreenshotButton() {
+  const map = useMap()
+  useEffect(() => {
+    const ctrl = (L.control as any)({ position: 'topleft' })
+    ctrl.onAdd = () => {
+      const btn = L.DomUtil.create('button')
+      btn.innerHTML = '📷'
+      btn.title = '截图下载（保存为PNG）'
+      btn.style.cssText = 'width:34px;height:34px;background:#fff;border:2px solid rgba(0,0,0,0.2);border-radius:4px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center'
+      btn.onclick = () => {
+        const c = map.getContainer()
+        // 用canvg方式截图：创建canvas并绘制SVG
+        const svg = c.querySelector('svg')?.cloneNode(true) as SVGElement
+        if (!svg) return
+        const rect = c.getBoundingClientRect()
+        const canvas = document.createElement('canvas')
+        canvas.width = rect.width * 2
+        canvas.height = rect.height * 2
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return
+        ctx.scale(2, 2)
+        // 渲染背景
+        ctx.fillStyle = '#fff'
+        ctx.fillRect(0, 0, rect.width, rect.height)
+        // 使用XML序列化SVG绘制到canvas
+        const data = new XMLSerializer().serializeToString(svg)
+        const img = new Image()
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0)
+          const a = document.createElement('a')
+          a.download = 'poetryspace-map.png'
+          a.href = canvas.toDataURL('image/png')
+          a.click()
+        }
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(data)))
+      }
+      return btn
+    }
+    ctrl.addTo(map)
+    return () => { map.removeControl(ctrl) }
+  }, [map])
+  return null
+}
+
 // ─── 距离测量工具 ─────────────────────────
 // 点击起点→点击终点→显示距离（km）
 function DistanceMeasure() {
@@ -389,6 +455,9 @@ export default function PoetryMap({
               <TileLayer url={t.url} attribution={t.attr} subdomains={t.subdomains} />
             </LayersControl.BaseLayer>
           ))}
+          <LayersControl.Overlay name="古风底图" checked={false}>
+            <TileLayer url={TILES.antique.url} attribution={TILES.antique.attr} subdomains={TILES.antique.subdomains} />
+          </LayersControl.Overlay>
           <LayersControl.Overlay name="地名" checked><PlaceMarkers places={places} /></LayersControl.Overlay>
           <LayersControl.Overlay name="诗人轨迹" checked={poets.length>0}>
             {poets.length > 0 && <MultiTrajectoryLayer poets={poets} />}
@@ -408,6 +477,7 @@ export default function PoetryMap({
           </LayersControl.Overlay>
         )}
         <DistanceMeasure />
+        <ScreenshotButton />
         <Legend />
       </MapContainer>
     </div>

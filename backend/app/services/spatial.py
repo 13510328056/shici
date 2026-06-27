@@ -196,11 +196,12 @@ class SpatialQueryService:
         return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
     async def get_poetry_heatmap_data(
-        self, dynasty: Optional[str] = None, mood_tag: Optional[str] = None
+        self, dynasty: Optional[str] = None, mood_tag: Optional[str] = None,
+        year_start: Optional[str] = None, year_end: Optional[str] = None,
     ) -> list[dict]:
         """
         诗词热力分布数据
-        需求 4.1.5：全局热力 + 主题筛选
+        需求 4.1.5：全局热力 + 主题筛选 + 时间轴动态
         """
         conditions = []
         params = {}
@@ -208,6 +209,13 @@ class SpatialQueryService:
         if dynasty:
             conditions.append("p.dynasty = :dynasty")
             params["dynasty"] = dynasty
+
+        if year_start:
+            conditions.append("pf.creation_year >= :year_start")
+            params["year_start"] = year_start
+        if year_end:
+            conditions.append("pf.creation_year <= :year_end")
+            params["year_end"] = year_end
 
         if mood_tag:
             if self._use_postgis:
