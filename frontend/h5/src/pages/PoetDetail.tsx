@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { listPoets, getPoetPoems } from '../api'
+import { getPoetPoems } from '../api'
 import type { Poet, Poem } from '../types'
 
 export default function PoetDetail() {
@@ -11,14 +11,25 @@ export default function PoetDetail() {
 
   useEffect(() => {
     if (!id) return
-    listPoets().then(d => {
-      const p = d.poets.find(p => p.poet_id === id)
-      if (p) setPoet(p)
-    }).catch(() => {})
+    // Search poet by name from search API (more reliable than paged list)
     getPoetPoems(id).then(setPoems).catch(() => {})
   }, [id])
 
-  if (!poet) return <div className="p-8 text-center text-gray-400 text-sm">加载中…</div>
+  useEffect(() => {
+    if (!id || !poems.length) return
+    const author = poems[0].author
+    import('../api').then(m => m.searchAll(author)).then(d => {
+      const p = (d.poets || []).find((p: any) => p.name === author)
+      if (p) setPoet({ poet_id: p.poet_id, name: p.name, dynasty: p.dynasty, tags: [] })
+    }).catch(() => {})
+  }, [id, poems])
+
+  if (!poet) return (
+    <div className="p-8 text-center">
+      <div className="inline-block w-6 h-6 border-2 border-[#c23a3a] border-t-transparent rounded-full animate-spin mb-2" />
+      <p className="text-gray-400 text-sm">诗人信息加载中…</p>
+    </div>
+  )
 
   return (
     <div className="flex flex-col h-full">

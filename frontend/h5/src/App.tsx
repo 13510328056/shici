@@ -5,6 +5,7 @@ import Discover from './pages/Discover'
 import SearchResults from './pages/SearchResults'
 import Detail from './pages/Detail'
 import PoetDetail from './pages/PoetDetail'
+import NotFound from './pages/NotFound'
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/search" element={<SearchResults />} />
           <Route path="/detail/:id" element={<Detail />} />
           <Route path="/poet/:id" element={<PoetDetail />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </BrowserRouter>

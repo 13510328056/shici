@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getDailyPoem, getRandomPoem, getRelatedPoems } from '../api'
+import { getPoemById, getRandomPoem, getRelatedPoems } from '../api'
 import type { Poem } from '../types'
 
 export default function Detail() {
@@ -13,14 +13,19 @@ export default function Detail() {
   useEffect(() => {
     if (id === 'random') {
       getRandomPoem().then(setPoem).catch(() => {})
-    } else {
-      getDailyPoem().then(d => { setPoem(d); return d }).then(d => {
+    } else if (id) {
+      getPoemById(id).then(d => { setPoem(d); return d }).then(d => {
         if (d?.poetry_id) getRelatedPoems(d.poetry_id).then(r => setRelated(r.related || [])).catch(() => {})
       }).catch(() => {})
     }
   }, [id])
 
-  if (!poem) return <div className="p-8 text-center text-gray-400 text-sm">加载中…</div>
+  if (!poem) return (
+    <div className="p-8 text-center">
+      <div className="inline-block w-6 h-6 border-2 border-[#c23a3a] border-t-transparent rounded-full animate-spin mb-2" />
+      <p className="text-gray-400 text-sm">诗词加载中…</p>
+    </div>
+  )
 
   return (
     <div className="flex flex-col h-full">

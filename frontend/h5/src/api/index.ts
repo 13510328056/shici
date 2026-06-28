@@ -33,6 +33,11 @@ export async function getPoetPoems(poetId: string): Promise<Poem[]> {
   return r.data?.poems || []
 }
 
+export async function getPoemById(id: string): Promise<Poem> {
+  const r = await api.get(`/play/poem/${id}`)
+  return r.data
+}
+
 export async function getRelatedPoems(poetryId: string) {
   const r = await api.get('/play/related', { params: { poetry_id: poetryId } })
   return r.data

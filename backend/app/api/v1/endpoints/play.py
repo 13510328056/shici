@@ -52,6 +52,37 @@ async def get_daily_poem(db: AsyncSession = Depends(get_db)):
     return result
 
 
+@router.get("/poem/{poetry_id}")
+async def get_poem_by_id(poetry_id: str, db: AsyncSession = Depends(get_db)):
+    """按 ID 获取单首诗词"""
+    stmt = text("""
+        SELECT p.poetry_id, p.title, p.content, p.dynasty, p.genre,
+               po.name as author,
+               pf.mood_tags, pf.imagery_items, pf.season
+        FROM poetry p
+        JOIN poetry_features pf ON pf.poetry_id = p.poetry_id
+        JOIN poets po ON po.poet_id = p.author_id
+        WHERE p.poetry_id = :pid
+        LIMIT 1
+    """)
+    row = (await db.execute(stmt, {"pid": poetry_id})).mappings().first()
+    if not row:
+        return {"error": "poem not found"}
+
+    import json
+    return {
+        "poetry_id": str(row["poetry_id"]),
+        "title": row["title"],
+        "content": row["content"],
+        "author": row["author"],
+        "dynasty": row["dynasty"],
+        "genre": row["genre"] or "",
+        "mood_tags": json.loads(row["mood_tags"]) if isinstance(row["mood_tags"], str) else (row["mood_tags"] or []),
+        "imagery_items": json.loads(row["imagery_items"]) if isinstance(row["imagery_items"], str) else (row["imagery_items"] or []),
+        "season": json.loads(row["season"]) if isinstance(row["season"], str) else (row["season"] or []),
+    }
+
+
 @router.get("/random")
 async def get_random_poem(db: AsyncSession = Depends(get_db)):
     """随机一首诗"""
