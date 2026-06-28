@@ -49,12 +49,14 @@ export default function Home() {
               开启研学
             </button>
             <div className="mt-4 flex gap-6 text-gray-400">
-              <button className="hover:text-[#c23a3a] transition-colors">
+              <button className="hover:text-[#c23a3a] transition-colors"
+                onClick={() => {}}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                 </svg>
               </button>
-              <button className="hover:text-blue-400 transition-colors">
+              <button className="hover:text-blue-400 transition-colors"
+                onClick={() => { if (navigator.share) navigator.share({title: poem.title, text: poem.content.slice(0,100)}).catch(()=>{}); }}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
                 </svg>
@@ -68,7 +70,7 @@ export default function Home() {
       <div className="mb-4">
         <div className="flex justify-between items-end mb-3">
           <h3 className="font-bold border-l-4 border-[#c23a3a] pl-2 text-sm">往期推荐</h3>
-          <span className="text-xs text-gray-400">更多 →</span>
+          <span className="text-xs text-gray-400 cursor-pointer hover:text-[#c23a3a]" onClick={() => navigate("/discover")}>更多 →</span>
         </div>
         <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
           {['将进酒', '声声慢', '琵琶行'].map((title, i) => (
