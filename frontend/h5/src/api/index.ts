@@ -19,13 +19,13 @@ export async function searchAll(keyword: string) {
 }
 
 export async function listPoets(dynasty?: string): Promise<{ poets: Poet[]; total: number }> {
-  const r = await api.get('/poets', { params: { dynasty, limit: 100 } })
+  const r = await api.get('/poets', { params: { dynasty, limit: 200 } })
   return r.data
 }
 
-export async function getPoetDetail(poetId: string): Promise<Poet> {
-  const r = await api.get(`/poets?poet_id=${poetId}`)
-  return r.data?.poets?.[0]
+export async function getPoetDetail(poetId: string): Promise<Poet | undefined> {
+  const r = await api.get('/poets', { params: { limit: 500 } })
+  return (r.data?.poets || []).find((p: any) => p.poet_id === poetId)
 }
 
 export async function getPoetPoems(poetId: string): Promise<Poem[]> {

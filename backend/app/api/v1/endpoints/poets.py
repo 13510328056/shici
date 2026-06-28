@@ -23,6 +23,7 @@ async def list_poets(
 ):
     """获取诗人列表（支持分页、朝代过滤）"""
     from app.models.poet import Poet
+    import json
     from sqlalchemy import select, func
 
     # 总数
@@ -42,7 +43,7 @@ async def list_poets(
     poets = result.scalars().all()
     return {
         "poets": [
-            {"poet_id": str(p.poet_id), "name": p.name, "dynasty": p.dynasty}
+            {"poet_id": str(p.poet_id), "name": p.name, "dynasty": p.dynasty, "tags": (json.loads(p.tags) if isinstance(p.tags, str) and p.tags else (p.tags if isinstance(p.tags, list) else [])), "description": (p.description or "")[:200] if p.description else ""}
             for p in poets
         ],
         "total": total,
@@ -105,6 +106,7 @@ async def get_poet_stats(
     from app.models.poet import Poet, PoetTrajectory
     from app.models.poetry import Poetry, PoetryFeature
     from app.models.place_name import PlaceName
+    import json
     from sqlalchemy import select, func, text
 
     if poet_id:
@@ -165,6 +167,7 @@ async def get_poet_poetry(
 ):
     """获取某位诗人的作品（支持分页，使用 JOIN 消除 N+1）"""
     from app.models.poetry import Poetry, PoetryFeature
+    import json
     from sqlalchemy import select, func as sa_func
     from sqlalchemy.orm import joinedload
 
