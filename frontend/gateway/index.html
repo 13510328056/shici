@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoetrySpace · 古诗词文化互动平台</title>
+<style>
+  body { margin: 0; background: #f5f0e8; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Noto Serif SC', serif; }
+  .loader { text-align: center; }
+  .spinner { width: 32px; height: 32px; border: 3px solid #D4C5A9; border-top-color: #C23B22; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  p { color: #8B7355; font-size: 14px; letter-spacing: 2px; }
+</style>
+<script>
+  (function() {
+    var ua = navigator.userAgent.toLowerCase();
+    var isMobile = /mobile|android|iphone|ipad|ipod|phone|tablet|touch/i.test(ua);
+    var target = isMobile ? '/h5/index.html' : '/pc/index.html';
+    // Store preference in sessionStorage for manual override
+    sessionStorage.setItem('deviceType', isMobile ? 'mobile' : 'desktop');
+    window.location.replace(target);
+  })();
+</script>
+</head>
+<body>
+  <div class="loader">
+    <div class="spinner"></div>
+    <p>诗词雅韵 · 加载中</p>
+  </div>
+</body>
+</html>
