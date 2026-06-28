@@ -1,0 +1,3203 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>诗词雅韵 - 古文研学平台</title>
+<!-- Tailwind CSS -->
+<script src="https://modao.cc/agent-py/static/source/js/tailwindcss.js"></script>
+<!-- Iconify -->
+<script src="https://modao.cc/agent-py/static/source/js/iconify-icon.min.js"></script>
+<!-- Google Fonts: Noto Serif SC -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background-color: #e5e5e5;
+            color: #2c2c2c;
+        }
+        .app-container {
+            width: 375px;
+            height: 812px;
+            background-color: #f5f0e8;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            margin: 0 auto;
+        }
+        .content-scroll {
+            height: calc(812px - 64px);
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .content-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .xuanzhi-texture {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+        .ink-border {
+            border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='10' viewBox='0 0 100 10'%3E%3Cpath d='M0 5 Q 25 0, 50 5 T 100 5' fill='none' stroke='%232c2c2c' stroke-width='2' opacity='0.3'/%3E%3C/svg%3E") 10 stretch;
+        }
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+        .seal {
+            background-color: #c23a3a;
+            color: white;
+            padding: 4px;
+            border: 1px solid #a12d2d;
+            font-size: 10px;
+            line-height: 1;
+            box-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+        }
+        .page-transition {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .active-tab {
+            color: #c23a3a;
+            border-bottom: 2px solid #c23a3a;
+        }
+        .brush-line {
+            height: 20px;
+            background: radial-gradient(ellipse at center, rgba(44,44,44,0.2) 0%, rgba(44,44,44,0) 70%);
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen py-10">
+<div class="app-container xuanzhi-texture flex flex-col shadow-2xl">
+<!-- Main Content Area -->
+<div class="flex-1 overflow-hidden relative" id="main-content">
+<!-- Page: Home (Daily Recommendation) -->
+<section class="page-transition h-full flex flex-col" id="page-home">
+<div class="p-6 pb-2 text-center relative">
+<div class="absolute top-4 left-6 vertical-text text-xs text-gray-500 tracking-widest opacity-60">
+                        丙申年 五月廿三
+                    </div>
+<h1 class="text-3xl font-black tracking-tighter mb-1">诗词雅韵</h1>
+<p class="text-[10px] tracking-[0.4em] text-gray-400 uppercase">Shici Yayun · Traditional Study</p>
+<div class="mt-4 flex justify-center">
+<div class="h-[1px] w-24 bg-gray-300 relative">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full border border-gray-300 bg-[#f5f0e8]"></div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 py-4">
+<!-- Daily Card -->
+<div class="bg-white/40 p-1 border border-gray-200 shadow-sm mb-8">
+<div class="border border-gray-300 p-6 flex flex-col items-center relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2 opacity-10">
+<iconify-icon icon="mingcute:cloud-line" width="80"></iconify-icon>
+</div>
+<span class="seal mb-4">今日荐</span>
+<h2 class="text-2xl font-bold mb-2">定风波</h2>
+<p class="text-gray-500 text-sm mb-6">苏轼 · 宋</p>
+<div class="text-lg leading-loose tracking-widest text-center mb-8 space-y-2">
+<p>莫听穿林打叶声，</p>
+<p>何妨吟啸且徐行。</p>
+<p>竹杖芒鞋轻胜马，</p>
+<p>谁怕？一蓑烟雨任平生。</p>
+</div>
+<button class="bg-[#2c2c2c] text-[#f5f0e8] px-8 py-2 text-sm tracking-widest hover:bg-black transition-colors" onclick="switchPage('detail')">
+                                开启研学
+                            </button>
+<div class="mt-6 flex gap-6 text-gray-400">
+<button class="hover:text-[#c23a3a]"><iconify-icon icon="ph:heart-bold"></iconify-icon></button>
+<button class="hover:text-blue-400"><iconify-icon icon="ph:share-network-bold"></iconify-icon></button>
+</div>
+</div>
+</div>
+<!-- Past Recommendations -->
+<div class="mb-6">
+<div class="flex justify-between items-end mb-4">
+<h3 class="font-bold border-l-4 border-[#c23a3a] pl-2">往期推荐</h3>
+<span class="text-xs text-gray-400">更多 <iconify-icon icon="ph:caret-right"></iconify-icon></span>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+<div class="min-w-[140px] bg-white/50 p-3 border border-gray-200">
+<img alt="Traditional landscape painting of a quiet river" class="w-full h-20 object-cover mb-2 grayscale opacity-80" src="https://modao.cc/agent-py/media/generated_images/2026-06-28/09d8ae6cb78243598619e21b1de38a7a.jpg"/>
+<p class="text-xs font-bold">将进酒</p>
+<p class="text-[10px] text-gray-400">李白 · 唐</p>
+</div>
+<div class="min-w-[140px] bg-white/50 p-3 border border-gray-200">
+<img alt="Ink wash painting of plum blossoms" class="w-full h-20 object-cover mb-2 grayscale opacity-80" src="https://modao.cc/agent-py/media/generated_images/2026-06-28/e00a2801b307414692c6110191630bb5.jpg"/>
+<p class="text-xs font-bold">声声慢</p>
+<p class="text-[10px] text-gray-400">李清照 · 宋</p>
+</div>
+<div class="min-w-[140px] bg-white/50 p-3 border border-gray-200">
+<img alt="Chinese calligraphy on old paper" class="w-full h-20 object-cover mb-2 grayscale opacity-80" src="https://modao.cc/agent-py/media/generated_images/2026-06-28/acc0bbf2956a4e0dad6858f5ad79191b.jpg"/>
+<p class="text-xs font-bold">琵琶行</p>
+<p class="text-[10px] text-gray-400">白居易 · 唐</p>
+</div>
+</div>
+</div>
+<!-- Footer Decoration -->
+<div class="py-4 opacity-20">
+<img alt="Minimalist ink mountain silhouette" class="w-full h-12 object-contain" src="https://modao.cc/agent-py/media/generated_images/2026-06-28/8e494109a99b450c9f46d0ab536eef9e.jpg"/>
+</div>
+</div>
+</section>
+<!-- Page: Discover -->
+<section class="page-transition h-full flex flex-col hidden" id="page-discover">
+<div class="p-4">
+<div class="relative mb-6">
+<input class="w-full bg-white/60 border border-gray-300 rounded-none py-2 px-10 text-sm focus:outline-none focus:border-[#c23a3a]" placeholder="搜索诗词、诗人、名句..." type="text"/>
+<iconify-icon class="absolute left-3 top-2.5 text-gray-400" icon="ph:magnifying-glass"></iconify-icon>
+<button class="absolute right-3 top-2.5 text-[#c23a3a] text-xs font-bold" onclick="switchPage('search-results')">搜索</button>
+</div>
+<!-- Categories -->
+<div class="space-y-6">
+<div>
+<h3 class="text-xs font-bold text-gray-400 mb-3 tracking-widest uppercase">按朝代</h3>
+<div class="flex gap-2 overflow-x-auto no-scrollbar">
+<span class="px-4 py-1 bg-white border border-gray-200 text-xs rounded-full whitespace-nowrap">唐</span>
+<span class="px-4 py-1 bg-white border border-gray-200 text-xs rounded-full whitespace-nowrap">宋</span>
+<span class="px-4 py-1 bg-[#c23a3a] text-white text-xs rounded-full whitespace-nowrap">魏晋</span>
+<span class="px-4 py-1 bg-white border border-gray-200 text-xs rounded-full whitespace-nowrap">先秦</span>
+<span class="px-4 py-1 bg-white border border-gray-200 text-xs rounded-full whitespace-nowrap">元</span>
+<span class="px-4 py-1 bg-white border border-gray-200 text-xs rounded-full whitespace-nowrap">明清</span>
+</div>
+</div>
+<div>
+<h3 class="text-xs font-bold text-gray-400 mb-3 tracking-widest uppercase">热门诗人</h3>
+<div class="flex gap-4 overflow-x-auto no-scrollbar py-2">
+<div class="flex flex-col items-center min-w-[70px]" onclick="switchPage('poet')">
+<div class="w-14 h-14 rounded-full border-2 border-[#b8860b] p-0.5 mb-2">
+<img alt="Classical portrait of Su Shi" class="w-full h-full rounded-full object-cover grayscale" src="https://modao.cc/agent-py/media/generated_images/2026-06-28/f33757454cd749b4a2050e0986fcf9f8.jpg"/>
+</div>
+<span class="text-xs font-bold">苏轼</span>
+<span class="text-[10px] text-gray-400">宋</span>
+</div>
+<div class="flex flex-col items-center min-w-[70px]" onclick="switchPage('poet-detail')">
+<div class="w-14 h-14 rounded-full border border-gray-300 p-0.5 mb-2">
+<img alt="Classical portrait of Li Bai" class="w-full h-full rounded-full object-cover grayscale" src="https://modao.cc/agent-py/media/generated_images/2026-06-28/6fefeed5b99942e583b1d1a5f00445b1.jpg"/>
+</div>
+<span class="text-xs font-bold">李白</span>
+<span class="text-[10px] text-gray-400">唐</span>
+</div>
+<div class="flex flex-col items-center min-w-[70px]" onclick="switchPage('poet-detail-liqingzhao')">
+<div class="w-14 h-14 rounded-full border border-gray-300 p-0.5 mb-2">
+<img alt="Classical portrait of Li Qingzhao" class="w-full h-full rounded-full object-cover grayscale" src="https://modao.cc/agent-py/media/generated_images/2026-06-28/491f9c9015c84e9fa1eddcfe1168f4fd.jpg"/>
+</div>
+<span class="text-xs font-bold">李清照</span>
+<span class="text-[10px] text-gray-400">宋</span>
+</div>
+<div class="flex flex-col items-center min-w-[70px]" onclick="switchPage('poet-detail-dufu')">
+<div class="w-14 h-14 rounded-full border border-gray-300 p-0.5 mb-2">
+<img alt="Classical portrait of Du Fu" class="w-full h-full rounded-full object-cover grayscale" src="https://modao.cc/agent-py/media/generated_images/2026-06-28/96c251e55d584b3fb795ae63525cdda9.jpg"/>
+</div>
+<span class="text-xs font-bold">杜甫</span>
+<span class="text-[10px] text-gray-400">唐</span>
+</div>
+</div>
+</div>
+<div>
+<h3 class="text-xs font-bold text-gray-400 mb-3 tracking-widest uppercase">精选诗单</h3>
+<div class="space-y-3">
+<div class="bg-white/60 p-3 border border-gray-200 flex items-center gap-4" onclick="switchPage('collection')">
+<div class="w-16 h-16 bg-[#7a8b8b]/20 flex items-center justify-center">
+<iconify-icon class="text-[#7a8b8b]" icon="ph:scroll-bold" width="32"></iconify-icon>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold">送别友人的十首佳作</h4>
+<p class="text-[10px] text-gray-400 mt-1">收录：长亭送别、送元二使安西等</p>
+</div>
+<div class="text-[10px] text-gray-400">10首</div>
+</div>
+<div class="bg-white/60 p-3 border border-gray-200 flex items-center gap-4">
+<div class="w-16 h-16 bg-[#c23a3a]/10 flex items-center justify-center">
+<iconify-icon class="text-[#c23a3a]" icon="ph:flower-lotus-bold" width="32"></iconify-icon>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold">宋词里的婉约春天</h4>
+<p class="text-[10px] text-gray-400 mt-1">收录：蝶恋花、浣溪沙等</p>
+</div>
+<div class="text-[10px] text-gray-400">12首</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Page: Search Results -->
+<section class="page-transition h-full flex flex-col hidden" id="page-search-results">
+<div class="p-4 border-b border-gray-200 flex items-center gap-4">
+<button class="text-gray-500" onclick="switchPage('discover')"><iconify-icon icon="ph:arrow-left-bold"></iconify-icon></button>
+<div class="flex-1 font-bold">关键词：秋</div>
+</div>
+<div class="flex text-xs border-b border-gray-200">
+<button class="flex-1 py-3 text-[#c23a3a] border-b-2 border-[#c23a3a] font-bold">全部</button>
+<button class="flex-1 py-3 text-gray-400">诗词</button>
+<button class="flex-1 py-3 text-gray-400">诗人</button>
+<button class="flex-1 py-3 text-gray-400">诗单</button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<div class="bg-white p-4 border border-gray-200 shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-lg">天净沙 · 秋思</h4>
+<span class="text-[#b8860b] text-xs">☆ 9.4</span>
+</div>
+<p class="text-xs text-gray-500 mb-2">马致远 · 元</p>
+<p class="text-sm italic text-gray-600 border-l-2 border-gray-200 pl-3 py-1 mb-3">枯藤老树昏鸦，小桥流水人家，古道西风瘦马。</p>
+<div class="flex gap-2">
+<span class="text-[10px] bg-gray-100 px-2 py-0.5 text-gray-500">元曲</span>
+<span class="text-[10px] bg-gray-100 px-2 py-0.5 text-gray-500">秋天</span>
+</div>
+</div>
+<div class="bg-white p-4 border border-gray-200 shadow-sm flex gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-none">
+<img alt="Ink portrait of Liu Yuxi" class="w-full h-full object-cover grayscale" src="https://modao.cc/agent-py/media/generated_images/2026-06-28/baa39d4f66764001bcd799e6f89d1756.jpg"/>
+</div>
+<div>
+<h4 class="font-bold">刘禹锡</h4>
+<p class="text-xs text-gray-500 mt-1">唐 · 字梦得</p>
+<p class="text-[10px] text-[#c23a3a] mt-1">代表作：《秋词》</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Page: Detail (Study Mode) -->
+<section class="page-transition h-full flex flex-col hidden" id="page-detail">
+<div class="p-4 flex justify-between items-center">
+<button class="text-gray-500" onclick="switchPage('home')"><iconify-icon icon="ph:arrow-left-bold"></iconify-icon></button>
+<button class="text-[#c23a3a]"><iconify-icon icon="ph:heart-fill" width="20"></iconify-icon></button>
+</div>
+<div class="flex-1 overflow-y-auto p-6 pt-2">
+<div class="text-center mb-8">
+<h2 class="text-3xl font-bold text-[#c23a3a] mb-2">定风波</h2>
+<p class="text-gray-500 tracking-widest text-sm">苏轼 · 宋</p>
+<div class="brush-line"></div>
+</div>
+<div class="text-lg leading-[2.5] tracking-[0.2em] text-center mb-10">
+<p>三月七日，沙湖道中遇雨。雨具先去，同行皆狼狈，余独不觉，已而遂晴，故作此词。</p>
+<p class="mt-6">莫听穿林打叶声，何妨吟啸且徐行。</p>
+<p>竹杖芒鞋轻胜马，谁怕？<span class="border-b-2 border-[#b8860b]/30">一蓑烟雨任平生</span><sup class="text-[10px] text-[#c23a3a] ml-1">1</sup>。</p>
+<p>料峭春风吹酒醒，微冷，山头斜照却相迎。</p>
+<p>回首向来萧瑟处，归去，也无风雨也无晴。</p>
+</div>
+<!-- Study Tabs -->
+<div class="mb-10">
+<div class="flex border-b border-gray-200 mb-4 overflow-x-auto no-scrollbar">
+<button class="px-4 py-2 text-xs font-bold border-b-2 border-[#c23a3a] text-[#c23a3a] whitespace-nowrap" id="tab-note" onclick="switchStudyTab('note')">注释 📖</button>
+<button class="px-4 py-2 text-xs font-bold text-gray-400 whitespace-nowrap" id="tab-background" onclick="switchStudyTab('background')">创作背景 🏮</button>
+<button class="px-4 py-2 text-xs font-bold text-gray-400 whitespace-nowrap" id="tab-comment" onclick="switchStudyTab('comment')">名家评注 🎋</button>
+<button class="px-4 py-2 text-xs font-bold text-gray-400 whitespace-nowrap" id="tab-allusion" onclick="switchStudyTab('allusion')">相关典故 🦋</button>
+</div>
+<div class="text-sm leading-relaxed text-gray-600 bg-white/40 p-4 border border-gray-200 italic" id="study-content">
+<!-- Content changes based on tab -->
+<div id="content-note">
+<p class="mb-2"><span class="font-bold text-[#c23a3a]">1. 一蓑烟雨：</span>披着蓑衣在风雨中。蓑衣，用草或棕毛制成的雨衣。</p>
+<p class="mb-2"><span class="font-bold text-[#c23a3a]">2. 吟啸：</span>吟咏啸咏，指放声歌咏。</p>
+<p><span class="font-bold text-[#c23a3a]">3. 萧瑟：</span>风雨吹打树木的声音。</p>
+</div>
+<div class="hidden" id="content-background">
+                                此词作于苏轼黄州贬所。当时他正经历人生最大的磨难，却在风雨中悟出了旷达的人生哲学。
+                            </div>
+<div class="hidden" id="content-comment">
+<p class="border-l-4 border-gray-300 pl-3">"此首旷达之怀，足以感发人心。" —— 郑文焯</p>
+</div>
+<div class="hidden" id="content-allusion">
+                                涉及"沙湖"地理背景及苏轼在黄州躬耕东坡的故事。
+                            </div>
+</div>
+</div>
+<!-- Related Recommend -->
+<div class="mb-6">
+<h3 class="text-xs font-bold text-gray-400 mb-4 tracking-widest uppercase">同作者推荐</h3>
+<div class="flex gap-3 overflow-x-auto no-scrollbar">
+<div class="min-w-[120px] bg-white border border-gray-200 p-3">
+<p class="text-xs font-bold mb-1">水调歌头</p>
+<p class="text-[10px] text-gray-400">明月几时有</p>
+</div>
+<div class="min-w-[120px] bg-white border border-gray-200 p-3">
+<p class="text-xs font-bold mb-1">念奴娇</p>
+<p class="text-[10px] text-gray-400">大江东去</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Page: Poet Detail (Su Shi - Full Version) -->
+<section class="page-transition h-full flex flex-col hidden" id="page-poet">
+<!-- Top: Ink Wash Header -->
+<div class="relative flex-none">
+<div class="h-56 bg-gradient-to-b from-[#2c2c2c]/5 via-[#7a8b8b]/15 to-[#f5f0e8] relative overflow-hidden">
+<!-- Ink wash mountain silhouettes -->
+<div class="absolute inset-0 opacity-10">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 375 224">
+<path d="M0 180 Q60 80 120 130 Q180 180 240 90 Q300 0 375 60 L375 224 L0 224 Z" fill="#2c2c2c"></path>
+<path d="M0 200 Q80 140 160 170 Q240 200 320 140 L375 160 L375 224 L0 224 Z" fill="#2c2c2c" opacity="0.5"></path>
+</svg>
+</div>
+<!-- Back button -->
+<button class="absolute top-4 left-4 z-10 w-8 h-8 bg-white/70 rounded-full flex items-center justify-center text-gray-600 shadow-sm" onclick="switchPage('discover')">
+<iconify-icon icon="ph:arrow-left-bold" width="18"></iconify-icon>
+</button>
+</div>
+<!-- Poet avatar & info - overlapping header -->
+<div class="relative -mt-20 z-10 flex flex-col items-center px-6">
+<div class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-[#f5f0e8] mb-4">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#b8860b" opacity="0.2" r="18"></circle>
+<ellipse cx="50" cy="48" fill="#b8860b" opacity="0.1" rx="28" ry="12"></ellipse>
+<path d="M22 75 Q35 55 50 60 Q65 55 78 75" fill="#b8860b" opacity="0.15"></path>
+<circle cx="50" cy="28" fill="#b8860b" opacity="0.3" r="2"></circle>
+<circle cx="44" cy="24" fill="#b8860b" opacity="0.25" r="0.8"></circle>
+<circle cx="56" cy="24" fill="#b8860b" opacity="0.25" r="0.8"></circle>
+<path d="M42 68 Q50 72 58 68" fill="none" opacity="0.25" stroke="#b8860b" stroke-width="0.5"></path>
+</svg>
+</div>
+<h2 class="text-3xl font-black text-[#c23a3a] tracking-wider" style="font-family: 'Noto Serif SC', 'KaiTi', serif;">苏轼</h2>
+<p class="text-sm text-gray-500 mt-1 tracking-wider">宋代 · 字子瞻 · 号东坡居士</p>
+<div class="flex flex-wrap gap-2 mt-4 justify-center">
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">豪放派</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">唐宋八大家</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">全才文豪</span>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 py-4">
+<!-- Poet Bio -->
+<div class="bg-white/40 p-4 border border-gray-200 mb-6">
+<p class="text-xs leading-relaxed text-gray-700 indent-4 tracking-wide">苏轼（1037-1101），字子瞻，号东坡居士，北宋文坛领袖。诗、词、文、书、画无一不精，是中国文化史上罕见的全才。其词开豪放一派，散文位列"唐宋八大家"，书法为"宋四家"之首。一生仕途坎坷但乐观豁达。</p>
+</div>
+<!-- Key Metrics -->
+<div class="grid grid-cols-3 gap-3 mb-6">
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">2700+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">存诗数量</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">120+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">代表名篇</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">50+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">相关典故</p>
+</div>
+</div>
+<!-- Timeline: 生平履历 -->
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">生平履历</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="relative pl-6 border-l-2 border-gray-200 space-y-6">
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-[#c23a3a] border-2 border-white shadow-sm"></div>
+<p class="text-xs font-bold text-[#c23a3a]">1037年</p>
+<p class="text-xs text-gray-600 mt-0.5">生于眉州眉山（今四川眉山）</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">1057年</p>
+<p class="text-xs text-gray-500 mt-0.5">进士及第，主考官欧阳修大为赞赏</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">1079年</p>
+<p class="text-xs text-gray-500 mt-0.5">乌台诗案，贬谪黄州</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">1094年</p>
+<p class="text-xs text-gray-500 mt-0.5">再次被贬，先后至惠州、儋州</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">1100年</p>
+<p class="text-xs text-gray-500 mt-0.5">遇赦北归</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-500">1101年</p>
+<p class="text-xs text-gray-500 mt-0.5">卒于常州</p>
+</div>
+</div>
+</div>
+<!-- 地域足迹 -->
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">地域足迹</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><rect height="20" rx="2" width="16" x="4" y="2"></rect><path d="M9 22v-2h6v2"></path><path d="M8 6h8"></path><path d="M8 10h8"></path><path d="M8 14h5"></path></svg>
+<p class="text-xs font-bold">眉山</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">故乡·少年求学</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"></path><circle cx="12" cy="11" r="3"></circle><path d="M20 6v2H4V6"></path></svg>
+<p class="text-xs font-bold">开封</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">进士及第·名动京师</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M2 12h3l2-3 2 3 2-3 2 3 2-3 2 3 3-3"></path><path d="M2 18h20"></path></svg>
+<p class="text-xs font-bold">杭州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">修堤西湖·苏堤春晓</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+<p class="text-xs font-bold">黄州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">谪居·赤壁赋天下</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M17.5 19H9a7 7 0 117-7v1a2 2 0 002 2h1"></path><path d="M17 22l-1.5-3 1.5-3"></path><path d="M12 2v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M20 12h2"></path></svg>
+<p class="text-xs font-bold">惠州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">再贬·日啖荔枝</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+<p class="text-xs font-bold">儋州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">天涯海角·载酒行歌</p>
+</div>
+</div>
+</div>
+<!-- 代表作合辑 -->
+<div class="mb-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">代表作合辑</h3>
+<div class="flex gap-2 text-[10px]">
+<span class="text-[#c23a3a] font-bold border-b border-[#c23a3a]">最热</span>
+<span class="text-gray-400">最新</span>
+<span class="text-gray-400">最长</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">水调歌头·明月几时有</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「但愿人长久，千里共婵娟」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">词</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.9</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">念奴娇·赤壁怀古</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「大江东去，浪淘尽，千古风流人物」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">词</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.9</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">定风波</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「回首向来萧瑟处，归去，也无风雨也无晴」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">词</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.8</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">江城子·密州出猎</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「老夫聊发少年狂，左牵黄，右擎苍」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">词</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.7</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">题西林壁</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「不识庐山真面目，只缘身在此山中」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">七言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.6</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">饮湖上初晴后雨</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「欲把西湖比西子，淡妆浓抹总相宜」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">七言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.7</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+</div>
+</div>
+<!-- 相关诗人推荐 -->
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">相关诗人</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-xinqiji')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">辛弃疾</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">稼轩</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-liqingzhao')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">李清照</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">易安</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-wanganshi')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">王安石</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">半山</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-ouyangxiu')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">欧阳修</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">醉翁</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Action Bar -->
+<div class="flex-none border-t border-gray-200 bg-[#f5f0e8]/95 backdrop-blur-sm px-6 py-3">
+<div class="flex items-center justify-around">
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-[#c23a3a] transition-colors">
+<iconify-icon icon="ph:heart-bold" width="20"></iconify-icon>
+<span class="text-[10px]">收藏诗人</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-amber-500 transition-colors" onclick="currentPoetWorksId='sushi'; mapFromPage='poet'; renderPoetMap(); switchPage('poet-map')">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<span class="text-[10px]">足迹地图</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-blue-500 transition-colors">
+<iconify-icon icon="ph:share-network-bold" width="20"></iconify-icon>
+<span class="text-[10px]">分享</span>
+</button>
+<button class="bg-[#2c2c2c] text-[#f5f0e8] px-6 py-2 text-xs tracking-wider hover:bg-black transition-colors" onclick="currentPoetWorksId='sushi'; poetWorksFromPage='poet'; renderPoetWorks(); switchPage('poet-works')">
+查看更多作品
+</button>
+</div>
+</div>
+</section>
+<!-- Page: Poet Detail (Li Bai) -->
+<section class="page-transition h-full flex flex-col hidden" id="page-poet-detail">
+<!-- Top: Ink Wash Header -->
+<div class="relative flex-none">
+<div class="h-56 bg-gradient-to-b from-[#2c2c2c]/5 via-[#7a8b8b]/15 to-[#f5f0e8] relative overflow-hidden">
+<!-- Ink wash mountain silhouettes -->
+<div class="absolute inset-0 opacity-10">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 375 224">
+<path d="M0 180 Q60 80 120 130 Q180 180 240 90 Q300 0 375 60 L375 224 L0 224 Z" fill="#2c2c2c"></path>
+<path d="M0 200 Q80 140 160 170 Q240 200 320 140 L375 160 L375 224 L0 224 Z" fill="#2c2c2c" opacity="0.5"></path>
+</svg>
+</div>
+<!-- Back button -->
+<button class="absolute top-4 left-4 z-10 w-8 h-8 bg-white/70 rounded-full flex items-center justify-center text-gray-600 shadow-sm" onclick="switchPage('discover')">
+<iconify-icon icon="ph:arrow-left-bold" width="18"></iconify-icon>
+</button>
+</div>
+<!-- Poet avatar & info - overlapping header -->
+<div class="relative -mt-20 z-10 flex flex-col items-center px-6">
+<div class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-[#f5f0e8] mb-4">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.15" r="18"></circle>
+<ellipse cx="50" cy="48" fill="#2c2c2c" opacity="0.08" rx="28" ry="12"></ellipse>
+<path d="M22 75 Q35 55 50 60 Q65 55 78 75" fill="#2c2c2c" opacity="0.12"></path>
+<circle cx="50" cy="28" fill="#2c2c2c" opacity="0.25" r="2"></circle>
+<circle cx="44" cy="24" fill="#2c2c2c" opacity="0.2" r="0.8"></circle>
+<circle cx="56" cy="24" fill="#2c2c2c" opacity="0.2" r="0.8"></circle>
+<path d="M42 68 Q50 72 58 68" fill="none" opacity="0.2" stroke="#2c2c2c" stroke-width="0.5"></path>
+</svg>
+</div>
+<h2 class="text-3xl font-black text-[#c23a3a] tracking-wider" style="font-family: 'Noto Serif SC', 'KaiTi', serif;">李白</h2>
+<p class="text-sm text-gray-500 mt-1 tracking-wider">唐代 · 字太白 · 号青莲居士</p>
+<div class="flex flex-wrap gap-2 mt-4 justify-center">
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">诗仙</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">浪漫主义</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">唐代三李之首</span>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 py-4">
+<!-- Poet Bio -->
+<div class="bg-white/40 p-4 border border-gray-200 mb-6">
+<p class="text-xs leading-relaxed text-gray-700 indent-4 tracking-wide">李白（701年－762年），字太白，号青莲居士，又号"谪仙人"，唐代伟大的浪漫主义诗人。其诗飘逸奔放、意境奇异，被后世尊为"诗仙"。李白好酒、好剑术，喜交游，一生游历大半个中国，与杜甫并称"李杜"，对中国诗歌文化产生深远影响。</p>
+</div>
+<!-- Key Metrics -->
+<div class="grid grid-cols-3 gap-3 mb-6">
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">1010</p>
+<p class="text-[10px] text-gray-400 mt-0.5">存诗数量</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">60+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">代表名篇</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">20+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">相关典故</p>
+</div>
+</div>
+<!-- Timeline: 生平履历 -->
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">生平履历</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="relative pl-6 border-l-2 border-gray-200 space-y-6">
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-[#c23a3a] border-2 border-white shadow-sm"></div>
+<p class="text-xs font-bold text-[#c23a3a]">701年</p>
+<p class="text-xs text-gray-600 mt-0.5">生于碎叶城（今吉尔吉斯斯坦托克马克）</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">705年</p>
+<p class="text-xs text-gray-500 mt-0.5">随父迁居绵州昌隆（今四川江油）</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">725年</p>
+<p class="text-xs text-gray-500 mt-0.5">辞亲远游，出蜀漫游</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">742年</p>
+<p class="text-xs text-gray-500 mt-0.5">奉诏入京，供奉翰林</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">744年</p>
+<p class="text-xs text-gray-500 mt-0.5">赐金放还，与杜甫相识</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">755年</p>
+<p class="text-xs text-gray-500 mt-0.5">安史之乱爆发</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-500">762年</p>
+<p class="text-xs text-gray-500 mt-0.5">卒于当涂（今安徽马鞍山）</p>
+</div>
+</div>
+</div>
+<!-- 地域足迹 -->
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">地域足迹</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><rect height="20" rx="2" width="16" x="4" y="2"></rect><path d="M9 22v-2h6v2"></path><path d="M8 6h8"></path><path d="M8 10h8"></path><path d="M8 14h5"></path></svg>
+<p class="text-xs font-bold">长安</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">翰林供奉·御前赋诗</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"></path><circle cx="12" cy="11" r="3"></circle><path d="M20 6v2H4V6"></path></svg>
+<p class="text-xs font-bold">成都</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">少时居蜀·青城问道</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M2 12h3l2-3 2 3 2-3 2 3 2-3 2 3 3-3"></path><path d="M2 18h20"></path></svg>
+<p class="text-xs font-bold">洛阳</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">与杜相识·把酒论诗</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+<p class="text-xs font-bold">金陵</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">游历江南·登临怀古</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M17.5 19H9a7 7 0 117-7v1a2 2 0 002 2h1"></path><path d="M17 22l-1.5-3 1.5-3"></path><path d="M12 2v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M20 12h2"></path></svg>
+<p class="text-xs font-bold">扬州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">散金三十万·广陵春色</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+<p class="text-xs font-bold">当涂</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">终老之地·青山长眠</p>
+</div>
+</div>
+</div>
+<!-- 代表作合辑 -->
+<div class="mb-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">代表作合辑</h3>
+<div class="flex gap-2 text-[10px]">
+<span class="text-[#c23a3a] font-bold border-b border-[#c23a3a]">最热</span>
+<span class="text-gray-400">最新</span>
+<span class="text-gray-400">最长</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">静夜思</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「床前明月光，疑是地上霜」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.8</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">望庐山瀑布</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「飞流直下三千尺，疑是银河落九天」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">七言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.7</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">将进酒</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「君不见黄河之水天上来，奔流到海不复回」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">乐府诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.9</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">早发白帝城</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「两岸猿声啼不住，轻舟已过万重山」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">七言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.6</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">黄鹤楼送孟浩然之广陵</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「孤帆远影碧空尽，唯见长江天际流」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">七言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.7</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">行路难</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「长风破浪会有时，直挂云帆济沧海」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">乐府诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.8</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+</div>
+</div>
+<!-- 相关诗人推荐 -->
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">相关诗人</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-dufu')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">杜甫</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗圣</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-wangwei')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">王维</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗佛</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-menghaoran')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">孟浩然</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">山水田园</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-baijuyi')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">白居易</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗魔</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Action Bar -->
+<div class="flex-none border-t border-gray-200 bg-[#f5f0e8]/95 backdrop-blur-sm px-6 py-3">
+<div class="flex items-center justify-around">
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-[#c23a3a] transition-colors">
+<iconify-icon icon="ph:heart-bold" width="20"></iconify-icon>
+<span class="text-[10px]">收藏诗人</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-amber-500 transition-colors" onclick="currentPoetWorksId='libai'; mapFromPage='poet-detail'; renderPoetMap(); switchPage('poet-map')">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<span class="text-[10px]">足迹地图</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-blue-500 transition-colors">
+<iconify-icon icon="ph:share-network-bold" width="20"></iconify-icon>
+<span class="text-[10px]">分享</span>
+</button>
+<button class="bg-[#2c2c2c] text-[#f5f0e8] px-6 py-2 text-xs tracking-wider hover:bg-black transition-colors" onclick="currentPoetWorksId='libai'; poetWorksFromPage='poet-detail'; renderPoetWorks(); switchPage('poet-works')">
+查看更多作品
+</button>
+</div>
+</div>
+</section>
+<!-- Page: Poet Detail (Du Fu) -->
+<section class="page-transition h-full flex flex-col hidden" id="page-poet-detail-dufu">
+<div class="relative flex-none">
+<div class="h-56 bg-gradient-to-b from-[#2c2c2c]/5 via-[#7a8b8b]/15 to-[#f5f0e8] relative overflow-hidden">
+<div class="absolute inset-0 opacity-10">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 375 224">
+<path d="M0 180 Q60 80 120 130 Q180 180 240 90 Q300 0 375 60 L375 224 L0 224 Z" fill="#2c2c2c"></path>
+<path d="M0 200 Q80 140 160 170 Q240 200 320 140 L375 160 L375 224 L0 224 Z" fill="#2c2c2c" opacity="0.5"></path>
+</svg>
+</div>
+<button class="absolute top-4 left-4 z-10 w-8 h-8 bg-white/70 rounded-full flex items-center justify-center text-gray-600 shadow-sm" onclick="switchPage('discover')">
+<iconify-icon icon="ph:arrow-left-bold" width="18"></iconify-icon>
+</button>
+</div>
+<div class="relative -mt-20 z-10 flex flex-col items-center px-6">
+<div class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-[#f5f0e8] mb-4">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#c23a3a" opacity="0.2" r="18"></circle>
+<ellipse cx="50" cy="48" fill="#c23a3a" opacity="0.1" rx="28" ry="12"></ellipse>
+<path d="M22 75 Q35 55 50 60 Q65 55 78 75" fill="#c23a3a" opacity="0.12"></path>
+<circle cx="50" cy="28" fill="#c23a3a" opacity="0.25" r="2"></circle>
+<circle cx="44" cy="24" fill="#c23a3a" opacity="0.2" r="0.8"></circle>
+<circle cx="56" cy="24" fill="#c23a3a" opacity="0.2" r="0.8"></circle>
+<path d="M42 68 Q50 72 58 68" fill="none" opacity="0.2" stroke="#c23a3a" stroke-width="0.5"></path>
+</svg>
+</div>
+<h2 class="text-3xl font-black text-[#c23a3a] tracking-wider" style="font-family: 'Noto Serif SC', 'KaiTi', serif;">杜甫</h2>
+<p class="text-sm text-gray-500 mt-1 tracking-wider">唐代 · 字子美 · 号少陵野老</p>
+<div class="flex flex-wrap gap-2 mt-4 justify-center">
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">诗圣</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">现实主义</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">律诗大家</span>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 py-4">
+<div class="bg-white/40 p-4 border border-gray-200 mb-6">
+<p class="text-xs leading-relaxed text-gray-700 indent-4 tracking-wide">杜甫（712-770），字子美，唐代伟大的现实主义诗人。其诗深刻反映社会矛盾与民生疾苦，被誉为"诗史"。与李白并称"李杜"，对中国古典诗歌影响深远。</p>
+</div>
+<div class="grid grid-cols-3 gap-3 mb-6">
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">1400+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">存诗数量</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">80+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">代表名篇</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">30+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">相关典故</p>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">生平履历</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="relative pl-6 border-l-2 border-gray-200 space-y-6">
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-[#c23a3a] border-2 border-white shadow-sm"></div>
+<p class="text-xs font-bold text-[#c23a3a]">712年</p>
+<p class="text-xs text-gray-600 mt-0.5">生于河南巩县（今巩义）</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">731年</p>
+<p class="text-xs text-gray-500 mt-0.5">漫游吴越（今江苏浙江）</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">746年</p>
+<p class="text-xs text-gray-500 mt-0.5">赴长安应试不第，困居十年</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">755年</p>
+<p class="text-xs text-gray-500 mt-0.5">安史之乱爆发，携家避难</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">759年</p>
+<p class="text-xs text-gray-500 mt-0.5">弃官入蜀，筑草堂于成都浣花溪</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-500">770年</p>
+<p class="text-xs text-gray-500 mt-0.5">卒于湘江舟中</p>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">地域足迹</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><rect height="20" rx="2" width="16" x="4" y="2"></rect><path d="M9 22v-2h6v2"></path><path d="M8 6h8"></path><path d="M8 10h8"></path><path d="M8 14h5"></path></svg>
+<p class="text-xs font-bold">长安</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">困守十年·望岳</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"></path><circle cx="12" cy="11" r="3"></circle><path d="M20 6v2H4V6"></path></svg>
+<p class="text-xs font-bold">成都</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">草堂安居·浣花溪畔</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M2 12h3l2-3 2 3 2-3 2 3 2-3 2 3 3-3"></path><path d="M2 18h20"></path></svg>
+<p class="text-xs font-bold">洛阳</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">故乡·青年游学</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+<p class="text-xs font-bold">奉先</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">自京赴奉先·咏怀</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M17.5 19H9a7 7 0 117-7v1a2 2 0 002 2h1"></path><path d="M17 22l-1.5-3 1.5-3"></path><path d="M12 2v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M20 12h2"></path></svg>
+<p class="text-xs font-bold">夔州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">登高·秋兴八首</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+<p class="text-xs font-bold">岳阳</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">登岳阳楼·终老</p>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">代表作合辑</h3>
+<div class="flex gap-2 text-[10px]">
+<span class="text-[#c23a3a] font-bold border-b border-[#c23a3a]">最热</span>
+<span class="text-gray-400">最新</span>
+<span class="text-gray-400">最长</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">春望</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「国破山河在，城春草木深」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言律诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.7</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">茅屋为秋风所破歌</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「安得广厦千万间，大庇天下寒士俱欢颜」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">七言古诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.8</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">登高</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「无边落木萧萧下，不尽长江滚滚来」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">七言律诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.9</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">春夜喜雨</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「好雨知时节，当春乃发生」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言律诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.5</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">望岳</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「会当凌绝顶，一览众山小」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言古诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.6</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">兵车行</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「车辚辚，马萧萧，行人弓箭各在腰」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">歌行体</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.4</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">相关诗人</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">李白</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗仙</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-wangwei')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">王维</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗佛</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-baijuyi')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">白居易</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗魔</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">苏轼</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">东坡</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-none border-t border-gray-200 bg-[#f5f0e8]/95 backdrop-blur-sm px-6 py-3">
+<div class="flex items-center justify-around">
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-[#c23a3a] transition-colors">
+<iconify-icon icon="ph:heart-bold" width="20"></iconify-icon>
+<span class="text-[10px]">收藏诗人</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-amber-500 transition-colors" onclick="currentPoetWorksId='dufu'; mapFromPage='poet-detail-dufu'; renderPoetMap(); switchPage('poet-map')">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<span class="text-[10px]">足迹地图</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-blue-500 transition-colors">
+<iconify-icon icon="ph:share-network-bold" width="20"></iconify-icon>
+<span class="text-[10px]">分享</span>
+</button>
+<button class="bg-[#2c2c2c] text-[#f5f0e8] px-6 py-2 text-xs tracking-wider hover:bg-black transition-colors" onclick="currentPoetWorksId='dufu'; poetWorksFromPage='poet-detail-dufu'; renderPoetWorks(); switchPage('poet-works')">
+查看更多作品
+</button>
+</div>
+</div>
+</section>
+<!-- Page: Poet Detail (Li Qingzhao) -->
+<section class="page-transition h-full flex flex-col hidden" id="page-poet-detail-liqingzhao">
+<div class="relative flex-none">
+<div class="h-56 bg-gradient-to-b from-[#2c2c2c]/5 via-[#7a8b8b]/15 to-[#f5f0e8] relative overflow-hidden">
+<div class="absolute inset-0 opacity-10">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 375 224">
+<path d="M0 180 Q60 80 120 130 Q180 180 240 90 Q300 0 375 60 L375 224 L0 224 Z" fill="#2c2c2c"></path>
+<path d="M0 200 Q80 140 160 170 Q240 200 320 140 L375 160 L375 224 L0 224 Z" fill="#2c2c2c" opacity="0.5"></path>
+</svg>
+</div>
+<button class="absolute top-4 left-4 z-10 w-8 h-8 bg-white/70 rounded-full flex items-center justify-center text-gray-600 shadow-sm" onclick="switchPage('discover')">
+<iconify-icon icon="ph:arrow-left-bold" width="18"></iconify-icon>
+</button>
+</div>
+<div class="relative -mt-20 z-10 flex flex-col items-center px-6">
+<div class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-[#f5f0e8] mb-4">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#7a8b8b" opacity="0.25" r="18"></circle>
+<ellipse cx="50" cy="48" fill="#7a8b8b" opacity="0.12" rx="28" ry="12"></ellipse>
+<path d="M22 75 Q35 55 50 60 Q65 55 78 75" fill="#7a8b8b" opacity="0.15"></path>
+<circle cx="50" cy="28" fill="#7a8b8b" opacity="0.3" r="2"></circle>
+<circle cx="44" cy="24" fill="#7a8b8b" opacity="0.25" r="0.8"></circle>
+<circle cx="56" cy="24" fill="#7a8b8b" opacity="0.25" r="0.8"></circle>
+<path d="M42 68 Q50 72 58 68" fill="none" opacity="0.25" stroke="#7a8b8b" stroke-width="0.5"></path>
+</svg>
+</div>
+<h2 class="text-3xl font-black text-[#c23a3a] tracking-wider" style="font-family: 'Noto Serif SC', 'KaiTi', serif;">李清照</h2>
+<p class="text-sm text-gray-500 mt-1 tracking-wider">宋代 · 字易安 · 号易安居士</p>
+<div class="flex flex-wrap gap-2 mt-4 justify-center">
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">千古第一才女</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">婉约派</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">词中皇后</span>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 py-4">
+<div class="bg-white/40 p-4 border border-gray-200 mb-6">
+<p class="text-xs leading-relaxed text-gray-700 indent-4 tracking-wide">李清照（1084-1155），号易安居士，宋代婉约词派代表人物。前期词多写闺情离愁，清新婉约；南渡后词风转为凄怆沉郁，抒发家国之痛。著有《漱玉词》，被誉为"词中皇后"。</p>
+</div>
+<div class="grid grid-cols-3 gap-3 mb-6">
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">80+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">存词数量</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">30+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">代表名篇</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">15+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">相关典故</p>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">生平履历</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="relative pl-6 border-l-2 border-gray-200 space-y-6">
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-[#c23a3a] border-2 border-white shadow-sm"></div>
+<p class="text-xs font-bold text-[#c23a3a]">1084年</p>
+<p class="text-xs text-gray-600 mt-0.5">生于济南府章丘（今山东济南）</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">1101年</p>
+<p class="text-xs text-gray-500 mt-0.5">与太学生赵明诚结婚</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">1107年</p>
+<p class="text-xs text-gray-500 mt-0.5">与赵明诚屏居青州，潜心金石文物</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">1127年</p>
+<p class="text-xs text-gray-500 mt-0.5">靖康之变，南渡避乱</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">1129年</p>
+<p class="text-xs text-gray-500 mt-0.5">赵明诚病逝，流寓江南</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-500">1155年</p>
+<p class="text-xs text-gray-500 mt-0.5">卒于临安（今杭州）</p>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">地域足迹</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><rect height="20" rx="2" width="16" x="4" y="2"></rect><path d="M9 22v-2h6v2"></path><path d="M8 6h8"></path><path d="M8 10h8"></path><path d="M8 14h5"></path></svg>
+<p class="text-xs font-bold">济南</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">故里·幼承家学</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"></path><circle cx="12" cy="11" r="3"></circle><path d="M20 6v2H4V6"></path></svg>
+<p class="text-xs font-bold">青州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">屏居十年·金石录</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M2 12h3l2-3 2 3 2-3 2 3 2-3 2 3 3-3"></path><path d="M2 18h20"></path></svg>
+<p class="text-xs font-bold">江宁</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">南渡·建康</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+<p class="text-xs font-bold">杭州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">临安·晚年寓居</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M17.5 19H9a7 7 0 117-7v1a2 2 0 002 2h1"></path><path d="M17 22l-1.5-3 1.5-3"></path><path d="M12 2v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M20 12h2"></path></svg>
+<p class="text-xs font-bold">金华</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">避难·武陵春</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+<p class="text-xs font-bold">绍兴</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">投亲·漱玉词</p>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">代表作合辑</h3>
+<div class="flex gap-2 text-[10px]">
+<span class="text-[#c23a3a] font-bold border-b border-[#c23a3a]">最热</span>
+<span class="text-gray-400">最新</span>
+<span class="text-gray-400">最长</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">声声慢</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「寻寻觅觅，冷冷清清，凄凄惨惨戚戚」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">词</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.9</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">如梦令</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「知否？知否？应是绿肥红瘦」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">词</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.7</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">一剪梅</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「花自飘零水自流，一种相思，两处闲愁」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">词</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.8</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">醉花阴</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「莫道不消魂，帘卷西风，人比黄花瘦」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">词</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.6</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">武陵春</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「只恐双溪舴艋舟，载不动许多愁」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">词</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.5</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">夏日绝句</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「生当作人杰，死亦为鬼雄」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.8</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">相关诗人</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">苏轼</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">东坡</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-xinqiji')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">辛弃疾</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">稼轩</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">李白</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗仙</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-nalanxingde')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">纳兰性德</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">容若</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-none border-t border-gray-200 bg-[#f5f0e8]/95 backdrop-blur-sm px-6 py-3">
+<div class="flex items-center justify-around">
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-[#c23a3a] transition-colors">
+<iconify-icon icon="ph:heart-bold" width="20"></iconify-icon>
+<span class="text-[10px]">收藏诗人</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-amber-500 transition-colors" onclick="currentPoetWorksId='liqingzhao'; mapFromPage='poet-detail-liqingzhao'; renderPoetMap(); switchPage('poet-map')">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<span class="text-[10px]">足迹地图</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-blue-500 transition-colors">
+<iconify-icon icon="ph:share-network-bold" width="20"></iconify-icon>
+<span class="text-[10px]">分享</span>
+</button>
+<button class="bg-[#2c2c2c] text-[#f5f0e8] px-6 py-2 text-xs tracking-wider hover:bg-black transition-colors" onclick="currentPoetWorksId='liqingzhao'; poetWorksFromPage='poet-detail-liqingzhao'; renderPoetWorks(); switchPage('poet-works')">
+查看更多作品
+</button>
+</div>
+</div>
+</section>
+<!-- Page: Poet Detail (Wang Wei) -->
+<section class="page-transition h-full flex flex-col hidden" id="page-poet-detail-wangwei">
+<div class="relative flex-none">
+<div class="h-56 bg-gradient-to-b from-[#2c2c2c]/5 via-[#7a8b8b]/15 to-[#f5f0e8] relative overflow-hidden">
+<div class="absolute inset-0 opacity-10">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 375 224">
+<path d="M0 180 Q60 80 120 130 Q180 180 240 90 Q300 0 375 60 L375 224 L0 224 Z" fill="#2c2c2c"></path>
+<path d="M0 200 Q80 140 160 170 Q240 200 320 140 L375 160 L375 224 L0 224 Z" fill="#2c2c2c" opacity="0.5"></path>
+</svg>
+</div>
+<button class="absolute top-4 left-4 z-10 w-8 h-8 bg-white/70 rounded-full flex items-center justify-center text-gray-600 shadow-sm" onclick="switchPage('discover')">
+<iconify-icon icon="ph:arrow-left-bold" width="18"></iconify-icon>
+</button>
+</div>
+<div class="relative -mt-20 z-10 flex flex-col items-center px-6">
+<div class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-[#f5f0e8] mb-4">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="18"></circle>
+<ellipse cx="50" cy="48" fill="#7a8b8b" opacity="0.08" rx="28" ry="12"></ellipse>
+<path d="M22 75 Q35 55 50 60 Q65 55 78 75" fill="#7a8b8b" opacity="0.1"></path>
+<circle cx="50" cy="28" fill="#2c2c2c" opacity="0.2" r="2"></circle>
+<circle cx="44" cy="24" fill="#2c2c2c" opacity="0.15" r="0.8"></circle>
+<circle cx="56" cy="24" fill="#2c2c2c" opacity="0.15" r="0.8"></circle>
+<path d="M42 68 Q50 72 58 68" fill="none" opacity="0.15" stroke="#2c2c2c" stroke-width="0.5"></path>
+</svg>
+</div>
+<h2 class="text-3xl font-black text-[#c23a3a] tracking-wider" style="font-family: 'Noto Serif SC', 'KaiTi', serif;">王维</h2>
+<p class="text-sm text-gray-500 mt-1 tracking-wider">唐代 · 字摩诘 · 号摩诘居士</p>
+<div class="flex flex-wrap gap-2 mt-4 justify-center">
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">诗佛</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">山水田园</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">南宗画祖</span>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 py-4">
+<div class="bg-white/40 p-4 border border-gray-200 mb-6">
+<p class="text-xs leading-relaxed text-gray-700 indent-4 tracking-wide">王维（701-761），字摩诘，号摩诘居士，唐代山水田园诗派代表人物。其诗融禅意于山水，被誉为"诗中有画，画中有诗"。精通音乐、绘画、书法，是少有的全才型文人。</p>
+</div>
+<div class="grid grid-cols-3 gap-3 mb-6">
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">400+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">存诗数量</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">50+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">代表名篇</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">20+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">相关典故</p>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">生平履历</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="relative pl-6 border-l-2 border-gray-200 space-y-6">
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-[#c23a3a] border-2 border-white shadow-sm"></div>
+<p class="text-xs font-bold text-[#c23a3a]">701年</p>
+<p class="text-xs text-gray-600 mt-0.5">生于河东蒲州（今山西永济）</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">721年</p>
+<p class="text-xs text-gray-500 mt-0.5">进士及第，任太乐丞</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">736年</p>
+<p class="text-xs text-gray-500 mt-0.5">出使塞上，作《使至塞上》</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">740年</p>
+<p class="text-xs text-gray-500 mt-0.5">先后隐居终南山和辋川别业</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">756年</p>
+<p class="text-xs text-gray-500 mt-0.5">安史之乱中被俘，被迫受伪职</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-500">761年</p>
+<p class="text-xs text-gray-500 mt-0.5">卒于辋川别业</p>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">地域足迹</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><rect height="20" rx="2" width="16" x="4" y="2"></rect><path d="M9 22v-2h6v2"></path><path d="M8 6h8"></path><path d="M8 10h8"></path><path d="M8 14h5"></path></svg>
+<p class="text-xs font-bold">长安</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">进士及第·太乐丞</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"></path><circle cx="12" cy="11" r="3"></circle><path d="M20 6v2H4V6"></path></svg>
+<p class="text-xs font-bold">辋川</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">别业·山水诗画</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M2 12h3l2-3 2 3 2-3 2 3 2-3 2 3 3-3"></path><path d="M2 18h20"></path></svg>
+<p class="text-xs font-bold">终南山</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">隐居·山居秋暝</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+<p class="text-xs font-bold">凉州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">使至塞上·大漠孤烟</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M17.5 19H9a7 7 0 117-7v1a2 2 0 002 2h1"></path><path d="M17 22l-1.5-3 1.5-3"></path><path d="M12 2v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M20 12h2"></path></svg>
+<p class="text-xs font-bold">洛阳</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">东都·送别元二</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+<p class="text-xs font-bold">蒲州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">故里·河东</p>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">代表作合辑</h3>
+<div class="flex gap-2 text-[10px]">
+<span class="text-[#c23a3a] font-bold border-b border-[#c23a3a]">最热</span>
+<span class="text-gray-400">最新</span>
+<span class="text-gray-400">最长</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">山居秋暝</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「空山新雨后，天气晚来秋」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言律诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.8</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">使至塞上</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「大漠孤烟直，长河落日圆」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言律诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.7</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">鸟鸣涧</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「人闲桂花落，夜静春山空」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.6</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">送元二使安西</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「劝君更尽一杯酒，西出阳关无故人」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">七言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.8</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">鹿柴</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「空山不见人，但闻人语响」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.5</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">竹里馆</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「独坐幽篁里，弹琴复长啸」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.4</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">相关诗人</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-menghaoran')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">孟浩然</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">山水田园</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-dufu')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">杜甫</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗圣</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">李白</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗仙</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-baijuyi')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">白居易</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗魔</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-none border-t border-gray-200 bg-[#f5f0e8]/95 backdrop-blur-sm px-6 py-3">
+<div class="flex items-center justify-around">
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-[#c23a3a] transition-colors">
+<iconify-icon icon="ph:heart-bold" width="20"></iconify-icon>
+<span class="text-[10px]">收藏诗人</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-amber-500 transition-colors" onclick="currentPoetWorksId='wangwei'; mapFromPage='poet-detail-wangwei'; renderPoetMap(); switchPage('poet-map')">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<span class="text-[10px]">足迹地图</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-blue-500 transition-colors">
+<iconify-icon icon="ph:share-network-bold" width="20"></iconify-icon>
+<span class="text-[10px]">分享</span>
+</button>
+<button class="bg-[#2c2c2c] text-[#f5f0e8] px-6 py-2 text-xs tracking-wider hover:bg-black transition-colors" onclick="currentPoetWorksId='wangwei'; poetWorksFromPage='poet-detail-wangwei'; renderPoetWorks(); switchPage('poet-works')">
+查看更多作品
+</button>
+</div>
+</div>
+</section>
+<!-- Page: Poet Detail (Meng Haoran) -->
+<section class="page-transition h-full flex flex-col hidden" id="page-poet-detail-menghaoran">
+<div class="relative flex-none">
+<div class="h-56 bg-gradient-to-b from-[#2c2c2c]/5 via-[#7a8b8b]/15 to-[#f5f0e8] relative overflow-hidden">
+<div class="absolute inset-0 opacity-10">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 375 224">
+<path d="M0 180 Q60 80 120 130 Q180 180 240 90 Q300 0 375 60 L375 224 L0 224 Z" fill="#2c2c2c"></path>
+<path d="M0 200 Q80 140 160 170 Q240 200 320 140 L375 160 L375 224 L0 224 Z" fill="#2c2c2c" opacity="0.5"></path>
+</svg>
+</div>
+<button class="absolute top-4 left-4 z-10 w-8 h-8 bg-white/70 rounded-full flex items-center justify-center text-gray-600 shadow-sm" onclick="switchPage('discover')">
+<iconify-icon icon="ph:arrow-left-bold" width="18"></iconify-icon>
+</button>
+</div>
+<div class="relative -mt-20 z-10 flex flex-col items-center px-6">
+<div class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-[#f5f0e8] mb-4">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#7a8b8b" opacity="0.15" r="18"></circle>
+<ellipse cx="50" cy="48" fill="#7a8b8b" opacity="0.08" rx="28" ry="12"></ellipse>
+<path d="M22 75 Q35 55 50 60 Q65 55 78 75" fill="#7a8b8b" opacity="0.1"></path>
+<circle cx="50" cy="28" fill="#7a8b8b" opacity="0.2" r="2"></circle>
+<circle cx="44" cy="24" fill="#7a8b8b" opacity="0.15" r="0.8"></circle>
+<circle cx="56" cy="24" fill="#7a8b8b" opacity="0.15" r="0.8"></circle>
+<path d="M42 68 Q50 72 58 68" fill="none" opacity="0.15" stroke="#7a8b8b" stroke-width="0.5"></path>
+</svg>
+</div>
+<h2 class="text-3xl font-black text-[#c23a3a] tracking-wider" style="font-family: 'Noto Serif SC', 'KaiTi', serif;">孟浩然</h2>
+<p class="text-sm text-gray-500 mt-1 tracking-wider">唐代 · 字浩然 · 号孟山人</p>
+<div class="flex flex-wrap gap-2 mt-4 justify-center">
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">山水田园</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">隐逸诗人</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">襄阳高士</span>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 py-4">
+<div class="bg-white/40 p-4 border border-gray-200 mb-6">
+<p class="text-xs leading-relaxed text-gray-700 indent-4 tracking-wide">孟浩然（689-740），字浩然，号孟山人，唐代山水田园诗派代表。未曾入仕，一生布衣，漫游山水之间。其诗清淡自然，意境深远，与王维并称"王孟"，是唐代山水田园诗的双峰之一。</p>
+</div>
+<div class="grid grid-cols-3 gap-3 mb-6">
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">260+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">存诗数量</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">40+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">代表名篇</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">15+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">相关典故</p>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">生平履历</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="relative pl-6 border-l-2 border-gray-200 space-y-6">
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-[#c23a3a] border-2 border-white shadow-sm"></div>
+<p class="text-xs font-bold text-[#c23a3a]">689年</p>
+<p class="text-xs text-gray-600 mt-0.5">生于襄阳（今湖北襄阳）</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">706年</p>
+<p class="text-xs text-gray-500 mt-0.5">游历湘楚，入鹿门山隐居</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">727年</p>
+<p class="text-xs text-gray-500 mt-0.5">游长安，与王维相识</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">730年</p>
+<p class="text-xs text-gray-500 mt-0.5">与李白在江夏邂逅，结下友谊</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">734年</p>
+<p class="text-xs text-gray-500 mt-0.5">赴长安应试不第</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-500">740年</p>
+<p class="text-xs text-gray-500 mt-0.5">王昌龄来访，食鲜疾发而卒</p>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">地域足迹</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><rect height="20" rx="2" width="16" x="4" y="2"></rect><path d="M9 22v-2h6v2"></path><path d="M8 6h8"></path><path d="M8 10h8"></path><path d="M8 14h5"></path></svg>
+<p class="text-xs font-bold">襄阳</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">故里·鹿门隐居</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"></path><circle cx="12" cy="11" r="3"></circle><path d="M20 6v2H4V6"></path></svg>
+<p class="text-xs font-bold">长安</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">应试·遇王维</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M2 12h3l2-3 2 3 2-3 2 3 2-3 2 3 3-3"></path><path d="M2 18h20"></path></svg>
+<p class="text-xs font-bold">洛阳</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">漫游·交游</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+<p class="text-xs font-bold">吴越</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">游历·春晓</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M17.5 19H9a7 7 0 117-7v1a2 2 0 002 2h1"></path><path d="M17 22l-1.5-3 1.5-3"></path><path d="M12 2v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M20 12h2"></path></svg>
+<p class="text-xs font-bold">洞庭</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">望洞庭·气蒸云梦</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+<p class="text-xs font-bold">江夏</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">邂逅李白·送别</p>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">代表作合辑</h3>
+<div class="flex gap-2 text-[10px]">
+<span class="text-[#c23a3a] font-bold border-b border-[#c23a3a]">最热</span>
+<span class="text-gray-400">最新</span>
+<span class="text-gray-400">最长</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">春晓</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「春眠不觉晓，处处闻啼鸟」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.8</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">过故人庄</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「故人具鸡黍，邀我至田家」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言律诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.7</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">望洞庭湖赠张丞相</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「气蒸云梦泽，波撼岳阳城」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言律诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.6</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">宿建德江</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「野旷天低树，江清月近人」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言绝句</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.6</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">岁暮归南山</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「南山归敝庐，不才明主弃」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言律诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.3</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">留别王侍御维</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「寂寂竟何待，朝朝空自归」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言律诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.2</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">相关诗人</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-wangwei')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">王维</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗佛</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">李白</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗仙</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-dufu')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">杜甫</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗圣</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-taoqian')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">陶渊明</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">五柳</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-none border-t border-gray-200 bg-[#f5f0e8]/95 backdrop-blur-sm px-6 py-3">
+<div class="flex items-center justify-around">
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-[#c23a3a] transition-colors">
+<iconify-icon icon="ph:heart-bold" width="20"></iconify-icon>
+<span class="text-[10px]">收藏诗人</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-amber-500 transition-colors" onclick="currentPoetWorksId='menghaoran'; mapFromPage='poet-detail-menghaoran'; renderPoetMap(); switchPage('poet-map')">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<span class="text-[10px]">足迹地图</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-blue-500 transition-colors">
+<iconify-icon icon="ph:share-network-bold" width="20"></iconify-icon>
+<span class="text-[10px]">分享</span>
+</button>
+<button class="bg-[#2c2c2c] text-[#f5f0e8] px-6 py-2 text-xs tracking-wider hover:bg-black transition-colors" onclick="currentPoetWorksId='menghaoran'; poetWorksFromPage='poet-detail-menghaoran'; renderPoetWorks(); switchPage('poet-works')">
+查看更多作品
+</button>
+</div>
+</div>
+</section>
+<!-- Page: Poet Detail (Bai Juyi) -->
+<section class="page-transition h-full flex flex-col hidden" id="page-poet-detail-baijuyi">
+<div class="relative flex-none">
+<div class="h-56 bg-gradient-to-b from-[#2c2c2c]/5 via-[#7a8b8b]/15 to-[#f5f0e8] relative overflow-hidden">
+<div class="absolute inset-0 opacity-10">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 375 224">
+<path d="M0 180 Q60 80 120 130 Q180 180 240 90 Q300 0 375 60 L375 224 L0 224 Z" fill="#2c2c2c"></path>
+<path d="M0 200 Q80 140 160 170 Q240 200 320 140 L375 160 L375 224 L0 224 Z" fill="#2c2c2c" opacity="0.5"></path>
+</svg>
+</div>
+<button class="absolute top-4 left-4 z-10 w-8 h-8 bg-white/70 rounded-full flex items-center justify-center text-gray-600 shadow-sm" onclick="switchPage('discover')">
+<iconify-icon icon="ph:arrow-left-bold" width="18"></iconify-icon>
+</button>
+</div>
+<div class="relative -mt-20 z-10 flex flex-col items-center px-6">
+<div class="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden bg-[#f5f0e8] mb-4">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#b8860b" opacity="0.18" r="18"></circle>
+<ellipse cx="50" cy="48" fill="#b8860b" opacity="0.1" rx="28" ry="12"></ellipse>
+<path d="M22 75 Q35 55 50 60 Q65 55 78 75" fill="#b8860b" opacity="0.12"></path>
+<circle cx="50" cy="28" fill="#b8860b" opacity="0.25" r="2"></circle>
+<circle cx="44" cy="24" fill="#b8860b" opacity="0.2" r="0.8"></circle>
+<circle cx="56" cy="24" fill="#b8860b" opacity="0.2" r="0.8"></circle>
+<path d="M42 68 Q50 72 58 68" fill="none" opacity="0.2" stroke="#b8860b" stroke-width="0.5"></path>
+</svg>
+</div>
+<h2 class="text-3xl font-black text-[#c23a3a] tracking-wider" style="font-family: 'Noto Serif SC', 'KaiTi', serif;">白居易</h2>
+<p class="text-sm text-gray-500 mt-1 tracking-wider">唐代 · 字乐天 · 号香山居士</p>
+<div class="flex flex-wrap gap-2 mt-4 justify-center">
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">诗魔</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">新乐府运动</span>
+<span class="text-[10px] border border-[#c23a3a] text-[#c23a3a] px-3 py-0.5 rounded-full">通俗诗派</span>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 py-4">
+<div class="bg-white/40 p-4 border border-gray-200 mb-6">
+<p class="text-xs leading-relaxed text-gray-700 indent-4 tracking-wide">白居易（772-846），字乐天，号香山居士，唐代伟大的现实主义诗人。主张"文章合为时而著，歌诗合为事而作"，倡导新乐府运动，其诗语言通俗，流传极广，被誉为"诗魔"。与元稹并称"元白"。</p>
+</div>
+<div class="grid grid-cols-3 gap-3 mb-6">
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">3000+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">存诗数量</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">100+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">代表名篇</p>
+</div>
+<div class="bg-white/50 border border-gray-200 p-3 text-center">
+<p class="text-xl font-black text-[#c23a3a]">40+</p>
+<p class="text-[10px] text-gray-400 mt-0.5">相关典故</p>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">生平履历</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="relative pl-6 border-l-2 border-gray-200 space-y-6">
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-[#c23a3a] border-2 border-white shadow-sm"></div>
+<p class="text-xs font-bold text-[#c23a3a]">772年</p>
+<p class="text-xs text-gray-600 mt-0.5">生于河南新郑（今郑州新郑）</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">800年</p>
+<p class="text-xs text-gray-500 mt-0.5">进士及第</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">806年</p>
+<p class="text-xs text-gray-500 mt-0.5">任盩厔县尉，作《长恨歌》</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">815年</p>
+<p class="text-xs text-gray-500 mt-0.5">贬为江州司马，作《琵琶行》</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-600">822年</p>
+<p class="text-xs text-gray-500 mt-0.5">出任杭州刺史，修筑西湖白堤</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[25px] top-0.5 w-4 h-4 rounded-full bg-gray-300 border-2 border-white"></div>
+<p class="text-xs font-bold text-gray-500">846年</p>
+<p class="text-xs text-gray-500 mt-0.5">卒于洛阳，赠尚书右仆射</p>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">地域足迹</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><rect height="20" rx="2" width="16" x="4" y="2"></rect><path d="M9 22v-2h6v2"></path><path d="M8 6h8"></path><path d="M8 10h8"></path><path d="M8 14h5"></path></svg>
+<p class="text-xs font-bold">长安</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">进士·左拾遗</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M4 20h16a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"></path><circle cx="12" cy="11" r="3"></circle><path d="M20 6v2H4V6"></path></svg>
+<p class="text-xs font-bold">江州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">谪居·琵琶行</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M2 12h3l2-3 2 3 2-3 2 3 2-3 2 3 3-3"></path><path d="M2 18h20"></path></svg>
+<p class="text-xs font-bold">杭州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">刺史·白堤春行</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+<p class="text-xs font-bold">洛阳</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">终老·香山</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M17.5 19H9a7 7 0 117-7v1a2 2 0 002 2h1"></path><path d="M17 22l-1.5-3 1.5-3"></path><path d="M12 2v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M20 12h2"></path></svg>
+<p class="text-xs font-bold">苏州</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">刺史·江南</p>
+</div>
+<div class="min-w-[100px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center">
+<svg class="w-8 h-8 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+<p class="text-xs font-bold">新郑</p>
+<p class="text-[9px] text-gray-400 text-center mt-0.5">故里·幼年</p>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">代表作合辑</h3>
+<div class="flex gap-2 text-[10px]">
+<span class="text-[#c23a3a] font-bold border-b border-[#c23a3a]">最热</span>
+<span class="text-gray-400">最新</span>
+<span class="text-gray-400">最长</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">长恨歌</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「在天愿作比翼鸟，在地愿为连理枝」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">长篇叙事诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.9</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">琵琶行</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「同是天涯沦落人，相逢何必曾相识」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">长篇叙事诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.9</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">赋得古原草送别</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「野火烧不尽，春风吹又生」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">五言律诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.7</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">忆江南</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「日出江花红胜火，春来江水绿如蓝」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">词</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.6</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">钱塘湖春行</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「乱花渐欲迷人眼，浅草才能没马蹄」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">七言律诗</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.5</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+<div class="bg-white/50 border border-gray-200 p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">卖炭翁</h4>
+<p class="text-[10px] italic text-gray-400 mt-0.5">「可怜身上衣正单，心忧炭贱愿天寒」</p>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5">新乐府</span>
+<p class="text-[10px] text-[#b8860b] mt-1">☆ 9.4</p>
+</div>
+</div>
+<button class="mt-2 text-[10px] text-[#c23a3a] border border-[#c23a3a] px-3 py-0.5 hover:bg-[#c23a3a] hover:text-white transition-colors" onclick="switchPage('detail')">研读</button>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-4">
+<h3 class="text-xs font-bold text-gray-400 tracking-widest uppercase">相关诗人</h3>
+<div class="flex-1 h-[1px] bg-gray-200"></div>
+</div>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-yuanzhen')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">元稹</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">微之</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-dufu')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">杜甫</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗圣</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">李白</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">诗仙</span>
+</div>
+<div class="min-w-[110px] bg-white/50 border border-gray-200 p-3 flex flex-col items-center cursor-pointer" onclick="switchPage('poet-detail-liuyuxi')">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-[#f5f0e8] mb-2 border border-gray-200">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="#f5f0e8" r="48"></circle>
+<circle cx="50" cy="35" fill="#2c2c2c" opacity="0.1" r="16"></circle>
+<ellipse cx="50" cy="46" fill="#2c2c2c" opacity="0.06" rx="26" ry="10"></ellipse>
+<path d="M24 70 Q35 52 50 56 Q65 52 76 70" fill="#2c2c2c" opacity="0.08"></path>
+</svg>
+</div>
+<p class="text-xs font-bold">刘禹锡</p>
+<span class="text-[9px] text-[#c23a3a] border border-[#c23a3a]/50 px-1.5 py-0.5 mt-1">梦得</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-none border-t border-gray-200 bg-[#f5f0e8]/95 backdrop-blur-sm px-6 py-3">
+<div class="flex items-center justify-around">
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-[#c23a3a] transition-colors">
+<iconify-icon icon="ph:heart-bold" width="20"></iconify-icon>
+<span class="text-[10px]">收藏诗人</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-amber-500 transition-colors" onclick="currentPoetWorksId='baijuyi'; mapFromPage='poet-detail-baijuyi'; renderPoetMap(); switchPage('poet-map')">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<span class="text-[10px]">足迹地图</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-blue-500 transition-colors">
+<iconify-icon icon="ph:share-network-bold" width="20"></iconify-icon>
+<span class="text-[10px]">分享</span>
+</button>
+<button class="bg-[#2c2c2c] text-[#f5f0e8] px-6 py-2 text-xs tracking-wider hover:bg-black transition-colors" onclick="currentPoetWorksId='baijuyi'; poetWorksFromPage='poet-detail-baijuyi'; renderPoetWorks(); switchPage('poet-works')">
+查看更多作品
+</button>
+</div>
+</div>
+</section>
+<!-- Page: Collection / Poetry List -->
+<section class="page-transition h-full flex flex-col hidden" id="page-collection">
+<div class="relative h-48 flex-none">
+<img alt="Ancient Chinese river landscape painting" class="w-full h-full object-cover grayscale brightness-50" src="https://modao.cc/agent-py/media/generated_images/2026-06-28/6d21a0b258bc401388df05c6a7506aa4.jpg"/>
+<div class="absolute inset-0 bg-black/20 flex flex-col justify-end p-6">
+<button class="absolute top-4 left-4 text-white" onclick="switchPage('discover')"><iconify-icon icon="ph:arrow-left-bold"></iconify-icon></button>
+<h2 class="text-2xl font-bold text-white mb-1">送别友人的十首佳作</h2>
+<p class="text-xs text-white/80">创建者：雅韵编辑部 · 10首</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4">
+<p class="text-xs text-gray-500 leading-relaxed mb-6 italic">"长亭外，古道边，芳草碧连天。" 这里的每一首诗，都藏着一段依依不舍的离情。</p>
+<div class="space-y-4">
+<div class="flex items-center gap-4 py-2 border-b border-gray-100">
+<span class="text-lg font-serif text-gray-300">01</span>
+<div class="flex-1">
+<h4 class="text-sm font-bold">送元二使安西</h4>
+<p class="text-[10px] text-gray-400">王维 · 西出阳关无故人</p>
+</div>
+<iconify-icon class="text-gray-300" icon="ph:play-circle-light" width="24"></iconify-icon>
+</div>
+<div class="flex items-center gap-4 py-2 border-b border-gray-100">
+<span class="text-lg font-serif text-gray-300">02</span>
+<div class="flex-1">
+<h4 class="text-sm font-bold">赋得古原草送别</h4>
+<p class="text-[10px] text-gray-400">白居易 · 又送王孙去</p>
+</div>
+<iconify-icon class="text-gray-300" icon="ph:play-circle-light" width="24"></iconify-icon>
+</div>
+<div class="flex items-center gap-4 py-2 border-b border-gray-100">
+<span class="text-lg font-serif text-gray-300">03</span>
+<div class="flex-1">
+<h4 class="text-sm font-bold">黄鹤楼送孟浩然之广陵</h4>
+<p class="text-[10px] text-gray-400">李白 · 孤帆远影碧空尽</p>
+</div>
+<iconify-icon class="text-gray-300" icon="ph:play-circle-light" width="24"></iconify-icon>
+</div>
+</div>
+</div>
+</section>
+<!-- Page: Favorites -->
+<section class="page-transition h-full flex flex-col hidden" id="page-favorites">
+<div class="p-6">
+<h2 class="text-2xl font-bold mb-6">我的收藏</h2>
+<div class="flex gap-6 border-b border-gray-200 mb-6">
+<button class="pb-2 text-sm font-bold border-b-2 border-[#c23a3a] text-[#c23a3a]">诗词</button>
+<button class="pb-2 text-sm text-gray-400">诗单</button>
+<button class="pb-2 text-sm text-gray-400">诗人</button>
+</div>
+<!-- Empty State (Hidden) -->
+<div class="hidden flex flex-col items-center justify-center py-20 opacity-30" id="favorites-empty">
+<iconify-icon icon="ph:scroll-light" width="80"></iconify-icon>
+<p class="mt-4 text-sm tracking-widest">暂无收藏</p>
+</div>
+<!-- Favorite List -->
+<div class="space-y-4">
+<div class="bg-white/60 p-4 border border-gray-200 shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 seal text-[8px] opacity-20">宋</div>
+<h4 class="font-bold">定风波</h4>
+<p class="text-xs text-gray-500 mt-1">苏轼</p>
+<p class="text-[10px] text-gray-400 mt-3">收藏于：2026-06-28</p>
+</div>
+<div class="bg-white/60 p-4 border border-gray-200 shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 seal text-[8px] opacity-20">唐</div>
+<h4 class="font-bold">将进酒</h4>
+<p class="text-xs text-gray-500 mt-1">李白</p>
+<p class="text-[10px] text-gray-400 mt-3">收藏于：2026-06-25</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Page: Profile -->
+<section class="page-transition h-full flex flex-col hidden" id="page-profile">
+<div class="p-8 flex flex-col items-center">
+<div class="w-20 h-20 rounded-full border-2 border-[#b8860b] p-1 mb-4 shadow-md">
+<div class="w-full h-full rounded-full bg-[#2c2c2c] flex items-center justify-center text-[#f5f0e8] text-2xl font-black">
+                            雅
+                        </div>
+</div>
+<h3 class="text-lg font-bold">书生小雅</h3>
+<p class="text-xs text-gray-400 mt-1">研学等级：初窥门径</p>
+<div class="flex gap-8 mt-8 w-full">
+<div class="flex-1 text-center">
+<p class="text-xl font-bold">12</p>
+<p class="text-[10px] text-gray-400 uppercase tracking-tighter">已学诗词</p>
+</div>
+<div class="flex-1 text-center border-x border-gray-200">
+<p class="text-xl font-bold">5</p>
+<p class="text-[10px] text-gray-400 uppercase tracking-tighter">研学笔记</p>
+</div>
+<div class="flex-1 text-center">
+<p class="text-xl font-bold">38</p>
+<p class="text-[10px] text-gray-400 uppercase tracking-tighter">收藏作品</p>
+</div>
+</div>
+</div>
+<div class="px-6 space-y-2">
+<div class="flex justify-between items-center p-4 bg-white/40 border border-gray-100">
+<div class="flex items-center gap-3">
+<iconify-icon class="text-gray-400" icon="ph:notebook-bold"></iconify-icon>
+<span class="text-sm">我的研学笔记</span>
+</div>
+<iconify-icon class="text-gray-300" icon="ph:caret-right"></iconify-icon>
+</div>
+<div class="flex justify-between items-center p-4 bg-white/40 border border-gray-100">
+<div class="flex items-center gap-3">
+<iconify-icon class="text-gray-400" icon="ph:clock-counter-clockwise-bold"></iconify-icon>
+<span class="text-sm">浏览历史</span>
+</div>
+<iconify-icon class="text-gray-300" icon="ph:caret-right"></iconify-icon>
+</div>
+<div class="flex justify-between items-center p-4 bg-white/40 border border-gray-100">
+<div class="flex items-center gap-3">
+<iconify-icon class="text-gray-400" icon="ph:gear-six-bold"></iconify-icon>
+<span class="text-sm">设置</span>
+</div>
+<iconify-icon class="text-gray-300" icon="ph:caret-right"></iconify-icon>
+</div>
+</div>
+</section>
+<!-- 作品列表页（升级版） -->
+<section class="hidden h-full flex flex-col overflow-hidden" id="page-poet-works">
+<!-- 顶部带装饰 -->
+<div class="flex-none px-5 pt-5 pb-2 bg-gradient-to-b from-[#f5f0e8] to-transparent">
+<!-- 返回 + 标题 -->
+<div class="flex items-center gap-3 mb-3">
+<button class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-[#c23a3a] transition-colors" id="poet-works-back" onclick="goBackFromWorks()">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+</button>
+<div class="flex items-center gap-2" id="poet-works-header"></div>
+</div>
+<!-- 诗人装饰信息 -->
+<div class="flex items-center gap-2 ml-11 mb-2 text-xs text-gray-400" id="poet-works-subtitle"></div>
+<!-- 朱砂分隔线 -->
+<div class="h-0.5 bg-gradient-to-r from-transparent via-[#c23a3a]/40 to-transparent rounded-full mx-2"></div>
+</div>
+<!-- 搜索和排序工具栏 -->
+<div class="flex-none px-5 py-3 space-y-3">
+<!-- 搜索框 -->
+<div class="relative">
+<svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+<input class="w-full pl-10 pr-4 py-2.5 text-sm bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:border-[#c23a3a]/40 focus:ring-1 focus:ring-[#c23a3a]/20 placeholder:text-gray-300 text-[#2c2c2c]" id="poet-works-search" oninput="searchPoetWorks(this.value)" placeholder="搜索作品名称或名句…" type="text"/>
+</div>
+<!-- 排序按钮 -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-xs text-gray-400 mr-1">排序：</span>
+<button class="text-xs px-3 py-1.5 rounded-full bg-[#c23a3a] text-white font-medium" onclick="sortPoetWorks('hot', this)">★ 热度</button>
+<button class="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200" onclick="sortPoetWorks('id', this)">📜 序次</button>
+<button class="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200" onclick="sortPoetWorks('name', this)">📖 名称</button>
+</div>
+<span class="text-xs text-gray-400" id="poet-works-count"></span>
+</div>
+</div>
+<!-- 作品列表（可滚动） -->
+<div class="flex-1 overflow-y-auto px-5 pb-8 space-y-3" id="poet-works-list">
+<!-- 由JS动态渲染 -->
+</div>
+</section>
+</div>
+<!-- 足迹地图页 -->
+<section class="hidden h-full flex flex-col overflow-hidden" id="page-poet-map">
+<!-- 顶部 -->
+<div class="flex-none px-5 pt-5 pb-2 bg-gradient-to-b from-[#f5f0e8] to-transparent">
+<div class="flex items-center gap-3 mb-3">
+<button class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-[#c23a3a] transition-colors" onclick="goBackFromMap()">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+</button>
+<div class="flex items-center gap-2" id="poet-map-header"></div>
+</div>
+<div class="flex items-center gap-2 ml-11 mb-2 text-xs text-gray-400" id="poet-map-subtitle"></div>
+<div class="h-0.5 bg-gradient-to-r from-transparent via-[#c23a3a]/40 to-transparent rounded-full mx-2"></div>
+</div>
+<!-- 地图容器 -->
+<div class="flex-1 overflow-y-auto px-5 pb-8" id="poet-map-content">
+<!-- 由JS动态渲染 -->
+</div>
+</section>
+<!-- Navigation Bar -->
+<nav class="h-16 bg-[#f5f0e8] border-t border-gray-200 flex items-center justify-around px-2 z-50">
+<button class="flex flex-col items-center gap-1 active-tab transition-all px-4" id="tab-btn-home" onclick="switchTab('home')">
+<iconify-icon icon="ph:house-line-bold" width="22"></iconify-icon>
+<span class="text-[10px] font-bold">首页</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 transition-all px-4" id="tab-btn-discover" onclick="switchTab('discover')">
+<iconify-icon icon="ph:compass-bold" width="22"></iconify-icon>
+<span class="text-[10px] font-bold">发现</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 transition-all px-4" id="tab-btn-favorites" onclick="switchTab('favorites')">
+<iconify-icon icon="ph:heart-bold" width="22"></iconify-icon>
+<span class="text-[10px] font-bold">收藏</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 transition-all px-4" id="tab-btn-profile" onclick="switchTab('profile')">
+<iconify-icon icon="ph:user-bold" width="22"></iconify-icon>
+<span class="text-[10px] font-bold">我的</span>
+</button>
+</nav>
+<!-- Water Ripple Effect Overlay (JS Controlled) -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden z-[100]" id="ripple-overlay"></div>
+</div>
+<script>
+        // Page Management
+        function switchPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('section');
+            pages.forEach(page => {
+                page.classList.add('hidden');
+                page.style.opacity = '0';
+            });
+
+            // Show target page
+            const targetPage = document.getElementById('page-' + pageId);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                setTimeout(() => {
+                    targetPage.style.opacity = '1';
+                }, 10);
+            }
+            
+            // Special: Scroll to top when switching
+            const scrollArea = targetPage.querySelector('.overflow-y-auto');
+            if (scrollArea) scrollArea.scrollTop = 0;
+            
+            // Trigger water ripple effect
+            createRipple();
+        }
+
+        // Tab Management
+        function switchTab(tabId) {
+            // Update UI
+            const tabs = ['home', 'discover', 'favorites', 'profile'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('tab-btn-' + t);
+                btn.classList.remove('active-tab');
+                btn.classList.add('text-gray-400');
+            });
+
+            const activeBtn = document.getElementById('tab-btn-' + tabId);
+            activeBtn.classList.add('active-tab');
+            activeBtn.classList.remove('text-gray-400');
+
+            switchPage(tabId);
+        }
+
+        // Study Mode Tab Management
+        function switchStudyTab(tabId) {
+            const tabs = ['note', 'background', 'comment', 'allusion'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('tab-' + t);
+                const content = document.getElementById('content-' + t);
+                btn.classList.remove('border-[#c23a3a]', 'text-[#c23a3a]');
+                btn.classList.add('text-gray-400');
+                content.classList.add('hidden');
+            });
+
+            const activeBtn = document.getElementById('tab-' + tabId);
+            const activeContent = document.getElementById('content-' + tabId);
+            activeBtn.classList.add('border-[#c23a3a]', 'text-[#c23a3a]');
+            activeBtn.classList.remove('text-gray-400');
+            activeContent.classList.remove('hidden');
+        }
+
+        // 诗人作品数据
+        const poetWorksData = {
+            "libai": [
+                { id: 1, title: "静夜思", type: "五言绝句", excerpt: "床前明月光，疑是地上霜。举头望明月，低头思故乡。", rating: "9.8" },
+                { id: 2, title: "望庐山瀑布", type: "七言绝句", excerpt: "日照香炉生紫烟，遥看瀑布挂前川。飞流直下三千尺，疑是银河落九天。", rating: "9.7" },
+                { id: 3, title: "将进酒", type: "乐府诗", excerpt: "君不见黄河之水天上来，奔流到海不复回。君不见高堂明镜悲白发，朝如青丝暮成雪。", rating: "9.9" },
+                { id: 4, title: "早发白帝城", type: "七言绝句", excerpt: "朝辞白帝彩云间，千里江陵一日还。两岸猿声啼不住，轻舟已过万重山。", rating: "9.7" },
+                { id: 5, title: "黄鹤楼送孟浩然之广陵", type: "七言绝句", excerpt: "故人西辞黄鹤楼，烟花三月下扬州。孤帆远影碧空尽，唯见长江天际流。", rating: "9.6" },
+                { id: 6, title: "行路难·其一", type: "乐府诗", excerpt: "金樽清酒斗十千，玉盘珍羞直万钱。停杯投箸不能食，拔剑四顾心茫然。", rating: "9.8" },
+                { id: 7, title: "送友人", type: "五言律诗", excerpt: "青山横北郭，白水绕东城。此地一为别，孤蓬万里征。", rating: "9.5" },
+                { id: 8, title: "梦游天姥吟留别", type: "七言古诗", excerpt: "海客谈瀛洲，烟涛微茫信难求。越人语天姥，云霞明灭或可睹。", rating: "9.6" },
+                { id: 9, title: "渡荆门送别", type: "五言律诗", excerpt: "渡远荆门外，来从楚国游。山随平野尽，江入大荒流。", rating: "9.4" },
+                { id: 10, title: "宣州谢朓楼饯别校书叔云", type: "七言古诗", excerpt: "弃我去者昨日之日不可留，乱我心者今日之日多烦忧。", rating: "9.5" },
+                { id: 11, title: "登金陵凤凰台", type: "七言律诗", excerpt: "凤凰台上凤凰游，凤去台空江自流。吴宫花草埋幽径，晋代衣冠成古丘。", rating: "9.6" },
+                { id: 12, title: "蜀道难", type: "乐府诗", excerpt: "噫吁嚱，危乎高哉！蜀道之难，难于上青天！", rating: "9.8" },
+                { id: 13, title: "独坐敬亭山", type: "五言绝句", excerpt: "众鸟高飞尽，孤云独去闲。相看两不厌，只有敬亭山。", rating: "9.5" },
+                { id: 14, title: "望天门山", type: "七言绝句", excerpt: "天门中断楚江开，碧水东流至此回。两岸青山相对出，孤帆一片日边来。", rating: "9.4" },
+                { id: 15, title: "月下独酌", type: "五言古诗", excerpt: "花间一壶酒，独酌无相亲。举杯邀明月，对影成三人。", rating: "9.6" },
+            ],
+            "dufu": [
+                { id: 101, title: "春望", type: "五言律诗", excerpt: "国破山河在，城春草木深。感时花溅泪，恨别鸟惊心。", rating: "9.7" },
+                { id: 102, title: "茅屋为秋风所破歌", type: "七言古诗", excerpt: "安得广厦千万间，大庇天下寒士俱欢颜，风雨不动安如山。", rating: "9.8" },
+                { id: 103, title: "登高", type: "七言律诗", excerpt: "风急天高猿啸哀，渚清沙白鸟飞回。无边落木萧萧下，不尽长江滚滚来。", rating: "9.9" },
+                { id: 104, title: "春夜喜雨", type: "五言律诗", excerpt: "好雨知时节，当春乃发生。随风潜入夜，润物细无声。", rating: "9.5" },
+                { id: 105, title: "望岳", type: "五言古诗", excerpt: "会当凌绝顶，一览众山小。", rating: "9.6" },
+                { id: 106, title: "兵车行", type: "歌行体", excerpt: "车辚辚，马萧萧，行人弓箭各在腰。", rating: "9.4" },
+                { id: 107, title: "石壕吏", type: "五言古诗", excerpt: "暮投石壕村，有吏夜捉人。老翁逾墙走，老妇出门看。", rating: "9.5" },
+                { id: 108, title: "闻官军收河南河北", type: "七言律诗", excerpt: "剑外忽传收蓟北，初闻涕泪满衣裳。却看妻子愁何在，漫卷诗书喜欲狂。", rating: "9.7" },
+                { id: 109, title: "蜀相", type: "七言律诗", excerpt: "丞相祠堂何处寻，锦官城外柏森森。映阶碧草自春色，隔叶黄鹂空好音。", rating: "9.6" },
+                { id: 110, title: "绝句", type: "五言绝句", excerpt: "两个黄鹂鸣翠柳，一行白鹭上青天。窗含西岭千秋雪，门泊东吴万里船。", rating: "9.5" },
+                { id: 111, title: "江南逢李龟年", type: "七言绝句", excerpt: "岐王宅里寻常见，崔九堂前几度闻。正是江南好风景，落花时节又逢君。", rating: "9.6" },
+                { id: 112, title: "月夜忆舍弟", type: "五言律诗", excerpt: "戍鼓断人行，边秋一雁声。露从今夜白，月是故乡明。", rating: "9.5" },
+                { id: 113, title: "登岳阳楼", type: "五言律诗", excerpt: "昔闻洞庭水，今上岳阳楼。吴楚东南坼，乾坤日夜浮。", rating: "9.6" },
+                { id: 114, title: "赠花卿", type: "七言绝句", excerpt: "锦城丝管日纷纷，半入江风半入云。此曲只应天上有，人间能得几回闻。", rating: "9.4" },
+                { id: 115, title: "旅夜书怀", type: "五言律诗", excerpt: "细草微风岸，危樯独夜舟。星垂平野阔，月涌大江流。", rating: "9.5" },
+            ],
+            "liqingzhao": [
+                { id: 201, title: "声声慢", type: "词", excerpt: "寻寻觅觅，冷冷清清，凄凄惨惨戚戚。乍暖还寒时候，最难将息。", rating: "9.9" },
+                { id: 202, title: "如梦令", type: "词", excerpt: "昨夜雨疏风骤，浓睡不消残酒。试问卷帘人，却道海棠依旧。知否？知否？应是绿肥红瘦。", rating: "9.7" },
+                { id: 203, title: "一剪梅", type: "词", excerpt: "红藕香残玉簟秋。轻解罗裳，独上兰舟。云中谁寄锦书来？雁字回时，月满西楼。", rating: "9.8" },
+                { id: 204, title: "醉花阴", type: "词", excerpt: "薄雾浓云愁永昼，瑞脑销金兽。佳节又重阳，玉枕纱橱，半夜凉初透。", rating: "9.6" },
+                { id: 205, title: "武陵春", type: "词", excerpt: "风住尘香花已尽，日晚倦梳头。物是人非事事休，欲语泪先流。", rating: "9.5" },
+                { id: 206, title: "夏日绝句", type: "五言绝句", excerpt: "生当作人杰，死亦为鬼雄。至今思项羽，不肯过江东。", rating: "9.8" },
+                { id: 207, title: "渔家傲", type: "词", excerpt: "天接云涛连晓雾，星河欲转千帆舞。仿佛梦魂归帝所。闻天语，殷勤问我归何处。", rating: "9.6" },
+                { id: 208, title: "蝶恋花", type: "词", excerpt: "泪湿罗衣脂粉满，四叠阳关，唱到千千遍。人道山长山又断，萧萧微雨闻孤馆。", rating: "9.4" },
+                { id: 209, title: "点绛唇", type: "词", excerpt: "蹴罢秋千，起来慵整纤纤手。露浓花瘦，薄汗轻衣透。", rating: "9.5" },
+                { id: 210, title: "鹧鸪天", type: "词", excerpt: "暗淡轻黄体性柔，情疏迹远只香留。何须浅碧轻红色，自是花中第一流。", rating: "9.4" },
+                { id: 211, title: "凤凰台上忆吹箫", type: "词", excerpt: "香冷金猊，被翻红浪，起来慵自梳头。任宝奁尘满，日上帘钩。", rating: "9.5" },
+                { id: 212, title: "清平乐", type: "词", excerpt: "年年雪里，常插梅花醉。挼尽梅花无好意，赢得满衣清泪。", rating: "9.4" },
+                { id: 213, title: "诉衷情", type: "词", excerpt: "夜来沉醉卸妆迟，梅萼插残枝。酒醒熏破春睡，梦远不成归。", rating: "9.3" },
+                { id: 214, title: "菩萨蛮", type: "词", excerpt: "归鸿声断残云碧，背窗雪落炉烟直。烛底凤钗明，钗头人胜轻。", rating: "9.3" },
+                { id: 215, title: "念奴娇", type: "词", excerpt: "萧条庭院，又斜风细雨，重门须闭。宠柳娇花寒食近，种种恼人天气。", rating: "9.4" },
+            ],
+            "wangwei": [
+                { id: 301, title: "山居秋暝", type: "五言律诗", excerpt: "空山新雨后，天气晚来秋。明月松间照，清泉石上流。", rating: "9.8" },
+                { id: 302, title: "使至塞上", type: "五言律诗", excerpt: "单车欲问边，属国过居延。征蓬出汉塞，归雁入胡天。大漠孤烟直，长河落日圆。", rating: "9.7" },
+                { id: 303, title: "鸟鸣涧", type: "五言绝句", excerpt: "人闲桂花落，夜静春山空。月出惊山鸟，时鸣春涧中。", rating: "9.6" },
+                { id: 304, title: "送元二使安西", type: "七言绝句", excerpt: "渭城朝雨浥轻尘，客舍青青柳色新。劝君更尽一杯酒，西出阳关无故人。", rating: "9.8" },
+                { id: 305, title: "鹿柴", type: "五言绝句", excerpt: "空山不见人，但闻人语响。返景入深林，复照青苔上。", rating: "9.5" },
+                { id: 306, title: "竹里馆", type: "五言绝句", excerpt: "独坐幽篁里，弹琴复长啸。深林人不知，明月来相照。", rating: "9.4" },
+                { id: 307, title: "相思", type: "五言绝句", excerpt: "红豆生南国，春来发几枝。愿君多采撷，此物最相思。", rating: "9.7" },
+                { id: 308, title: "九月九日忆山东兄弟", type: "七言绝句", excerpt: "独在异乡为异客，每逢佳节倍思亲。遥知兄弟登高处，遍插茱萸少一人。", rating: "9.8" },
+                { id: 309, title: "终南别业", type: "五言律诗", excerpt: "中岁颇好道，晚家南山陲。兴来每独往，胜事空自知。行到水穷处，坐看云起时。", rating: "9.6" },
+                { id: 310, title: "画", type: "五言绝句", excerpt: "远看山有色，近听水无声。春去花还在，人来鸟不惊。", rating: "9.5" },
+                { id: 311, title: "青溪", type: "五言古诗", excerpt: "言入黄花川，每逐青溪水。随山将万转，趣途无百里。", rating: "9.3" },
+                { id: 312, title: "渭川田家", type: "五言古诗", excerpt: "斜阳照墟落，穷巷牛羊归。野老念牧童，倚杖候荆扉。", rating: "9.4" },
+                { id: 313, title: "积雨辋川庄作", type: "七言律诗", excerpt: "积雨空林烟火迟，蒸藜炊黍饷东菑。漠漠水田飞白鹭，阴阴夏木啭黄鹂。", rating: "9.5" },
+                { id: 314, title: "山中", type: "五言绝句", excerpt: "荆溪白石出，天寒红叶稀。山路元无雨，空翠湿人衣。", rating: "9.3" },
+                { id: 315, title: "辋川闲居赠裴秀才迪", type: "五言律诗", excerpt: "寒山转苍翠，秋水日潺湲。倚杖柴门外，临风听暮蝉。", rating: "9.4" },
+            ],
+            "menghaoran": [
+                { id: 401, title: "春晓", type: "五言绝句", excerpt: "春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少。", rating: "9.8" },
+                { id: 402, title: "过故人庄", type: "五言律诗", excerpt: "故人具鸡黍，邀我至田家。绿树村边合，青山郭外斜。", rating: "9.7" },
+                { id: 403, title: "望洞庭湖赠张丞相", type: "五言律诗", excerpt: "八月湖水平，涵虚混太清。气蒸云梦泽，波撼岳阳城。", rating: "9.6" },
+                { id: 404, title: "宿建德江", type: "五言绝句", excerpt: "移舟泊烟渚，日暮客愁新。野旷天低树，江清月近人。", rating: "9.6" },
+                { id: 405, title: "岁暮归南山", type: "五言律诗", excerpt: "北阙休上书，南山归敝庐。不才明主弃，多病故人疏。", rating: "9.3" },
+                { id: 406, title: "留别王侍御维", type: "五言律诗", excerpt: "寂寂竟何待，朝朝空自归。欲寻芳草去，惜与故人违。", rating: "9.2" },
+                { id: 407, title: "早寒江上有怀", type: "五言律诗", excerpt: "木落雁南度，北风江上寒。我家襄水曲，遥隔楚云端。", rating: "9.3" },
+                { id: 408, title: "田家元日", type: "五言律诗", excerpt: "昨夜斗回北，今朝岁起东。我年已强仕，无禄尚忧农。", rating: "9.2" },
+                { id: 409, title: "清明日宴梅道士房", type: "五言律诗", excerpt: "林卧愁春尽，开轩览物华。忽逢青鸟使，邀入赤松家。", rating: "9.1" },
+                { id: 410, title: "万山潭作", type: "五言古诗", excerpt: "垂钓坐磐石，水清心亦闲。鱼行潭树下，猿挂岛藤间。", rating: "9.2" },
+                { id: 411, title: "秋登万山寄张五", type: "五言古诗", excerpt: "北山白云里，隐者自怡悦。相望始登高，心随雁飞灭。", rating: "9.3" },
+                { id: 412, title: "与诸子登岘山", type: "五言律诗", excerpt: "人事有代谢，往来成古今。江山留胜迹，我辈复登临。", rating: "9.4" },
+                { id: 413, title: "彭蠡湖中望庐山", type: "五言古诗", excerpt: "太虚生月晕，舟子知天风。挂席候明发，渺漫平湖中。", rating: "9.1" },
+                { id: 414, title: "夜归鹿门山歌", type: "七言古诗", excerpt: "山寺钟鸣昼已昏，渔梁渡头争渡喧。人随沙岸向江村，余亦乘舟归鹿门。", rating: "9.3" },
+                { id: 415, title: "鹦鹉洲送王九之江左", type: "七言古诗", excerpt: "昔登江上黄鹤楼，遥爱江中鹦鹉洲。洲势逶迤绕碧流，鸳鸯鸂鶒满滩头。", rating: "9.2" },
+            ],
+            "baijuyi": [
+                { id: 501, title: "长恨歌", type: "长篇叙事诗", excerpt: "回眸一笑百媚生，六宫粉黛无颜色。在天愿作比翼鸟，在地愿为连理枝。", rating: "9.9" },
+                { id: 502, title: "琵琶行", type: "长篇叙事诗", excerpt: "同是天涯沦落人，相逢何必曾相识。千呼万唤始出来，犹抱琵琶半遮面。", rating: "9.9" },
+                { id: 503, title: "赋得古原草送别", type: "五言律诗", excerpt: "离离原上草，一岁一枯荣。野火烧不尽，春风吹又生。", rating: "9.7" },
+                { id: 504, title: "忆江南", type: "词", excerpt: "江南好，风景旧曾谙。日出江花红胜火，春来江水绿如蓝。能不忆江南？", rating: "9.6" },
+                { id: 505, title: "钱塘湖春行", type: "七言律诗", excerpt: "乱花渐欲迷人眼，浅草才能没马蹄。最爱湖东行不足，绿杨阴里白沙堤。", rating: "9.5" },
+                { id: 506, title: "卖炭翁", type: "新乐府", excerpt: "卖炭翁，伐薪烧炭南山中。满面尘灰烟火色，两鬓苍苍十指黑。", rating: "9.4" },
+                { id: 507, title: "暮江吟", type: "七言绝句", excerpt: "一道残阳铺水中，半江瑟瑟半江红。可怜九月初三夜，露似真珠月似弓。", rating: "9.5" },
+                { id: 508, title: "大林寺桃花", type: "七言绝句", excerpt: "人间四月芳菲尽，山寺桃花始盛开。长恨春归无觅处，不知转入此中来。", rating: "9.5" },
+                { id: 509, title: "问刘十九", type: "五言绝句", excerpt: "绿蚁新醅酒，红泥小火炉。晚来天欲雪，能饮一杯无？", rating: "9.6" },
+                { id: 510, title: "池上", type: "五言绝句", excerpt: "小娣撑小艇，偷采白莲回。不解藏踪迹，浮萍一道开。", rating: "9.3" },
+                { id: 511, title: "观刈麦", type: "五言古诗", excerpt: "田家少闲月，五月人倍忙。夜来南风起，小麦覆陇黄。", rating: "9.4" },
+                { id: 512, title: "花非花", type: "杂言古诗", excerpt: "花非花，雾非雾。夜半来，天明去。来如春梦几多时？去似朝云无觅处。", rating: "9.5" },
+                { id: 513, title: "采莲曲", type: "七言绝句", excerpt: "菱叶萦波荷飐风，荷花深处小船通。逢郎欲语低头笑，碧玉搔头落水中。", rating: "9.3" },
+                { id: 514, title: "江雪", type: "五言绝句", excerpt: "已讶衾枕冷，复见窗户明。夜深知雪重，时闻折竹声。", rating: "9.2" },
+                { id: 515, title: "夜筝", type: "七言绝句", excerpt: "紫袖红弦明月中，自弹自感暗低容。弦凝指咽声停处，别有深情一万重。", rating: "9.3" },
+            ],
+            "sushi": [
+                { id: 601, title: "水调歌头·明月几时有", type: "词", excerpt: "明月几时有？把酒问青天。不知天上宫阙，今夕是何年。", rating: "9.9" },
+                { id: 602, title: "念奴娇·赤壁怀古", type: "词", excerpt: "大江东去，浪淘尽，千古风流人物。故垒西边，人道是，三国周郎赤壁。", rating: "9.9" },
+                { id: 603, title: "定风波", type: "词", excerpt: "莫听穿林打叶声，何妨吟啸且徐行。竹杖芒鞋轻胜马，谁怕？一蓑烟雨任平生。", rating: "9.8" },
+                { id: 604, title: "江城子·密州出猎", type: "词", excerpt: "老夫聊发少年狂，左牵黄，右擎苍。锦帽貂裘，千骑卷平冈。", rating: "9.7" },
+                { id: 605, title: "题西林壁", type: "七言绝句", excerpt: "横看成岭侧成峰，远近高低各不同。不识庐山真面目，只缘身在此山中。", rating: "9.6" },
+                { id: 606, title: "饮湖上初晴后雨", type: "七言绝句", excerpt: "水光潋滟晴方好，山色空蒙雨亦奇。欲把西湖比西子，淡妆浓抹总相宜。", rating: "9.7" },
+                { id: 607, title: "江城子·乙卯正月二十日夜记梦", type: "词", excerpt: "十年生死两茫茫，不思量，自难忘。千里孤坟，无处话凄凉。", rating: "9.9" },
+                { id: 608, title: "浣溪沙", type: "词", excerpt: "山下兰芽短浸溪，松间沙路净无泥。萧萧暮雨子规啼。谁道人生无再少？门前流水尚能西！", rating: "9.5" },
+                { id: 609, title: "赤壁赋", type: "文赋", excerpt: "壬戌之秋，七月既望，苏子与客泛舟游于赤壁之下。清风徐来，水波不兴。", rating: "9.8" },
+                { id: 610, title: "六月二十七日望湖楼醉书", type: "七言绝句", excerpt: "黑云翻墨未遮山，白雨跳珠乱入船。卷地风来忽吹散，望湖楼下水如天。", rating: "9.5" },
+                { id: 611, title: "惠崇春江晚景", type: "七言绝句", excerpt: "竹外桃花三两枝，春江水暖鸭先知。蒌蒿满地芦芽短，正是河豚欲上时。", rating: "9.6" },
+                { id: 612, title: "蝶恋花·春景", type: "词", excerpt: "花褪残红青杏小。燕子飞时，绿水人家绕。枝上柳绵吹又少。天涯何处无芳草。", rating: "9.5" },
+                { id: 613, title: "临江仙·夜饮东坡醒复醉", type: "词", excerpt: "夜饮东坡醒复醉，归来仿佛三更。家童鼻息已雷鸣。敲门都不应，倚杖听江声。", rating: "9.6" },
+                { id: 614, title: "望江南·超然台作", type: "词", excerpt: "春未老，风细柳斜斜。试上超然台上看，半壕春水一城花。烟雨暗千家。", rating: "9.4" },
+                { id: 615, title: "西江月·世事一场大梦", type: "词", excerpt: "世事一场大梦，人生几度秋凉？夜来风叶已鸣廊。看取眉头鬓上。", rating: "9.5" },
+            ]
+        };
+
+        let currentPoetWorksId = 'libai';
+
+        // 记录从哪个页面进入作品列表（用于智能返回）
+        let poetWorksFromPage = 'discover';
+
+        const poetMeta = {
+            "libai": { name: "李白", dynasty: "唐代", avatar: "🖌️" },
+            "dufu": { name: "杜甫", dynasty: "唐代", avatar: "📜" },
+            "liqingzhao": { name: "李清照", dynasty: "宋代", avatar: "🌸" },
+            "wangwei": { name: "王维", dynasty: "唐代", avatar: "🏔️" },
+            "menghaoran": { name: "孟浩然", dynasty: "唐代", avatar: "🏡" },
+            "baijuyi": { name: "白居易", dynasty: "唐代", avatar: "📖" },
+            "sushi": { name: "苏轼", dynasty: "宋代", avatar: "🌊" }
+        };
+
+        const poetMapData = {
+    "libai": {
+        color: "#c23a3a",
+        locations: [
+            { city: "碎叶城", lat: 40, lng: 10, event: "701年出生", desc: "今吉尔吉斯斯坦托克马克", period: "少年" },
+            { city: "江油", lat: 55, lng: 22, event: "705年随父迁居", desc: "少时读书习剑之地", period: "少年" },
+            { city: "成都", lat: 50, lng: 25, event: "少年居蜀", desc: "青城问道，蜀中漫游", period: "少年" },
+            { city: "安陆", lat: 48, lng: 35, event: "727年寓居安陆", desc: "与前宰相孙女结婚", period: "壮年" },
+            { city: "长安", lat: 52, lng: 30, event: "742年供奉翰林", desc: "御前赋诗，名动天下", period: "壮年" },
+            { city: "洛阳", lat: 50, lng: 33, event: "744年与杜甫相识", desc: "赐金放还，李杜相会", period: "壮年" },
+            { city: "梁宋", lat: 48, lng: 32, event: "745年与杜高同游", desc: "梁宋之游", period: "壮年" },
+            { city: "齐州", lat: 54, lng: 38, event: "750年入道门", desc: "受道箓", period: "中年" },
+            { city: "金陵", lat: 42, lng: 36, event: "漫游江南", desc: "登临怀古，诗酒风流", period: "中年" },
+            { city: "庐山", lat: 40, lng: 34, event: "756年入永王幕", desc: "避乱隐居", period: "晚年" },
+            { city: "夜郎", lat: 35, lng: 20, event: "758年流放夜郎", desc: "中途遇赦", period: "晚年" },
+            { city: "当涂", lat: 42, lng: 37, event: "762年终老", desc: "青山长眠", period: "晚年" },
+        ]
+    },
+    "dufu": {
+        color: "#2563eb",
+        locations: [
+            { city: "巩县", lat: 50, lng: 33, event: "712年出生", desc: "河南巩义", period: "少年" },
+            { city: "吴越", lat: 42, lng: 37, event: "731年漫游", desc: "江南游学", period: "少年" },
+            { city: "洛阳", lat: 50, lng: 33, event: "744年遇李白", desc: "李杜相会", period: "壮年" },
+            { city: "长安", lat: 52, lng: 30, event: "746年困居十年", desc: "应试不第，献赋得官", period: "壮年" },
+            { city: "奉先", lat: 50, lng: 28, event: "755年探亲", desc: "自京赴奉先咏怀", period: "壮年" },
+            { city: "凤翔", lat: 50, lng: 26, event: "757年奔赴行在", desc: "授左拾遗", period: "壮年" },
+            { city: "成都", lat: 48, lng: 23, event: "759年入蜀", desc: "浣花草堂", period: "中年" },
+            { city: "夔州", lat: 45, lng: 28, event: "766年寓居", desc: "登高·秋兴八首", period: "晚年" },
+            { city: "江陵", lat: 44, lng: 32, event: "768年出峡", desc: "流寓江陵", period: "晚年" },
+            { city: "岳阳", lat: 42, lng: 32, event: "770年登岳阳楼", desc: "昔闻洞庭水", period: "晚年" },
+            { city: "湘江", lat: 40, lng: 33, event: "770年终老", desc: "卒于湘江舟中", period: "晚年" },
+        ]
+    },
+    "liqingzhao": {
+        color: "#ec4899",
+        locations: [
+            { city: "济南", lat: 54, lng: 38, event: "1084年出生", desc: "章丘明水", period: "少年" },
+            { city: "汴京", lat: 50, lng: 32, event: "1101年结婚", desc: "与赵明诚成婚", period: "少年" },
+            { city: "青州", lat: 53, lng: 37, event: "1107年屏居", desc: "归来堂·金石录", period: "壮年" },
+            { city: "莱州", lat: 54, lng: 36, event: "1121年随任", desc: "赵明诚知莱州", period: "壮年" },
+            { city: "江宁", lat: 43, lng: 36, event: "1127年南渡", desc: "建康", period: "中年" },
+            { city: "杭州", lat: 42, lng: 35, event: "1129年赵卒", desc: "赵明诚病逝", period: "中年" },
+            { city: "越州", lat: 43, lng: 34, event: "1130年避难", desc: "浙东流寓", period: "晚年" },
+            { city: "金华", lat: 41, lng: 35, event: "1134年后", desc: "避难·武陵春", period: "晚年" },
+            { city: "临安", lat: 42, lng: 35, event: "1155年终老", desc: "卒于杭州", period: "晚年" },
+        ]
+    },
+    "wangwei": {
+        color: "#059669",
+        locations: [
+            { city: "蒲州", lat: 52, lng: 29, event: "701年出生", desc: "山西永济", period: "少年" },
+            { city: "长安", lat: 52, lng: 30, event: "721年进士及第", desc: "任太乐丞", period: "少年" },
+            { city: "济州", lat: 54, lng: 37, event: "722年被贬", desc: "司仓参军", period: "壮年" },
+            { city: "凉州", lat: 56, lng: 15, event: "736年出塞", desc: "使至塞上", period: "壮年" },
+            { city: "襄阳", lat: 46, lng: 32, event: "740年知南选", desc: "途经襄阳", period: "中年" },
+            { city: "辋川", lat: 50, lng: 27, event: "741年隐居", desc: "辋川别业·诗画", period: "中年" },
+            { city: "终南山", lat: 50, lng: 28, event: "740年隐居", desc: "山居秋暝", period: "中年" },
+            { city: "洛阳", lat: 50, lng: 33, event: "756年被俘", desc: "安史之乱", period: "晚年" },
+            { city: "长安", lat: 52, lng: 30, event: "758年复官", desc: "尚书右丞", period: "晚年" },
+            { city: "辋川", lat: 50, lng: 27, event: "761年终老", desc: "卒于辋川", period: "晚年" },
+        ]
+    },
+    "menghaoran": {
+        color: "#d97706",
+        locations: [
+            { city: "襄阳", lat: 46, lng: 32, event: "689年出生", desc: "湖北襄阳", period: "少年" },
+            { city: "鹿门山", lat: 45, lng: 32, event: "706年隐居", desc: "鹿门读书", period: "少年" },
+            { city: "江南", lat: 42, lng: 37, event: "712年漫游", desc: "吴越游历", period: "壮年" },
+            { city: "长安", lat: 52, lng: 30, event: "727年游长安", desc: "结识王维", period: "壮年" },
+            { city: "江夏", lat: 44, lng: 33, event: "730年遇李白", desc: "李白送别", period: "壮年" },
+            { city: "洛阳", lat: 50, lng: 33, event: "734年应试", desc: "不第归隐", period: "中年" },
+            { city: "洞庭", lat: 43, lng: 31, event: "游历洞庭", desc: "气蒸云梦泽", period: "中年" },
+            { city: "吴越", lat: 42, lng: 37, event: "738年再游", desc: "访友寻胜", period: "晚年" },
+            { city: "襄阳", lat: 46, lng: 32, event: "740年终老", desc: "卒于故里", period: "晚年" },
+        ]
+    },
+    "baijuyi": {
+        color: "#7c3aed",
+        locations: [
+            { city: "新郑", lat: 50, lng: 32, event: "772年出生", desc: "河南新郑", period: "少年" },
+            { city: "符离", lat: 50, lng: 35, event: "794年发奋", desc: "刻苦读书", period: "少年" },
+            { city: "长安", lat: 52, lng: 30, event: "800年进士及第", desc: "左拾遗·翰林", period: "壮年" },
+            { city: "盩厔", lat: 50, lng: 28, event: "806年作长恨歌", desc: "县尉任上", period: "壮年" },
+            { city: "江州", lat: 42, lng: 34, event: "815年被贬", desc: "琵琶行", period: "中年" },
+            { city: "忠州", lat: 42, lng: 25, event: "818年量移", desc: "刺史", period: "中年" },
+            { city: "杭州", lat: 42, lng: 35, event: "822年刺史", desc: "修筑白堤", period: "中年" },
+            { city: "苏州", lat: 43, lng: 36, event: "825年刺史", desc: "江南风光", period: "中年" },
+            { city: "洛阳", lat: 50, lng: 33, event: "829年归隐", desc: "香山居士", period: "晚年" },
+            { city: "洛阳", lat: 50, lng: 33, event: "846年终老", desc: "卒于履道里", period: "晚年" },
+        ]
+    },
+    "sushi": {
+        color: "#c23a3a",
+        locations: [
+            { city: "眉山", lat: 45, lng: 22, event: "1037年出生", desc: "四川眉山", period: "少年" },
+            { city: "汴京", lat: 50, lng: 32, event: "1057年进士及第", desc: "名动京师", period: "少年" },
+            { city: "凤翔", lat: 50, lng: 26, event: "1061年判官", desc: "初入仕途", period: "壮年" },
+            { city: "杭州", lat: 42, lng: 35, event: "1071年通判", desc: "初到江南", period: "壮年" },
+            { city: "密州", lat: 55, lng: 36, event: "1074年知州", desc: "水调歌头", period: "壮年" },
+            { city: "黄州", lat: 44, lng: 33, event: "1079年贬谪", desc: "赤壁赋天下", period: "中年" },
+            { city: "汴京", lat: 50, lng: 32, event: "1085年召还", desc: "连升数级", period: "中年" },
+            { city: "杭州", lat: 42, lng: 35, event: "1089年再出", desc: "疏浚西湖·苏堤", period: "中年" },
+            { city: "惠州", lat: 36, lng: 32, event: "1094年被贬", desc: "日啖荔枝", period: "晚年" },
+            { city: "儋州", lat: 30, lng: 28, event: "1097年再贬", desc: "天涯海角", period: "晚年" },
+            { city: "常州", lat: 43, lng: 36, event: "1101年终老", desc: "北归途中卒", period: "晚年" },
+        ]
+    }
+};
+
+        // 记录从哪个页面进入足迹地图
+        let mapFromPage = 'discover';
+
+        function renderPoetMap() {
+            const data = poetMapData[currentPoetWorksId];
+            const meta = poetMeta[currentPoetWorksId] || { name: "未知", avatar: "" };
+            const header = document.getElementById('poet-map-header');
+            const subtitle = document.getElementById('poet-map-subtitle');
+            const container = document.getElementById('poet-map-content');
+            
+            header.innerHTML = '<span class="text-xl font-bold text-[#2c2c2c]" style="font-family: serif;">' + meta.name + '</span><span class="text-sm text-gray-400">足迹地图</span>';
+            subtitle.innerHTML = '<span class="inline-block w-1.5 h-1.5 rounded-full bg-[#c23a3a]/60 mr-1.5"></span>' + meta.avatar + ' 一生行迹 · ' + data.locations.length + ' 处重要地点';
+            
+            var html = '';
+            var periods = ['少年', '壮年', '中年', '晚年'];
+            var periodLabels = {'少年': '少年时期', '壮年': '壮年时期', '中年': '中年时期', '晚年': '晚年时期'};
+            var periodIcons = {'少年': '🌱', '壮年': '🌿', '中年': '🍂', '晚年': '🍁'};
+            
+            var grouped = {};
+            periods.forEach(function(p) { grouped[p] = []; });
+            data.locations.forEach(function(loc) {
+                if (grouped[loc.period]) grouped[loc.period].push(loc);
+            });
+            
+            periods.forEach(function(period) {
+                var locs = grouped[period];
+                if (!locs || locs.length === 0) return;
+                
+                html += '<div class="mb-6">';
+                html += '<div class="flex items-center gap-2 mb-3">';
+                html += '<span class="text-lg">' + periodIcons[period] + '</span>';
+                html += '<h3 class="text-sm font-bold text-gray-700">' + periodLabels[period] + '</h3>';
+                html += '<span class="text-xs text-gray-400">' + locs.length + '站</span>';
+                html += '<div class="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>';
+                html += '</div>';
+                
+                html += '<div class="relative">';
+                html += '<div class="absolute left-6 top-6 right-6 h-0.5 bg-gray-200"></div>';
+                
+                html += '<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">';
+                locs.forEach(function(loc, li) {
+                    var markerColor = data.color;
+                    html += '<div class="min-w-[130px] flex-shrink-0">';
+                    html += '<div class="flex flex-col items-center mb-2">';
+                    html += '<div class="w-8 h-8 rounded-full bg-white border-2 flex items-center justify-center" style="border-color: ' + markerColor + ';">';
+                    html += '<div class="w-3 h-3 rounded-full" style="background-color: ' + markerColor + ';"></div>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '<div class="bg-white/80 rounded-xl p-3 border border-gray-200 shadow-sm hover:shadow-md transition-all">';
+                    html += '<p class="text-sm font-bold text-[#2c2c2c]">' + loc.city + '</p>';
+                    html += '<p class="text-xs text-[#c23a3a] font-medium mt-0.5">' + loc.event + '</p>';
+                    html += '<p class="text-[10px] text-gray-400 mt-1 leading-relaxed">' + loc.desc + '</p>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+            });
+            
+            var activePeriods = periods.filter(function(p) { return grouped[p] && grouped[p].length > 0; });
+            html += '<div class="bg-gradient-to-r from-[#c23a3a]/5 to-amber-50 rounded-xl p-4 border border-[#c23a3a]/10 mt-2">';
+            html += '<div class="flex items-center gap-2 mb-2">';
+            html += '<svg class="w-4 h-4 text-[#c23a3a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+            html += '<span class="text-sm font-bold text-gray-700">行程总结</span>';
+            html += '</div>';
+            html += '<div class="grid grid-cols-2 gap-2 text-xs">';
+            html += '<div class="bg-white/60 rounded-lg p-2 text-center"><span class="text-lg font-bold text-[#c23a3a]">' + data.locations.length + '</span><br><span class="text-gray-400">个足迹城市</span></div>';
+            html += '<div class="bg-white/60 rounded-lg p-2 text-center"><span class="text-lg font-bold text-[#c23a3a]">' + activePeriods.length + '</span><br><span class="text-gray-400">个人生时期</span></div>';
+            html += '</div>';
+            html += '</div>';
+            
+            container.innerHTML = html;
+        }
+
+        function goBackFromMap() {
+            switchPage(mapFromPage);
+        }
+
+        function renderPoetWorks() {
+            const works = poetWorksData[currentPoetWorksId] || [];
+            const meta = poetMeta[currentPoetWorksId] || { name: "未知", dynasty: "" };
+            const container = document.getElementById('poet-works-list');
+            const header = document.getElementById('poet-works-header');
+            const subtitle = document.getElementById('poet-works-subtitle');
+            const countEl = document.getElementById('poet-works-count');
+            const searchInput = document.getElementById('poet-works-search');
+            
+            // 清空搜索框
+            if (searchInput) searchInput.value = '';
+            
+            // 更新标题
+            header.innerHTML = '<span class="text-xl font-bold text-[#2c2c2c]" style="font-family: serif;">' + meta.name + '</span><span class="text-sm text-gray-400 mt-1">全部作品</span>';
+            
+            // 更新副标题
+            subtitle.innerHTML = '<span class="inline-block w-1.5 h-1.5 rounded-full bg-[#c23a3a]/60 mr-1.5"></span>' + meta.avatar + ' ' + works.length + ' 首传世佳作，流传千年';
+            
+            // 更新计数
+            countEl.textContent = works.length + ' 首';
+            
+            // 渲染列表
+            let html = '';
+            works.forEach(function(item, index) {
+                var num = (index + 1).toString().padStart(2, '0');
+                html += '<div class="bg-white/80 rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#c23a3a]/20 transition-all cursor-pointer group" onclick="switchPage(\'detail\')">' +
+                    '<div class="flex items-start gap-3">' +
+                        '<div class="flex-none w-8 h-8 rounded-full bg-[#c23a3a]/5 border border-[#c23a3a]/10 flex items-center justify-center text-xs font-bold text-[#c23a3a]">' + num + '</div>' +
+                        '<div class="flex-1 min-w-0">' +
+                            '<div class="flex items-center gap-2 mb-1.5">' +
+                                '<span class="text-xs font-bold text-[#c23a3a] bg-[#c23a3a]/10 px-2 py-0.5 rounded">' + item.type + '</span>' +
+                                '<span class="text-[#b8860b] text-xs">★ ' + item.rating + '</span>' +
+                            '</div>' +
+                            '<h3 class="text-base font-bold text-[#2c2c2c] group-hover:text-[#c23a3a] transition-colors">' + item.title + '</h3>' +
+                            '<div class="relative mt-2 pl-3 border-l-2 border-gray-200">' +
+                                '<p class="text-sm text-gray-500 leading-relaxed italic">" ' + item.excerpt + ' "</p>' +
+                            '</div>' +
+                            '<div class="flex items-center justify-between mt-3 pt-2 border-t border-gray-50">' +
+                                '<span class="text-xs text-gray-400">' + meta.name + ' · ' + meta.dynasty + '</span>' +
+                                '<span class="text-xs text-[#c23a3a] font-medium opacity-0 group-hover:opacity-100 transition-opacity">研读 →</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function sortPoetWorks(type, el) {
+            const allWorks = poetWorksData[currentPoetWorksId] || [];
+            const meta = poetMeta[currentPoetWorksId] || { name: "未知", dynasty: "" };
+            
+            // 更新按钮样式
+            var btns = document.querySelectorAll('#page-poet-works .flex.items-center.gap-2 button');
+            btns.forEach(function(btn) {
+                btn.className = 'text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200';
+            });
+            el.className = 'text-xs px-3 py-1.5 rounded-full bg-[#c23a3a] text-white font-medium';
+
+            // 排序
+            var sorted = [].concat(allWorks);
+            if (type === 'hot') {
+                sorted.sort(function(a, b) { return parseFloat(b.rating) - parseFloat(a.rating); });
+            } else if (type === 'id') {
+                sorted.sort(function(a, b) { return a.id - b.id; });
+            } else if (type === 'name') {
+                sorted.sort(function(a, b) { return a.title.localeCompare(b.title, 'zh'); });
+            }
+            
+            // 渲染
+            var container = document.getElementById('poet-works-list');
+            var countEl = document.getElementById('poet-works-count');
+            countEl.textContent = sorted.length + ' 首';
+            
+            var html = '';
+            sorted.forEach(function(item, index) {
+                var num = (index + 1).toString().padStart(2, '0');
+                html += '<div class="bg-white/80 rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#c23a3a]/20 transition-all cursor-pointer group" onclick="switchPage(\'detail\')">' +
+                    '<div class="flex items-start gap-3">' +
+                        '<div class="flex-none w-8 h-8 rounded-full bg-[#c23a3a]/5 border border-[#c23a3a]/10 flex items-center justify-center text-xs font-bold text-[#c23a3a]">' + num + '</div>' +
+                        '<div class="flex-1 min-w-0">' +
+                            '<div class="flex items-center gap-2 mb-1.5">' +
+                                '<span class="text-xs font-bold text-[#c23a3a] bg-[#c23a3a]/10 px-2 py-0.5 rounded">' + item.type + '</span>' +
+                                '<span class="text-[#b8860b] text-xs">★ ' + item.rating + '</span>' +
+                            '</div>' +
+                            '<h3 class="text-base font-bold text-[#2c2c2c] group-hover:text-[#c23a3a] transition-colors">' + item.title + '</h3>' +
+                            '<div class="relative mt-2 pl-3 border-l-2 border-gray-200">' +
+                                '<p class="text-sm text-gray-500 leading-relaxed italic">" ' + item.excerpt + ' "</p>' +
+                            '</div>' +
+                            '<div class="flex items-center justify-between mt-3 pt-2 border-t border-gray-50">' +
+                                '<span class="text-xs text-gray-400">' + meta.name + ' · ' + meta.dynasty + '</span>' +
+                                '<span class="text-xs text-[#c23a3a] font-medium opacity-0 group-hover:opacity-100 transition-opacity">研读 →</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        // 从作品列表页智能返回
+        function goBackFromWorks() {
+            switchPage(poetWorksFromPage);
+        }
+
+        // 搜索过滤作品
+        function searchPoetWorks(keyword) {
+            const allWorks = poetWorksData[currentPoetWorksId] || [];
+            const meta = poetMeta[currentPoetWorksId] || { name: "未知", dynasty: "" };
+            const container = document.getElementById('poet-works-list');
+            const countEl = document.getElementById('poet-works-count');
+            
+            const filtered = keyword.trim() === '' ? allWorks : allWorks.filter(function(item) {
+                return item.title.indexOf(keyword) !== -1 || item.excerpt.indexOf(keyword) !== -1;
+            });
+            
+            countEl.textContent = filtered.length + ' 首';
+            
+            let html = '';
+            filtered.forEach(function(item, index) {
+                var num = (index + 1).toString().padStart(2, '0');
+                // 高亮搜索关键词
+                var displayTitle = item.title;
+                var displayExcerpt = item.excerpt;
+                if (keyword.trim() !== '') {
+                    var kw = keyword.trim();
+                    var regex = new RegExp(kw, 'g');
+                    displayTitle = displayTitle.replace(regex, '<span class="text-[#c23a3a] bg-[#c23a3a]/10 px-0.5 rounded">' + kw + '</span>');
+                    displayExcerpt = displayExcerpt.replace(regex, '<span class="text-[#c23a3a] bg-[#c23a3a]/10 px-0.5 rounded">' + kw + '</span>');
+                }
+                html += '<div class="bg-white/80 rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#c23a3a]/20 transition-all cursor-pointer group" onclick="switchPage(\'detail\')">' +
+                    '<div class="flex items-start gap-3">' +
+                        '<div class="flex-none w-8 h-8 rounded-full bg-[#c23a3a]/5 border border-[#c23a3a]/10 flex items-center justify-center text-xs font-bold text-[#c23a3a]">' + num + '</div>' +
+                        '<div class="flex-1 min-w-0">' +
+                            '<div class="flex items-center gap-2 mb-1.5">' +
+                                '<span class="text-xs font-bold text-[#c23a3a] bg-[#c23a3a]/10 px-2 py-0.5 rounded">' + item.type + '</span>' +
+                                '<span class="text-[#b8860b] text-xs">★ ' + item.rating + '</span>' +
+                            '</div>' +
+                            '<h3 class="text-base font-bold text-[#2c2c2c] group-hover:text-[#c23a3a] transition-colors">' + displayTitle + '</h3>' +
+                            '<div class="relative mt-2 pl-3 border-l-2 border-gray-200">' +
+                                '<p class="text-sm text-gray-500 leading-relaxed italic">" ' + displayExcerpt + ' "</p>' +
+                            '</div>' +
+                            '<div class="flex items-center justify-between mt-3 pt-2 border-t border-gray-50">' +
+                                '<span class="text-xs text-gray-400">' + meta.name + ' · ' + meta.dynasty + '</span>' +
+                                '<span class="text-xs text-[#c23a3a] font-medium opacity-0 group-hover:opacity-100 transition-opacity">研读 →</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        // Simple Water Ripple Animation
+        function createRipple() {
+            const container = document.getElementById('ripple-overlay');
+            const ripple = document.createElement('div');
+            
+            ripple.className = 'absolute rounded-full border border-[#2c2c2c] opacity-10';
+            ripple.style.width = '10px';
+            ripple.style.height = '10px';
+            ripple.style.left = '50%';
+            ripple.style.top = '50%';
+            ripple.style.transform = 'translate(-50%, -50%)';
+            ripple.style.transition = 'all 0.6s ease-out';
+            
+            container.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.style.width = '600px';
+                ripple.style.height = '600px';
+                ripple.style.opacity = '0';
+            }, 50);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 700);
+        }
+
+        // Initial Page
+        window.onload = () => {
+            switchTab('home');
+        };
+    </script>
+</body>
+</html>
