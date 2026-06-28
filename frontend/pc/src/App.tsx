@@ -6,14 +6,10 @@ import type { TrajectoryEvent, HeatmapPoint, PlaceName } from './types'
 import { getHeatmap, fenceQuery } from './api'
 import { theme as T, sharedStyles as S } from './theme'
 import AIToolsPanel from './components/AIToolsPanel'
-import TourismPanel from './components/TourismPanel'
 import PoetryOverlay from './components/PoetryOverlay'
 import PoemReadingOverlay from './components/PoemReadingOverlay'
 import PoemCompareView from './components/PoemCompareView'
 import StatsChart from './components/StatsChart'
-import DailyCard from './components/DailyCard'
-import FeihualingPanel from './components/FeihualingPanel'
-import { useResponsive } from './hooks/useResponsive'
 
 const ST = {
   container: { display:'flex', width:'100vw', height:'100vh', fontFamily:'"Noto Serif SC","Source Han Serif SC",serif', color:T.text, overflow:'hidden', background:T.bg } as const,
@@ -28,8 +24,6 @@ const ST = {
 } as const
 
 export default function App() {
-  const { isMobile } = useResponsive()
-  const [drawerOpen, setDrawerOpen] = useState(false)
 
   // 检索状态
   const [searchQuery, setSearchQuery] = useState('')
@@ -38,7 +32,6 @@ export default function App() {
   const [searching, setSearching] = useState(false)
   const [compareList, setCompareList] = useState<Array<{title:string;content:string;author?:string;genre?:string;mood_tags?:string[];dynasty?:string}>>([])
   const [showCompare, setShowCompare] = useState(false)
-  const [activeRoute, setActiveRoute] = useState<any>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [gotoLat, setGotoLat] = useState('')
   const [gotoLng, setGotoLng] = useState('')
@@ -215,12 +208,11 @@ export default function App() {
   const poetName = (id: string) => poets.find(p => p.poet_id === id)?.name || id
 
   return (
-    <div style={{ ...ST.container, ...(isMobile ? { display:'block' } : {}) }}>
+    <div style={ST.container}>
       {/* 遮罩层（移动端抽屉打开时） */}
-      {isMobile && drawerOpen && <div className="poetry-overlay" onClick={() => setDrawerOpen(false)} />}
 
       {/* 侧边栏 / 抽屉 */}
-      <div style={ST.sidebar} className={isMobile ? `poetry-drawer${drawerOpen ? ' open' : ''}` : ''}>
+      <div style={ST.sidebar}>
         <div style={ST.header}>
           <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
             <div style={{width:32,height:32,background:'#5B4A3E',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',color:'#F5F0EA',fontSize:16,fontWeight:'bold',fontFamily:'serif'}}>诗</div>
@@ -317,8 +309,7 @@ export default function App() {
         )}
 
         {/* 每日一诗 */}
-        <DailyCard />
-
+        
         {/* 随机一诗 + 同主题推荐 */}
         <div style={S.panel}>
           <button style={{...ST.animBtn, width:'100%', fontSize:11, letterSpacing:1}}
@@ -441,12 +432,8 @@ export default function App() {
         </div>
 
         {/* 文旅交互 */}
-        <TourismPanel onRouteSelect={(route) => {
-          setActiveRoute(route)
-        }} />
 
         {/* 飞花令 */}
-        <FeihualingPanel />
 
         {/* AI 创作工具 */}
         <AIToolsPanel />
@@ -539,7 +526,7 @@ export default function App() {
           encounterLines={encounterLines} fenceResults={fenceResults}
           fenceMode={fenceMode} onFenceClick={handleFenceClick}
           searchResults={showUnified ? unifiedResults?.poems?.map((r:any)=>({title:r.title,author:r.author,wgs84_lat:r.wgs84_lat,wgs84_lon:r.wgs84_lon,place_name:r.place_name})) || [] : []}
-          activeRoute={activeRoute} isMobile={isMobile}
+          activeRoute={null}
           gotoLat={gotoLat} gotoLng={gotoLng} gotoKey={gotoKey} />
       </div>
 
@@ -573,14 +560,6 @@ export default function App() {
         }}>
           {errorMsg}
         </div>
-      )}
-
-      {/* 浮动汉堡按钮（移动端） */}
-      {isMobile && (
-        <button className="poetry-hamburger" onClick={() => setDrawerOpen(v => !v)}
-          aria-label={drawerOpen ? '关闭侧边栏' : '打开侧边栏'}>
-          {drawerOpen ? '✕' : '☰'}
-        </button>
       )}
 
       {/* 多诗对比浮层 */}

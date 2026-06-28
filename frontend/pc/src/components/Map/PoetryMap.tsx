@@ -525,7 +525,7 @@ interface PoetryMapProps {
 export default function PoetryMap({
   places = [], poets = [], heatmap = [], encounterLines = [],
   searchResults = [],
-  fenceResults, fenceMode = false, onFenceClick, activeRoute, isMobile,
+  fenceResults, fenceMode = false, onFenceClick, activeRoute,
   gotoLat, gotoLng, gotoKey,
 }: PoetryMapProps) {
   return (
@@ -560,10 +560,10 @@ export default function PoetryMap({
         )}
         {activeRoute && <RouteLayer route={activeRoute} />}
         <GotoHandler lat={gotoLat} lng={gotoLng} trigger={gotoKey} />
-        {!isMobile && <BoxSelectMode />}
-        {!isMobile && <DistanceMeasure />}
-        {!isMobile && <ScreenshotButton />}
-        {!isMobile && <Legend />}
+        <BoxSelectMode />
+        <DistanceMeasure />
+        <ScreenshotButton />
+        <Legend />
       </MapContainer>
     </div>
   )
