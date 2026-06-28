@@ -11,6 +11,8 @@ import PoetryOverlay from './components/PoetryOverlay'
 import PoemReadingOverlay from './components/PoemReadingOverlay'
 import PoemCompareView from './components/PoemCompareView'
 import StatsChart from './components/StatsChart'
+import DailyCard from './components/DailyCard'
+import FeihualingPanel from './components/FeihualingPanel'
 import { useResponsive } from './hooks/useResponsive'
 
 const ST = {
@@ -314,6 +316,20 @@ export default function App() {
           </div>
         )}
 
+        {/* 每日一诗 */}
+        <DailyCard />
+
+        {/* 随机一诗 + 同主题推荐 */}
+        <div style={S.panel}>
+          <button style={{...ST.animBtn, width:'100%', fontSize:11, letterSpacing:1}}
+            onClick={async()=>{
+              try{const r=await fetch('/api/v1/play/random');const d=await r.json();
+              if(d?.title){setReadingPoem({title:d.title,content:d.content,genre:d.genre,mood_tags:d.mood_tags});setShowPoemReading(true)}}catch{}
+            }}>
+            🎲 随机一诗
+          </button>
+        </div>
+
         {/* 诗人 */}
         <div style={S.panel}>
           <div style={S.sectionTitle}>诗人</div>
@@ -428,6 +444,9 @@ export default function App() {
         <TourismPanel onRouteSelect={(route) => {
           setActiveRoute(route)
         }} />
+
+        {/* 飞花令 */}
+        <FeihualingPanel />
 
         {/* AI 创作工具 */}
         <AIToolsPanel />

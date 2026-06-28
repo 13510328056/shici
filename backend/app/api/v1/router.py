@@ -4,7 +4,7 @@ API v1 路由聚合
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import places, poets, search, ai, export, tourism
+from app.api.v1.endpoints import places, poets, search, ai, export, tourism, play
 
 api_router = APIRouter()
 
@@ -25,3 +25,6 @@ api_router.include_router(export.router, prefix="/export", tags=["数据导出"]
 
 # 文旅交互服务
 api_router.include_router(tourism.router, prefix="/tourism", tags=["文旅交互"])
+
+# 互动娱乐服务
+api_router.include_router(play.router, prefix="/play", tags=["互动娱乐"])

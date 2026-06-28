@@ -3,20 +3,29 @@
 html, body, #root { width: 100%; height: 100%; overflow: hidden; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-    "Noto Serif SC", "Source Han Serif SC", "SimSun", "PingFang SC", serif;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
   color: #2c2c2c;
   background: #F5F0EA;
   -webkit-font-smoothing: antialiased;
 }
 
+/* ─── 宣纸纹理背景 ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
 /* ─── 按钮互动 ─── */
 button {
   font-family: inherit;
-  transition: all 0.2s ease;
+  transition: box-shadow 0.2s, transform 0.15s;
   outline: none;
 }
-button:hover { opacity: 0.85; }
+button:hover { box-shadow: 0 0 0 2px rgba(194, 59, 34, 0.25); }
 button:active { transform: scale(0.97); }
 
 input, select, textarea {
@@ -29,11 +38,72 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 2px rgba(139, 115, 85, 0.12);
 }
 
+/* ─── 书法标题 ─── */
+.calligraphy {
+  font-family: "Ma Shan Zheng", "ZCOOL XiaoWei", "Noto Serif SC", serif;
+}
+
 /* ─── 古典卷轴滚动条 ─── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #D4C5A9; border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: #B8A88C; }
+
+/* ─── 卷轴装饰条 ─── */
+.scroll-rod {
+  height: 3px;
+  background: linear-gradient(90deg, #8B7355, #C4B5A0, #8B7355);
+  border-radius: 2px;
+}
+
+/* ─── 朱红钤印 ─── */
+.seal {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 9px;
+  font-family: "Ma Shan Zheng", serif;
+  color: #C23B22;
+  border: 1.5px solid #C23B22;
+  border-radius: 2px;
+  line-height: 1.2;
+  transform: rotate(-2deg);
+  letter-spacing: 1px;
+}
+
+/* ─── 古籍双线框 ─── */
+.antique-border {
+  border: 1px solid #D4C5A9;
+  outline: 1px solid #EDE8E0;
+  outline-offset: 2px;
+}
+
+/* ─── 水墨标题背景 ─── */
+.ink-title {
+  background: linear-gradient(135deg, rgba(74,102,112,0.08) 0%, rgba(245,240,234,0) 100%);
+  border-left: 3px solid #4A6670;
+  padding: 4px 10px;
+}
+
+/* ─── 淡入动画 ─── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.4s ease-out; }
+
+/* ─── 水墨涟漪 loading ─── */
+@keyframes inkRipple {
+  0% { transform: scale(0.8); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.6; }
+  100% { transform: scale(0.8); opacity: 0.3; }
+}
+.ink-loading {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4A6670;
+  animation: inkRipple 1.2s ease-in-out infinite;
+}
 
 /* ─── Leaflet 样式覆盖 ─── */
 .leaflet-popup-content {

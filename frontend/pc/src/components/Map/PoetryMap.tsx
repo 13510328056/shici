@@ -14,7 +14,7 @@ L.Marker.prototype.options.icon = L.icon({ iconUrl: icon, shadowUrl: iconShadow,
 import type { PlaceName, TrajectoryEvent, HeatmapPoint } from '../../types'
 import { EVENT_COLORS } from '../../types'
 
-export const POET_COLORS = ['#2196F3', '#F44336', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4', '#FF5722', '#795548', '#607D8B', '#E91E63']
+export const POET_COLORS = ['#4A6670', '#C23B22', '#5B8C5A', '#B8860B', '#7A5C61', '#6B8E9E', '#8B5E3C', '#9E7B6B', '#5D7A6E', '#8B6F5E']
 
 // 国内网络环境可用的瓦片地图源
 // OSM/CartoDB/OpenTopoMap 在部分网络受限环境下不可用，已替换为高德地图
