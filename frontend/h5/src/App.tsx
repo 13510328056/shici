@@ -8,6 +8,7 @@ import PoetDetail from './pages/PoetDetail'
 import PoetWorks from './pages/PoetWorks'
 import Favorites from './pages/Favorites'
 import Profile from './pages/Profile'
+import Feihualing from './pages/Feihualing'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/poet/:id/works" element={<PoetWorks />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/feihualing" element={<Feihualing />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
