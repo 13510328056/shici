@@ -7,6 +7,7 @@ import Seal from '../components/Seal'
 export default function Home() {
   const [poem, setPoem] = useState<DailyPoem | null>(null)
   const [recommend, setRecommend] = useState<Poem[]>([])
+  const [favd, setFavd] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -14,6 +15,14 @@ export default function Home() {
     // 加载往期推荐（随机3首）
     Promise.all([getRandomPoem(), getRandomPoem(), getRandomPoem()]).then(setRecommend).catch(() => {})
   }, [])
+  useEffect(() => {
+    if (poem?.poetry_id) {
+      try {
+        const fav = JSON.parse(localStorage.getItem('h5_favorites') || '[]')
+        setFavd(!!fav.find((f:any) => f.id === poem.poetry_id))
+      } catch(e) {}
+    }
+  }, [poem?.poetry_id])
 
   return (
     <div className="px-5 pt-5 pb-4">
@@ -84,13 +93,22 @@ export default function Home() {
 
             {/* 操作图标 */}
             <div className="mt-4 flex gap-8 text-gray-400">
-              <button className="hover:text-[#C23B22] transition-colors" onClick={() => { try { const fav = JSON.parse(localStorage.getItem("h5_favorites") || "[]"); if (!fav.find((f:any) => f.id === poem.poetry_id)) { fav.unshift({id: poem.poetry_id, title: poem.title, author: poem.author, type: "poem", time: Date.now()}); localStorage.setItem("h5_favorites", JSON.stringify(fav)); } } catch(e) {} }} title="收藏">
-                <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+              <button className={`hover:text-[#C23B22] transition-colors ${favd ? 'text-[#C23B22]' : ''}`}
+                onClick={() => {
+                  try {
+                    const fav = JSON.parse(localStorage.getItem('h5_favorites') || '[]');
+                    const idx = fav.findIndex((f:any) => f.id === poem.poetry_id);
+                    if (idx >= 0) { fav.splice(idx, 1); setFavd(false); }
+                    else { fav.unshift({id: poem.poetry_id, title: poem.title, author: poem.author, type: 'poem', time: Date.now()}); setFavd(true); }
+                    localStorage.setItem('h5_favorites', JSON.stringify(fav));
+                  } catch(e) {}
+                }} title="收藏">
+                <svg className="w-[18px] h-[18px]" fill={favd ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                 </svg>
               </button>
               <button className="hover:text-[#5B8C5A] transition-colors"
-                onClick={() => { if (navigator.share) navigator.share({title: poem.title, text: poem.content.slice(0,80)}).catch(()=>{}) }}
+                onClick={() => { const t = poem.title + ' - ' + poem.author + '\\n' + poem.content.slice(0,60) + '…'; navigator.clipboard.writeText(t).then(() => alert('已复制诗词内容')).catch(() => {}) }}
                 title="分享">
                 <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
