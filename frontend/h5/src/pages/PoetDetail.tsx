@@ -167,7 +167,7 @@ export default function PoetDetail() {
               <h3 className="text-[11px] font-bold text-[#5B4A3E] tracking-wider">地域足迹</h3>
               <div className="flex-1 h-[1px] bg-gradient-to-r from-gray-200 to-transparent" />
             </div>
-            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+            <div className="flex flex-wrap gap-2 pb-1">
               {cities.map((city, i) => {
                 // 找到该城市的出现位置，用于计算距离
                 const firstEvent = sortedTraj.find(e => e.ancient_place === city)
@@ -178,7 +178,7 @@ export default function PoetDetail() {
                   if (d > 0) dist = `${d}km`
                 }
                 return (
-                  <div key={i} className="min-w-[95px] bg-white/50 border border-[#e5ddd0] p-2.5 flex flex-col items-center">
+                  <div key={i} className="min-w-[80px] bg-white/50 border border-[#e5ddd0] p-2 flex flex-col items-center">
                     <svg className="w-5 h-5 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" />
                     </svg>

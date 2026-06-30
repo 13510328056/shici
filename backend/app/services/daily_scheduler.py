@@ -136,7 +136,7 @@ async def get_daily_poem_for_date(db: AsyncSession, target_date: date) -> Option
     # ── 1. 检查是否已有记录 ──
     existing = await _get_existing_log(db, date_str)
     if existing:
-        return await _build_response(db, existing.poetry_id, date_str, existing.reason, existing.priority)
+        return await _build_response(db, str(existing.poetry_id), date_str, existing.reason, existing.priority)
 
     # ── 2. 获取90天冷却期排除列表 ──
     exclude_ids = await _get_recent_poem_ids(db, target_date, 90)
@@ -290,9 +290,10 @@ async def _pick_by_difficulty_balance(db: AsyncSession, exclude_ids: set) -> Opt
     # 统计最近推送的难度分布
     diff_counts = {"L1": 0, "L2": 0, "L3": 0}
     for log in recent:
-        if log.poetry_id:
+        pid = str(log.poetry_id) if log.poetry_id else None
+        if pid:
             r = await db.execute(
-                select(PoetryFeature.difficulty).where(PoetryFeature.poetry_id == log.poetry_id)
+                select(PoetryFeature.difficulty).where(PoetryFeature.poetry_id == pid)
             )
             d = r.scalar()
             if d in diff_counts:
@@ -328,16 +329,19 @@ async def _pick_by_diversity(db: AsyncSession, exclude_ids: set) -> Optional[str
     recent_genres = set()
     recent_moods = set()
     for log in recent:
+        pid = str(log.poetry_id) if log.poetry_id else ""
+        if not pid:
+            continue
         r = await db.execute(
             text("SELECT genre FROM poetry WHERE poetry_id = :pid"),
-            {"pid": log.poetry_id}
+            {"pid": pid}
         )
         g = r.scalar()
         if g:
             recent_genres.add(g)
         r2 = await db.execute(
             text("SELECT mood_tags FROM poetry_features WHERE poetry_id = :pid"),
-            {"pid": log.poetry_id}
+            {"pid": pid}
         )
         mt = r2.scalar()
         if mt:
@@ -391,7 +395,7 @@ async def _pick_fallback(db: AsyncSession, exclude_ids: set) -> Optional[str]:
 
 
 async def _log_selection(db: AsyncSession, date_str: str, poetry_id: str, reason: str, priority: int):
-    log = DailyPoemLog(date=date_str, poetry_id=poetry_id, reason=reason, priority=priority)
+    log = DailyPoemLog(date=date_str, poetry_id=str(poetry_id), reason=reason, priority=priority)
     db.add(log)
 
 
