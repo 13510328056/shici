@@ -25,13 +25,31 @@ export default function PoetDetail() {
   const [poems, setPoems] = useState<Poem[]>([])
   const [trajectory, setTrajectory] = useState<TrajectoryEvent[]>([])
 
-  // 直接通过诗人 ID 获取诗人信息
+  // 通过诗人作品反向获取诗人信息（可靠获取所有字段）
   useEffect(() => {
     if (!id) return
-    fetch(`/api/v1/poets?limit=500`).then(r => r.json()).then(d => {
-      const p = (d.poets || []).find((p: any) => p.poet_id === id)
-      if (p) setPoet({ poet_id: p.poet_id, name: p.name, dynasty: p.dynasty, tags: p.tags || [] })
-    }).catch(() => {})
+    getPoetPoems(id).then(poems => {
+      if (poems.length > 0) {
+        const author = poems[0].author
+        // Use the name search endpoint to get poet info
+        fetch(`/api/v1/poets?name=${encodeURIComponent(author)}`).then(r => r.json()).then(d => {
+          const p = d.poets?.[0]
+          if (p) setPoet({ poet_id: p.poet_id, name: p.name, dynasty: p.dynasty, tags: p.tags || [] })
+        }).catch(() => {})
+      } else {
+        // Fallback: search by ID across the full list
+        setPoet({ poet_id: id, name: '加载中', dynasty: '', tags: [] })
+        fetch('/api/v1/poets?limit=500').then(r => r.json()).then(d => {
+          const p = (d.poets || []).find((p: any) => p.poet_id === id)
+          if (p) setPoet({ poet_id: p.poet_id, name: p.name, dynasty: p.dynasty, tags: p.tags || [] })
+        }).catch(() => {})
+      }
+    }).catch(() => {
+      fetch('/api/v1/poets?limit=500').then(r => r.json()).then(d => {
+        const p = (d.poets || []).find((p: any) => p.poet_id === id)
+        if (p) setPoet({ poet_id: p.poet_id, name: p.name, dynasty: p.dynasty, tags: p.tags || [] })
+      }).catch(() => {})
+    })
   }, [id])
 
   useEffect(() => {

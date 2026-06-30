@@ -42,3 +42,13 @@ export async function getRelatedPoems(poetryId: string) {
   const r = await api.get('/play/related', { params: { poetry_id: poetryId } })
   return r.data
 }
+
+export async function getGenreData(genreType: string): Promise<import('../types').GenreMeta> {
+  const r = await api.get(`/play/genre/${encodeURIComponent(genreType)}`)
+  return r.data
+}
+
+export async function searchPoetry(params: Record<string, any>) {
+  const r = await api.get('/search/poetry', { params })
+  return r.data
+}

@@ -343,3 +343,162 @@ async def feihualing(
             "matching_line": matching_lines[0] if matching_lines else "",
         },
     }
+
+
+# ─── 诗词分类元数据 ──────────────────────────────
+GENRE_META = {
+    "五言": {
+        "name": "五言诗",
+        "subtitle": "五绝 · 五律",
+        "description": "五言诗是中国古典诗歌的主要体裁之一，每句五字。起源于汉代民歌，成熟于魏晋，盛于唐代。五言诗较四言诗容量更大，节奏更富变化，成为后世最常用的诗歌形式之一。",
+        "background": "五言诗的雏形可追溯至《诗经》中的部分篇章。汉代乐府民歌大量使用五言，至东汉末年《古诗十九首》标志着五言诗的成熟。魏晋时期，曹植、陶渊明等大家将五言诗推向新高度。唐代是五言诗的巅峰时代，王维、孟浩然、李白、杜甫等巨匠留下了无数千古名篇。",
+        "characteristics": [
+            "简洁凝练，言简意赅——五言诗以极简的篇幅承载深厚的情感和思想",
+            "节奏优美，抑扬顿挫——二三结构形成独特的韵律美感",
+            "意境深远，余韵悠长——以有限之景写无限之情",
+            "题材广泛，包罗万象——从山水田园到边塞征战，从送别怀人到咏史抒怀",
+        ],
+        "sub_genres": ["五言绝句", "五言律诗"],
+        "famous_lines": [
+            {"line": "床前明月光，疑是地上霜。举头望明月，低头思故乡。", "source": "静夜思", "author": "李白"},
+            {"line": "春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少。", "source": "春晓", "author": "孟浩然"},
+            {"line": "空山新雨后，天气晚来秋。明月松间照，清泉石上流。", "source": "山居秋暝", "author": "王维"},
+            {"line": "国破山河在，城春草木深。感时花溅泪，恨别鸟惊心。", "source": "春望", "author": "杜甫"},
+            {"line": "红豆生南国，春来发几枝。愿君多采撷，此物最相思。", "source": "相思", "author": "王维"},
+        ],
+    },
+    "七言": {
+        "name": "七言诗",
+        "subtitle": "七绝 · 七律",
+        "description": "七言诗每句七字，是中国古典诗歌气势最恢宏的体裁。起源于汉代，成熟于唐代。七言诗音节更为丰富，篇幅更为舒展，尤其适合抒发磅礴气势和深沉感慨。",
+        "background": '七言诗的起源可追溯到汉代柏梁体，魏晋时期曹丕《燕歌行》是现存最早的完整七言诗。至唐代，七言绝句和七言律诗高度成熟，李白、王昌龄、杜甫、杜牧、李商隐等诗人创作了大量传世名篇。七言律诗格律严谨、对仗工整，被誉为中国古典诗歌的「黄金体裁」。',
+        "characteristics": [
+            "气势磅礴，雄浑壮阔——七言诗更擅长表现宏大场面和豪迈情怀",
+            "音韵丰富，节奏多变——四三结构使节奏更富表现力",
+            "对仗工整，格律严谨——七律尤其讲究「二四六分明」的平仄规则",
+            "抒情叙事兼善——既可婉约细腻，亦可慷慨激昂",
+        ],
+        "sub_genres": ["七言绝句", "七言律诗"],
+        "famous_lines": [
+            {"line": "朝辞白帝彩云间，千里江陵一日还。两岸猿声啼不住，轻舟已过万重山。", "source": "早发白帝城", "author": "李白"},
+            {"line": "秦时明月汉时关，万里长征人未还。但使龙城飞将在，不教胡马度阴山。", "source": "出塞", "author": "王昌龄"},
+            {"line": "无边落木萧萧下，不尽长江滚滚来。万里悲秋常作客，百年多病独登台。", "source": "登高", "author": "杜甫"},
+            {"line": "渭城朝雨浥轻尘，客舍青青柳色新。劝君更尽一杯酒，西出阳关无故人。", "source": "送元二使安西", "author": "王维"},
+            {"line": "清明时节雨纷纷，路上行人欲断魂。借问酒家何处有，牧童遥指杏花村。", "source": "清明", "author": "杜牧"},
+        ],
+    },
+    "词": {
+        "name": "词",
+        "subtitle": "婉约 · 豪放",
+        "description": "词，又称诗余、长短句，是中国古典诗歌的重要形式。起源于隋唐，兴盛于两宋。词配合音乐歌唱，句式长短错落，格律灵活多变，特别擅长抒发细腻情感和描绘婉约意境。",
+        "background": "词起源于隋唐燕乐，最初为配合乐曲而作的歌词。晚唐五代时期，温庭筠、韦庄等花间词人确立了词的文学地位。两宋是词的黄金时代，婉约派以柳永、李清照、晏殊为代表，词风细腻含蓄；豪放派以苏轼、辛弃疾为代表，词风雄浑奔放。词分为小令（58字以内）、中调（59-90字）和长调（91字以上），各有不同的格律要求。",
+        "characteristics": [
+            "句式长短错落——突破齐言诗的束缚，更贴近语言的自然节奏",
+            "格律依谱填词——每个词牌都有固定的平仄和韵脚要求",
+            "意境婉约含蓄——尤擅表现细腻情感和微妙心境",
+            "题材丰富多样——从儿女情长到家国天下，从山水田园到咏史怀古",
+        ],
+        "sub_genres": ["小令", "中调", "长调"],
+        "famous_lines": [
+            {"line": "大江东去，浪淘尽，千古风流人物。", "source": "念奴娇·赤壁怀古", "author": "苏轼"},
+            {"line": "寻寻觅觅，冷冷清清，凄凄惨惨戚戚。", "source": "声声慢", "author": "李清照"},
+            {"line": "但愿人长久，千里共婵娟。", "source": "水调歌头", "author": "苏轼"},
+            {"line": "问君能有几多愁？恰似一江春水向东流。", "source": "虞美人", "author": "李煜"},
+            {"line": "衣带渐宽终不悔，为伊消得人憔悴。", "source": "蝶恋花", "author": "柳永"},
+        ],
+    },
+}
+
+GENRE_MAP = {
+    "五言": ["五绝", "五律"],
+    "七言": ["七绝", "七律"],
+    "词": ["词"],
+}
+
+
+@router.get("/genre/{genre_type}")
+async def get_genre_data(genre_type: str, db: AsyncSession = Depends(get_db)):
+    """诗词分类数据 — 返回体裁概述、代表作品、代表诗人"""
+    if genre_type not in GENRE_META:
+        return {"error": f"不支持的体裁：{genre_type}"}
+
+    meta = GENRE_META[genre_type]
+    genre_list = GENRE_MAP[genre_type]
+
+    # 构建 IN 条件
+    placeholders = ",".join(f"'{g}'" for g in genre_list)
+
+    # 查询诗词
+    poems_sql = f"""
+        SELECT p.poetry_id, p.title, p.content, p.dynasty, p.genre,
+               po.name as author,
+               pf.mood_tags, pf.imagery_items
+        FROM poetry p
+        JOIN poetry_features pf ON pf.poetry_id = p.poetry_id
+        JOIN poets po ON po.poet_id = p.author_id
+        WHERE p.genre IN ({placeholders})
+        ORDER BY RANDOM() LIMIT 50
+    """
+    rows = (await db.execute(text(poems_sql))).mappings().all()
+
+    import json
+    poems = []
+    poet_counts: dict[str, dict] = {}
+
+    for row in rows:
+        mood_tags = json.loads(row["mood_tags"]) if isinstance(row["mood_tags"], str) else (row["mood_tags"] or [])
+        imagery_items = json.loads(row["imagery_items"]) if isinstance(row["imagery_items"], str) else (row["imagery_items"] or [])
+
+        poems.append({
+            "poetry_id": str(row["poetry_id"]),
+            "title": row["title"],
+            "content": row["content"],
+            "author": row["author"],
+            "dynasty": row["dynasty"],
+            "genre": row["genre"] or "",
+            "mood_tags": mood_tags,
+            "imagery_items": imagery_items,
+        })
+
+        # 统计诗人
+        author_name = row["author"]
+        if author_name not in poet_counts:
+            poet_counts[author_name] = {"name": author_name, "dynasty": row["dynasty"], "count": 0, "poet_id": ""}
+        poet_counts[author_name]["count"] += 1
+
+    # 统计子体裁数量
+    sub_counts_sql = f"""
+        SELECT p.genre, COUNT(*) as cnt
+        FROM poetry p
+        WHERE p.genre IN ({placeholders})
+        GROUP BY p.genre
+    """
+    sub_rows = (await db.execute(text(sub_counts_sql))).mappings().all()
+    sub_genres = [{"name": r["genre"], "count": r["cnt"]} for r in sub_rows]
+
+    # 获取代表诗人的 poet_id
+    top_poets = sorted(poet_counts.values(), key=lambda x: x["count"], reverse=True)[:8]
+    if top_poets:
+        for poet in top_poets:
+            poet_row = (await db.execute(
+                text("SELECT poet_id FROM poets WHERE name = :n LIMIT 1"), {"n": poet["name"]}
+            )).mappings().first()
+            if poet_row:
+                poet["poet_id"] = str(poet_row["poet_id"])
+
+    return {
+        "genre_type": genre_type,
+        "name": meta["name"],
+        "subtitle": meta["subtitle"],
+        "description": meta["description"],
+        "background": meta["background"],
+        "characteristics": meta["characteristics"],
+        "sub_genres": sub_genres,
+        "famous_lines": meta["famous_lines"],
+        "stats": {
+            "total_poems": len(poems),
+            "total_poets": len(poet_counts),
+        },
+        "poems": poems,
+        "representative_poets": top_poets,
+    }

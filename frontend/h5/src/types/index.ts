@@ -25,6 +25,20 @@ export interface DailyPoem extends Poem {
   date: string
 }
 
+export interface GenreMeta {
+  genre_type: string
+  name: string
+  subtitle: string
+  description: string
+  background: string
+  characteristics: string[]
+  sub_genres: { name: string; count: number }[]
+  famous_lines: { line: string; source: string; author: string }[]
+  stats: { total_poems: number; total_poets: number }
+  poems: Poem[]
+  representative_poets: { name: string; poet_id: string; poem_count: number; dynasty: string }[]
+}
+
 export interface PoetStats {
   poet_id: string
   total_cities: number
