@@ -3,7 +3,7 @@
 需求依据：3.2.3 诗词多维特征标注数据库（六维度标注）
 """
 
-from sqlalchemy import Column, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, String, Text, DateTime, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -59,4 +59,21 @@ class PoetryFeature(Base):
     allusion_sources = ArrayColumn(comment="典故出处")
     allusion_targets = ArrayColumn(comment="典故指代对象")
 
+    # 难度分级（SRS 3.1 优先级4：难度均衡调控）
+    difficulty = Column(String(10), comment="难度：L1入门/L2进阶/L3深度")
+
     poem = relationship("Poetry", back_populates="features")
+
+
+class DailyPoemLog(Base):
+    """每日诗词推送记录 — SRS 3.1 智能推荐日志"""
+    __tablename__ = "daily_poem_log"
+
+    id = UUIDColumn()
+    date = Column(String(20), nullable=False, unique=True, comment="日期 YYYY-MM-DD")
+    poetry_id = FKColumn(ForeignKey("poetry.poetry_id"), nullable=False)
+    reason = Column(String(50), comment="推荐理由：节日/节气/季节/专题/均衡")
+    priority = Column(Integer, comment="命中优先级 1-5")
+    created_at = Column(DateTime, default=utcnow)
+
+    poem = relationship("Poetry")

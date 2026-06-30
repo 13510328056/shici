@@ -56,37 +56,11 @@ CRITIQUES = {
 
 @router.get("/daily")
 async def get_daily_poem(db: AsyncSession = Depends(get_db)):
-    """每日一诗 — 按日期种子随机"""
-    seed = date.today().toordinal()
-    random.seed(seed)
-
-    # 随机获取一首有特征标注的诗
-    stmt = text("""
-        SELECT p.poetry_id, p.title, p.content, p.dynasty, p.genre,
-               po.name as author,
-               pf.mood_tags, pf.imagery_items, pf.season
-        FROM poetry p
-        JOIN poetry_features pf ON pf.poetry_id = p.poetry_id
-        JOIN poets po ON po.poet_id = p.author_id
-        ORDER BY RANDOM() LIMIT 1
-    """)
-    row = (await db.execute(stmt)).mappings().first()
-    if not row:
+    """每日一诗 — SRS 3.1 分层优先级全自动推荐"""
+    from app.services.daily_scheduler import get_daily_poem_for_date
+    result = await get_daily_poem_for_date(db, date.today())
+    if not result:
         return {"error": "no poetry found"}
-
-    import json
-    result = {
-        "poetry_id": str(row["poetry_id"]),
-        "title": row["title"],
-        "content": row["content"],
-        "author": row["author"],
-        "dynasty": row["dynasty"],
-        "genre": row["genre"] or "",
-        "mood_tags": json.loads(row["mood_tags"]) if isinstance(row["mood_tags"], str) else (row["mood_tags"] or []),
-        "imagery_items": json.loads(row["imagery_items"]) if isinstance(row["imagery_items"], str) else (row["imagery_items"] or []),
-        "season": json.loads(row["season"]) if isinstance(row["season"], str) else (row["season"] or []),
-        "date": date.today().isoformat(),
-    }
     return result
 
 
@@ -219,7 +193,7 @@ async def get_random_poem(db: AsyncSession = Depends(get_db)):
     stmt = text("""
         SELECT p.poetry_id, p.title, p.content, p.dynasty, p.genre,
                po.name as author,
-               pf.mood_tags, pf.imagery_items
+               pf.mood_tags, pf.imagery_items, pf.season, pf.difficulty
         FROM poetry p
         JOIN poetry_features pf ON pf.poetry_id = p.poetry_id
         JOIN poets po ON po.poet_id = p.author_id
@@ -239,6 +213,9 @@ async def get_random_poem(db: AsyncSession = Depends(get_db)):
         "genre": row["genre"] or "",
         "mood_tags": json.loads(row["mood_tags"]) if isinstance(row["mood_tags"], str) else (row["mood_tags"] or []),
         "imagery_items": json.loads(row["imagery_items"]) if isinstance(row["imagery_items"], str) else (row["imagery_items"] or []),
+        "season": json.loads(row["season"]) if isinstance(row["season"], str) else (row["season"] or []),
+        "difficulty": row["difficulty"] or "",
+        "date": date.today().isoformat(),
     }
 
 

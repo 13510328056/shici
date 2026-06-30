@@ -18,11 +18,15 @@ export interface Poem {
   mood_tags?: string[]
   imagery_items?: string[]
   season?: string[]
+  difficulty?: string
   rating?: number
 }
 
 export interface DailyPoem extends Poem {
   date: string
+  reason?: string
+  priority?: number
+  difficulty?: string
 }
 
 export interface GenreMeta {

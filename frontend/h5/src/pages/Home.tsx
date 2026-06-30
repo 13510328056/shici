@@ -41,6 +41,16 @@ export default function Home() {
             <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#8B7355] via-[#C4B5A0] to-[#8B7355]" />
 
             <Seal text="今日荐" />
+
+            {/* 意境标签 */}
+            {(poem.mood_tags || []).length > 0 && (
+              <div className="flex gap-2 mt-2">
+                {(poem.mood_tags || []).slice(0, 3).map((t: string) => (
+                  <span key={t} className="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">{t}</span>
+                ))}
+              </div>
+            )}
+
             <h2 className="text-xl font-bold mt-3 mb-0.5 text-[#5B4A3E]"
               style={{ fontFamily: '"Noto Serif SC",serif' }}>
               {poem.title}

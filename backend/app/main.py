@@ -124,6 +124,26 @@ async def lifespan(app: FastAPI):
 
                 await session.commit()
                 logger.info("✅ 种子数据导入完成！")
+
+            # 自动迁移 + 难度填充
+            try:
+                from sqlalchemy import text as sa_text
+                pragma = await session.execute(sa_text("PRAGMA table_info(poetry_features)"))
+                cols = {row[1] for row in pragma.fetchall()}
+                if "difficulty" not in cols:
+                    await session.execute(sa_text("ALTER TABLE poetry_features ADD COLUMN difficulty VARCHAR(10)"))
+                    await session.commit()
+                    logger.info("✅ 添加 difficulty 列成功")
+            except Exception as e:
+                await session.rollback()
+                logger.info("difficulty 列迁移: %s", e)
+
+            # 填充诗词难度分级
+            from app.services.daily_scheduler import seed_difficulty
+            await seed_difficulty(session)
+            await session.commit()
+            await session.close()
+            logger.info("✅ 诗词难度分级填充完成，种子会话已关闭")
     except Exception as e:
         logger.warning("自动种子数据导入失败（首次启动可忽略）: %s", e)
 

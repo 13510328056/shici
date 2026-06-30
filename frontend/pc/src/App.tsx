@@ -59,7 +59,8 @@ export default function App() {
   const [fenceMode, setFenceMode] = useState(false)
   const [viewingPoet, setViewingPoet] = useState<string|null>(null) // 正在查看作品的诗人ID
   const [showPoemReading, setShowPoemReading] = useState(false)
-  const [readingPoem, setReadingPoem] = useState<{title:string;content:string;genre?:string;mood_tags?:string[]} | null>(null)
+  const [readingPoem, setReadingPoem] = useState<{title:string;content:string;genre?:string;mood_tags?:string[];dynasty?:string} | null>(null)
+  const [dailyPoem, setDailyPoem] = useState<{title:string;content:string;author:string;dynasty:string;genre?:string;mood_tags?:string[];reason?:string;difficulty?:string;poetry_id:string} | null>(null)
   const [fenceResults, setFenceResults] = useState<{lat:number;lon:number;places:PlaceName[]}|undefined>(undefined)
 
   // 交游线段（暂存多诗人间的交游连线）
@@ -67,6 +68,13 @@ export default function App() {
 
   useEffect(() => {
     fetch('/api/v1/poets').then(r=>r.json()).then(d=>setPoets(d.poets||[])).catch(()=>console.warn('[API] 获取诗人列表失败'))
+  }, [])
+
+  // 获取每日诗词
+  useEffect(() => {
+    fetch('/api/v1/play/daily').then(r=>r.json()).then(d=>{
+      if(d?.title) setDailyPoem(d)
+    }).catch(()=>console.warn('[API] 获取每日诗词失败'))
   }, [])
 
   // 选/取消选诗人
@@ -309,13 +317,43 @@ export default function App() {
         )}
 
         {/* 每日一诗 */}
-        
-        {/* 随机一诗 + 同主题推荐 */}
+        {dailyPoem && (
+          <div style={{...S.panel, cursor:'pointer', borderLeft:`3px solid ${T.accent}`}}
+            onClick={() => {
+              setReadingPoem({title:dailyPoem.title,content:dailyPoem.content,genre:dailyPoem.genre,mood_tags:dailyPoem.mood_tags,dynasty:dailyPoem.dynasty})
+              setShowPoemReading(true)
+            }}>
+            <div style={{fontSize:10, fontWeight:'bold', letterSpacing:2, color:T.accent, marginBottom:6}}>
+              📜 每日一诗 · {dailyPoem.date || ''}
+            </div>
+            <div style={{fontSize:13, fontWeight:'bold', marginBottom:2}}>{dailyPoem.title}</div>
+            <div style={{fontSize:10, color:T.textMuted, marginBottom:4}}>{dailyPoem.author} · {dailyPoem.dynasty}</div>
+            <div style={{fontSize:10, color:'#666', lineHeight:1.6, marginBottom:4}}>
+              {dailyPoem.content.slice(0, 60)}…
+            </div>
+            <div style={{display:'flex', gap:4, flexWrap:'wrap'}}>
+              {dailyPoem.reason && (
+                <span style={{fontSize:9, padding:'1px 6px', borderRadius:2, background:'#4A667015', color:'#4A6670'}}>
+                  {dailyPoem.reason}
+                </span>
+              )}
+              {dailyPoem.difficulty && (
+                <span style={{fontSize:9, padding:'1px 6px', borderRadius:2,
+                  background: dailyPoem.difficulty === 'L1' ? '#dcfce7' : dailyPoem.difficulty === 'L2' ? '#fef3c7' : '#fee2e2',
+                  color: dailyPoem.difficulty === 'L1' ? '#166534' : dailyPoem.difficulty === 'L2' ? '#92400e' : '#991b1b'}}>
+                  {dailyPoem.difficulty === 'L1' ? '入门' : dailyPoem.difficulty === 'L2' ? '进阶' : '深度'}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 随机一诗 */}
         <div style={S.panel}>
           <button style={{...ST.animBtn, width:'100%', fontSize:11, letterSpacing:1}}
             onClick={async()=>{
               try{const r=await fetch('/api/v1/play/random');const d=await r.json();
-              if(d?.title){setReadingPoem({title:d.title,content:d.content,genre:d.genre,mood_tags:d.mood_tags});setShowPoemReading(true)}}catch{}
+              if(d?.title){setReadingPoem({title:d.title,content:d.content,genre:d.genre,mood_tags:d.mood_tags,dynasty:d.dynasty});setShowPoemReading(true)}}catch{}
             }}>
             🎲 随机一诗
           </button>

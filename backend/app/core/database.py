@@ -41,6 +41,7 @@ if settings.DATABASE_URL.startswith("sqlite"):
         cursor.execute("PRAGMA journal_mode=WAL")
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.execute("PRAGMA cache_size=-8000")  # 8MB cache
+        cursor.execute("PRAGMA busy_timeout=5000")  # 5秒超时避免 locked 错误
         cursor.close()
 
 async_session_factory = async_sessionmaker(
