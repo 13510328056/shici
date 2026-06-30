@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getDailyPoem } from '../api'
-import type { DailyPoem } from '../types'
+import { getDailyPoem, getRandomPoem } from '../api'
+import type { DailyPoem, Poem } from '../types'
 import Seal from '../components/Seal'
 
 export default function Home() {
   const [poem, setPoem] = useState<DailyPoem | null>(null)
+  const [recommend, setRecommend] = useState<Poem[]>([])
   const navigate = useNavigate()
 
-  useEffect(() => { getDailyPoem().then(setPoem).catch(() => {}) }, [])
+  useEffect(() => {
+    getDailyPoem().then(setPoem).catch(() => {})
+    // 加载往期推荐（随机3首）
+    Promise.all([getRandomPoem(), getRandomPoem(), getRandomPoem()]).then(setRecommend).catch(() => {})
+  }, [])
 
   return (
     <div className="px-5 pt-5 pb-4">
@@ -90,32 +95,30 @@ export default function Home() {
       )}
 
       {/* 往期推荐 */}
-      <div className="mb-4">
-        <div className="flex justify-between items-end mb-3">
-          <h3 className="text-xs font-bold text-[#5B4A3E] tracking-wider border-l-3 border-[#C23B22] pl-2"
-            style={{ borderLeftWidth: 3 }}>往期推荐</h3>
-          <span className="text-[10px] text-gray-400 cursor-pointer hover:text-[#C23B22] transition-colors"
-            onClick={() => navigate("/discover")}>更多 →</span>
-        </div>
-        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
-          {[
-            { title: '将进酒', author: '李白', dynasty: '唐', emoji: '🏔️' },
-            { title: '声声慢', author: '李清照', dynasty: '宋', emoji: '🌸' },
-            { title: '琵琶行', author: '白居易', dynasty: '唐', emoji: '📜' },
-          ].map((item, i) => (
-            <div key={i}
-              className="min-w-[130px] bg-white/50 border border-[#e5ddd0] p-3 cursor-pointer
-                         hover:border-[#C23B22] hover:shadow-sm transition-all duration-200"
-              onClick={() => navigate('/discover')}>
-              <div className="w-full h-[60px] bg-gradient-to-br from-gray-50 to-gray-100 mb-2 flex items-center justify-center text-xl opacity-70">
-                {item.emoji}
+      {recommend.length > 0 && (
+        <div className="mb-4">
+          <div className="flex justify-between items-end mb-3">
+            <h3 className="text-xs font-bold text-[#5B4A3E] tracking-wider pl-2"
+              style={{ borderLeft: '3px solid #C23B22' }}>随机推荐</h3>
+            <span className="text-[10px] text-gray-400 cursor-pointer hover:text-[#C23B22] transition-colors"
+              onClick={() => navigate("/discover")}>更多 →</span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+            {recommend.slice(0, 3).map((item, i) => (
+              <div key={i}
+                className="min-w-[130px] bg-white/50 border border-[#e5ddd0] p-3 cursor-pointer
+                           hover:border-[#C23B22] hover:shadow-sm transition-all duration-200"
+                onClick={() => navigate(`/detail/${item.poetry_id}`)}>
+                <div className="w-full h-[60px] bg-gradient-to-br from-gray-50 to-gray-100 mb-2 flex items-center justify-center text-xl opacity-70">
+                  {['🏔️', '🌸', '📜'][i]}
+                </div>
+                <p className="text-xs font-bold text-[#5B4A3E]">{item.title}</p>
+                <p className="text-[9px] text-gray-400 mt-0.5">{item.author} · {item.dynasty}</p>
               </div>
-              <p className="text-xs font-bold text-[#5B4A3E]">{item.title}</p>
-              <p className="text-[9px] text-gray-400 mt-0.5">{item.author} · {item.dynasty}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 底部装饰 — 水墨山 */}
       <div className="py-4 opacity-[0.08] text-center">

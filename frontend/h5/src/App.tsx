@@ -6,6 +6,8 @@ import SearchResults from './pages/SearchResults'
 import Detail from './pages/Detail'
 import PoetDetail from './pages/PoetDetail'
 import PoetWorks from './pages/PoetWorks'
+import Favorites from './pages/Favorites'
+import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -19,6 +21,8 @@ export default function App() {
           <Route path="/detail/:id" element={<Detail />} />
           <Route path="/poet/:id" element={<PoetDetail />} />
           <Route path="/poet/:id/works" element={<PoetWorks />} />
+          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
