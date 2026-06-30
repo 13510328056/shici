@@ -43,8 +43,8 @@ export async function getRelatedPoems(poetryId: string) {
   return r.data
 }
 
-export async function getGenreData(genreType: string): Promise<import('../types').GenreMeta> {
-  const r = await api.get(`/play/genre/${encodeURIComponent(genreType)}`)
+export async function searchByGenre(genre: string, pageSize = 20) {
+  const r = await api.get('/search/poetry', { params: { genre, page_size: pageSize } })
   return r.data
 }
 

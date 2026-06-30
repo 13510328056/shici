@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { searchAll, listPoets } from '../api'
+import { searchAll, listPoets, searchByGenre } from '../api'
 import type { Poet } from '../types'
 
 export default function SearchResults() {
@@ -32,6 +32,13 @@ export default function SearchResults() {
       setDynastyPoets([])
     }
   }, [dynasty])
+
+  // 体裁/意境筛选
+  useEffect(() => {
+    if (genre || mood) {
+      searchByGenre(genre || mood || '诗', 30).then(setResults).catch(() => {})
+    }
+  }, [genre, mood])
 
   return (
     <div className="flex flex-col h-full">
@@ -75,9 +82,33 @@ export default function SearchResults() {
           {dynasty && dynastyPoets.length === 0 && (
             <div className="text-center py-8 text-sm text-gray-400">暂无该朝代诗人数据</div>
           )}
-          {(genre || mood) && (
+          {(genre || mood) && results?.results?.length > 0 && (
+            <>
+              <p className="text-xs text-gray-400 mb-2">共 {results.total || results.results.length} 首</p>
+              {results.results.slice(0, 20).map((p: any, i: number) => (
+                <div key={i}
+                  className="bg-white p-4 border border-[#e5ddd0] cursor-pointer hover:border-[#C23B22] transition-colors"
+                  style={{ outline: '1px solid #ede8e0', outlineOffset: 1 }}
+                  onClick={() => navigate(`/detail/${p.poetry_id}`)}>
+                  <div className="flex justify-between items-start mb-1">
+                    <h4 className="font-bold text-sm text-[#5B4A3E]">{p.title}</h4>
+                    <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5">{p.genre}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-0.5">{p.author} · {p.dynasty}</p>
+                  {(p.mood_tags || []).length > 0 && (
+                    <div className="flex gap-1 mt-1">
+                      {(p.mood_tags || []).slice(0, 2).map((t: string) => (
+                        <span key={t} className="text-[10px] bg-gray-100 px-1.5 py-0.5 text-gray-500">{t}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
+          {(genre || mood) && (!results?.results || results.results.length === 0) && (
             <div className="text-center py-8 text-sm text-gray-400">
-              请在搜索框中输入关键词搜索相关{mood ? '意境' : '体裁'}诗词
+              暂无{genre || mood}相关诗词数据
             </div>
           )}
         </div>
