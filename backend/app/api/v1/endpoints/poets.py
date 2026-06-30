@@ -19,9 +19,10 @@ async def list_poets(
     limit: Optional[int] = Query(None, description="返回条数上限"),
     offset: Optional[int] = Query(0, ge=0, description="分页偏移"),
     dynasty: Optional[str] = Query(None, description="朝代过滤"),
+    name: Optional[str] = Query(None, description="诗人名称精确匹配"),
     db: AsyncSession = Depends(get_db),
 ):
-    """获取诗人列表（支持分页、朝代过滤）"""
+    """获取诗人列表（支持分页、朝代过滤、名称精确匹配）"""
     from app.models.poet import Poet
     import json
     from sqlalchemy import select, func
@@ -30,12 +31,16 @@ async def list_poets(
     count_q = select(func.count()).select_from(Poet)
     if dynasty:
         count_q = count_q.where(Poet.dynasty == dynasty)
+    if name:
+        count_q = count_q.where(Poet.name == name)
     total = (await db.execute(count_q)).scalar() or 0
 
     # 查询
     q = select(Poet).order_by(Poet.dynasty, Poet.name)
     if dynasty:
         q = q.where(Poet.dynasty == dynasty)
+    if name:
+        q = q.where(Poet.name == name)
     if limit:
         q = q.limit(limit).offset(offset)
 
