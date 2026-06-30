@@ -22,6 +22,11 @@ class SearchService:
 
     def __init__(self, db: AsyncSession):
         self.db = db
+        try:
+            b = db.get_bind()
+            self._sqlite = str(b.url).startswith("sqlite") if hasattr(b, 'url') else (b.dialect.name == "sqlite")
+        except Exception:
+            self._sqlite = True
 
     async def search(
         self,
@@ -90,11 +95,17 @@ class SearchService:
 
         # 季节（数组字段，靠 compat 层自动适配）
         if season:
-            conditions.append(PoetryFeature.season.any(season))
+            if self._sqlite:
+                conditions.append(PoetryFeature.season.like(f"%{season}%"))
+            else:
+                conditions.append(PoetryFeature.season.any(season))
 
         # 节日
         if festival:
-            conditions.append(PoetryFeature.festival.any(festival))
+            if self._sqlite:
+                conditions.append(PoetryFeature.festival.like(f"%{festival}%"))
+            else:
+                conditions.append(PoetryFeature.festival.any(festival))
 
         # 时间范围
         if year_start:
@@ -104,19 +115,31 @@ class SearchService:
 
         # 人物
         if character:
-            conditions.append(PoetryFeature.character_names.any(character))
+            if self._sqlite:
+                conditions.append(PoetryFeature.character_names.like(f"%{character}%"))
+            else:
+                conditions.append(PoetryFeature.character_names.any(character))
 
         # 意象
         if imagery:
-            conditions.append(PoetryFeature.imagery_items.any(imagery))
+            if self._sqlite:
+                conditions.append(PoetryFeature.imagery_items.like(f"%{imagery}%"))
+            else:
+                conditions.append(PoetryFeature.imagery_items.any(imagery))
 
         # 意境
         if mood_tag:
-            conditions.append(PoetryFeature.mood_tags.any(mood_tag))
+            if self._sqlite:
+                conditions.append(PoetryFeature.mood_tags.like(f'%{mood_tag}%'))
+            else:
+                conditions.append(PoetryFeature.mood_tags.any(mood_tag))
 
         # 用典
         if allusion:
-            conditions.append(PoetryFeature.allusion_names.any(allusion))
+            if self._sqlite:
+                conditions.append(PoetryFeature.allusion_names.like(f'%{allusion}%'))
+            else:
+                conditions.append(PoetryFeature.allusion_names.any(allusion))
 
         # 应用所有条件
         for cond in conditions:
