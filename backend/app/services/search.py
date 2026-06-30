@@ -8,7 +8,7 @@ PostgreSQL/SQLite 数组字段差异，消除重复的分支判断。
 
 from typing import Optional
 
-from sqlalchemy import select, func, or_
+from sqlalchemy import select, func, or_, cast, String as SAType
 from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -96,14 +96,14 @@ class SearchService:
         # 季节（数组字段，靠 compat 层自动适配）
         if season:
             if self._sqlite:
-                conditions.append(PoetryFeature.season.like(f"%{season}%"))
+                conditions.append(cast(PoetryFeature.season, SAType).like(f"%{season}%"))
             else:
                 conditions.append(PoetryFeature.season.any(season))
 
         # 节日
         if festival:
             if self._sqlite:
-                conditions.append(PoetryFeature.festival.like(f"%{festival}%"))
+                conditions.append(cast(PoetryFeature.festival, SAType).like(f"%{festival}%"))
             else:
                 conditions.append(PoetryFeature.festival.any(festival))
 
@@ -116,28 +116,28 @@ class SearchService:
         # 人物
         if character:
             if self._sqlite:
-                conditions.append(PoetryFeature.character_names.like(f"%{character}%"))
+                conditions.append(cast(PoetryFeature.character_names, SAType).like(f"%{character}%"))
             else:
                 conditions.append(PoetryFeature.character_names.any(character))
 
         # 意象
         if imagery:
             if self._sqlite:
-                conditions.append(PoetryFeature.imagery_items.like(f"%{imagery}%"))
+                conditions.append(cast(PoetryFeature.imagery_items, SAType).like(f"%{imagery}%"))
             else:
                 conditions.append(PoetryFeature.imagery_items.any(imagery))
 
         # 意境
         if mood_tag:
             if self._sqlite:
-                conditions.append(PoetryFeature.mood_tags.like(f'%{mood_tag}%'))
+                conditions.append(cast(PoetryFeature.mood_tags, SAType).like(f'%{mood_tag}%'))
             else:
                 conditions.append(PoetryFeature.mood_tags.any(mood_tag))
 
         # 用典
         if allusion:
             if self._sqlite:
-                conditions.append(PoetryFeature.allusion_names.like(f'%{allusion}%'))
+                conditions.append(cast(PoetryFeature.allusion_names, SAType).like(f'%{allusion}%'))
             else:
                 conditions.append(PoetryFeature.allusion_names.any(allusion))
 
