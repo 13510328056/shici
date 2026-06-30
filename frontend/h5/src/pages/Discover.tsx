@@ -130,15 +130,15 @@ export default function Discover() {
         <h3 className="text-[11px] font-bold text-[#5B4A3E] mb-3 tracking-wider">诗词分类</h3>
         <div className="flex gap-3 overflow-x-auto no-scrollbar">
           {[
-            { label: '五言诗', sub: '五绝 · 五律', path: '五言', color: 'from-[#4A6670]/20 to-transparent', border: 'border-[#4A6670]/30' },
-            { label: '七言诗', sub: '七绝 · 七律', path: '七言', color: 'from-[#C23B22]/10 to-transparent', border: 'border-[#C23B22]/20' },
+            { label: '五言诗', sub: '五绝 · 五律', path: '五绝', color: 'from-[#4A6670]/20 to-transparent', border: 'border-[#4A6670]/30' },
+            { label: '七言诗', sub: '七绝 · 七律', path: '七绝', color: 'from-[#C23B22]/10 to-transparent', border: 'border-[#C23B22]/20' },
             { label: '词 · 长短句', sub: '婉约 · 豪放', path: '词', color: 'from-[#B8860B]/10 to-transparent', border: 'border-[#B8860B]/20' },
           ].map((item, i) => (
             <div key={i}
               className={`flex-1 min-w-[100px] bg-gradient-to-br ${item.color} border ${item.border} p-3
                           cursor-pointer hover:border-[#C23B22] transition-colors`}
               style={{ outline: '1px solid #ede8e0', outlineOffset: 1 }}
-              onClick={() => navigate(`/genre/${item.path}`)}>
+              onClick={() => navigate(`/search?genre=${item.path}`)}>
               <p className="text-sm font-bold text-[#5B4A3E]">{item.label}</p>
               <p className="text-[9px] text-gray-400 mt-0.5">{item.sub}</p>
             </div>
