@@ -36,8 +36,9 @@ export default function PoetMap() {
     mapInit.current = true
 
     const map = L.map(mapRef.current).setView([34, 108], 5)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap', maxZoom: 18,
+    L.tileLayer('https://{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+      attribution: '&copy; 高德地图', maxZoom: 18,
+      subdomains: ['webrd01', 'webrd02', 'webrd03', 'webrd04'],
     }).addTo(map)
 
     // 延迟修正尺寸（确保容器已渲染）

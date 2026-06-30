@@ -412,7 +412,7 @@ async def _build_response(db: AsyncSession, poetry_id: str, date_str: str, reaso
         WHERE p.poetry_id = :pid
         LIMIT 1
     """)
-    row = (await db.execute(sql, {"pid": poetry_id})).mappings().first()
+    row = (await db.execute(sql, {"pid": str(poetry_id)})).mappings().first()
     if not row:
         return None
 

@@ -142,7 +142,7 @@ export default function PoetDetail() {
               <h3 className="text-[11px] font-bold text-[#5B4A3E] tracking-wider">生平履历</h3>
               <div className="flex-1 h-[1px] bg-gradient-to-r from-gray-200 to-transparent" />
             </div>
-            <div className="relative pl-6 border-l-2 border-gray-200 space-y-4">
+            <div className="relative pl-6 border-l-2 border-gray-200 space-y-4 overflow-y-auto max-h-[320px]">
               {sortedTraj.map((t, i) => (
                 <div key={i} className="relative">
                   <div className="absolute -left-[25px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm"
@@ -167,7 +167,9 @@ export default function PoetDetail() {
               <h3 className="text-[11px] font-bold text-[#5B4A3E] tracking-wider">地域足迹</h3>
               <div className="flex-1 h-[1px] bg-gradient-to-r from-gray-200 to-transparent" />
             </div>
-            <div className="flex flex-wrap gap-2 pb-1">
+            <div className="relative">
+              <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar"
+                style={{ maskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)' }}>
               {cities.map((city, i) => {
                 // 找到该城市的出现位置，用于计算距离
                 const firstEvent = sortedTraj.find(e => e.ancient_place === city)
@@ -187,6 +189,7 @@ export default function PoetDetail() {
                   </div>
                 )}
               )}
+            </div>
             </div>
             <div className="mt-3 text-center">
               <button onClick={() => navigate(`/poet/${id}/map`)}
