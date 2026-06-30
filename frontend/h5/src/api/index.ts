@@ -48,6 +48,11 @@ export async function searchByGenre(genre: string, pageSize = 20) {
   return r.data
 }
 
+export async function searchByMood(mood: string, pageSize = 20) {
+  const r = await api.get('/search/poetry', { params: { mood_tag: mood, page_size: pageSize } })
+  return r.data
+}
+
 export async function searchPoetry(params: Record<string, any>) {
   const r = await api.get('/search/poetry', { params })
   return r.data

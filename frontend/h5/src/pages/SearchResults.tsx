@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { searchAll, listPoets, searchByGenre } from '../api'
+import { searchAll, listPoets, searchByGenre, searchByMood } from '../api'
 import type { Poet } from '../types'
 
 export default function SearchResults() {
@@ -33,12 +33,19 @@ export default function SearchResults() {
     }
   }, [dynasty])
 
-  // 体裁/意境筛选
+  // 体裁筛选
   useEffect(() => {
-    if (genre || mood) {
-      searchByGenre(genre || mood || '诗', 30).then(setResults).catch(() => {})
+    if (genre) {
+      searchByGenre(genre, 30).then(setResults).catch(() => {})
     }
-  }, [genre, mood])
+  }, [genre])
+
+  // 意境筛选
+  useEffect(() => {
+    if (mood) {
+      searchByMood(mood, 30).then(setResults).catch(() => {})
+    }
+  }, [mood])
 
   return (
     <div className="flex flex-col h-full">
