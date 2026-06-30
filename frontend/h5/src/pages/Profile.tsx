@@ -61,7 +61,7 @@ export default function Profile() {
             { label: '我的收藏', icon: '❤️', desc: '收藏的诗词和诗人', onClick: () => navigate('/favorites') },
             { label: '打卡记录', icon: '📍', desc: '文旅景点打卡', onClick: () => navigate('/feihualing') },
             { label: '浏览历史', icon: '📖', desc: '最近看过的诗词', onClick: () => navigate('/favorites') },
-            { label: '诗词统计', icon: '📊', desc: '平台数据概览', onClick: () => navigate('/discover') },
+            { label: '诗词统计', icon: '📊', desc: '平台数据概览', onClick: () => {} },
           ].map((item, i) => (
             <div key={i}
               className="bg-white/50 border border-[#e5ddd0] p-3 flex items-center gap-3 cursor-pointer
