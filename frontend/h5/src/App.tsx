@@ -10,6 +10,7 @@ import Favorites from './pages/Favorites'
 import Profile from './pages/Profile'
 import Feihualing from './pages/Feihualing'
 import PoetMap from './pages/PoetMap'
+import Stats from './pages/Stats'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/feihualing" element={<Feihualing />} />
           <Route path="/poet/:id/map" element={<PoetMap />} />
+          <Route path="/stats" element={<Stats />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

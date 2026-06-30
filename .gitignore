@@ -43,3 +43,7 @@ config/local.yaml
 # Environment
 backend/.venv/
 backend/poetry_space_dev.db*
+
+# Database
+*.sqlite
+*.db
