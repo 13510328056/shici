@@ -6,12 +6,34 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.services.spatial import SpatialQueryService
 
 router = APIRouter()
+
+
+@router.get("/{poet_id}/detail")
+async def get_poet_detail(poet_id: str, db: AsyncSession = Depends(get_db)):
+    """获取诗人详细信息（按 ID）"""
+    from app.models.poet import Poet
+    result = await db.execute(select(Poet).where(Poet.poet_id == poet_id))
+    poet = result.scalar_one_or_none()
+    if not poet:
+        return {"error": "poet not found"}
+
+    import json
+    return {
+        "poet_id": str(poet.poet_id),
+        "name": poet.name,
+        "dynasty": poet.dynasty,
+        "birth_year": poet.birth_year or "",
+        "death_year": poet.death_year or "",
+        "tags": json.loads(poet.tags) if isinstance(poet.tags, str) else (poet.tags or []),
+        "description": poet.description or "",
+    }
 
 
 @router.get("")

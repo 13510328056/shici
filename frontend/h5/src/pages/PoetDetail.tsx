@@ -4,18 +4,11 @@ import { getPoetPoems } from '../api'
 import type { Poem } from '../types'
 
 interface PoetInfo {
-  poet_id: string
-  name: string
-  dynasty: string
-  tags: string[]
+  name: string; dynasty: string; tags: string[]; description: string
 }
-
 interface TrajectoryEvent {
-  event_year: string
-  ancient_place: string | null
-  wgs84_lat: number | null
-  wgs84_lon: number | null
-  event_type: string
+  event_year: string; ancient_place: string | null
+  wgs84_lat: number | null; wgs84_lon: number | null; event_type: string
 }
 
 export default function PoetDetail() {
@@ -25,39 +18,26 @@ export default function PoetDetail() {
   const [poems, setPoems] = useState<Poem[]>([])
   const [trajectory, setTrajectory] = useState<TrajectoryEvent[]>([])
 
-  // 通过诗人作品反向获取诗人信息（可靠获取所有字段）
   useEffect(() => {
     if (!id) return
-    getPoetPoems(id).then(poems => {
-      if (poems.length > 0) {
-        const author = poems[0].author
-        // Use the name search endpoint to get poet info
-        fetch(`/api/v1/poets?name=${encodeURIComponent(author)}`).then(r => r.json()).then(d => {
-          const p = d.poets?.[0]
-          if (p) setPoet({ poet_id: p.poet_id, name: p.name, dynasty: p.dynasty, tags: p.tags || [] })
-        }).catch(() => {})
+    // 并行获取诗人信息、作品、轨迹
+    Promise.all([
+      fetch(`/api/v1/poets/${id}/detail`).then(r => r.json()).catch(() => null),
+      getPoetPoems(id).catch(() => [] as Poem[]),
+      fetch(`/api/v1/poets/${id}/trajectory`).then(r => r.json()).then(d => d.events || []).catch(() => []),
+    ]).then(([poetData, poemsData, trajData]) => {
+      if (poetData && poetData.name) {
+        setPoet({ name: poetData.name, dynasty: poetData.dynasty, tags: poetData.tags || [], description: poetData.description || '' })
       } else {
-        // Fallback: search by ID across the full list
-        setPoet({ poet_id: id, name: '加载中', dynasty: '', tags: [] })
-        fetch('/api/v1/poets?limit=500').then(r => r.json()).then(d => {
+        // 如果 detail 端点失败，尝试从列表获取
+        fetch('/api/v1/poets?limit=200').then(r => r.json()).then(d => {
           const p = (d.poets || []).find((p: any) => p.poet_id === id)
-          if (p) setPoet({ poet_id: p.poet_id, name: p.name, dynasty: p.dynasty, tags: p.tags || [] })
+          if (p) setPoet({ name: p.name, dynasty: p.dynasty, tags: p.tags || [], description: '' })
         }).catch(() => {})
       }
-    }).catch(() => {
-      fetch('/api/v1/poets?limit=500').then(r => r.json()).then(d => {
-        const p = (d.poets || []).find((p: any) => p.poet_id === id)
-        if (p) setPoet({ poet_id: p.poet_id, name: p.name, dynasty: p.dynasty, tags: p.tags || [] })
-      }).catch(() => {})
+      setPoems(poemsData)
+      setTrajectory(trajData)
     })
-  }, [id])
-
-  useEffect(() => {
-    if (!id) return
-    getPoetPoems(id).then(setPoems).catch(() => {})
-    fetch(`/api/v1/poets/${id}/trajectory`).then(r => r.json()).then(d => {
-      setTrajectory(d.events || [])
-    }).catch(() => {})
   }, [id])
 
   const validTraj = trajectory.filter(t => t.event_year)
@@ -72,7 +52,6 @@ export default function PoetDetail() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* 山水顶栏 */}
       <div className="relative flex-none h-44 bg-gradient-to-b from-[#2c2c2c]/5 via-[#7a8b8b]/15 to-[#f5f0e8] overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 375 176">
@@ -87,7 +66,6 @@ export default function PoetDetail() {
         </button>
       </div>
 
-      {/* 头像信息 */}
       <div className="relative -mt-14 z-10 flex flex-col items-center px-6">
         <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-gradient-to-br from-amber-50 to-amber-100 mb-3 flex items-center justify-center text-2xl font-bold text-[#5B4A3E]">
           {poet.name[0]}
@@ -101,11 +79,12 @@ export default function PoetDetail() {
             ))}
           </div>
         )}
+        {poet.description && (
+          <p className="text-xs text-gray-500 mt-3 leading-relaxed text-center px-2">{poet.description.slice(0, 120)}</p>
+        )}
       </div>
 
-      {/* 内容 */}
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        {/* 三指标 */}
         <div className="grid grid-cols-3 gap-3 mb-5">
           {[
             { label: '存诗', value: poems.length, color: '#C23B22' },
@@ -120,7 +99,6 @@ export default function PoetDetail() {
           ))}
         </div>
 
-        {/* 时间线 */}
         {validTraj.length > 0 && (
           <div className="mb-5">
             <div className="flex items-center gap-2 mb-3">
@@ -130,9 +108,7 @@ export default function PoetDetail() {
             <div className="relative pl-6 border-l-2 border-gray-200 space-y-4">
               {validTraj.slice(0, 6).map((t, i) => (
                 <div key={i} className="relative">
-                  <div className={`absolute -left-[25px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm ${
-                    i === 0 ? 'bg-[#c23a3a]' : 'bg-gray-300'
-                  }`} />
+                  <div className={`absolute -left-[25px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm ${i === 0 ? 'bg-[#c23a3a]' : 'bg-gray-300'}`} />
                   <p className={`text-xs font-bold ${i === 0 ? 'text-[#c23a3a]' : 'text-gray-600'}`}>{t.event_year}</p>
                   <p className="text-[11px] text-gray-500 mt-0.5">{t.ancient_place || ''} · {t.event_type}</p>
                 </div>
@@ -141,7 +117,6 @@ export default function PoetDetail() {
           </div>
         )}
 
-        {/* 足迹 */}
         {cities.length > 0 && (
           <div className="mb-5">
             <div className="flex items-center gap-2 mb-3">
@@ -161,7 +136,6 @@ export default function PoetDetail() {
           </div>
         )}
 
-        {/* 代表作 */}
         {poems.length > 0 && (
           <div className="mb-5">
             <div className="flex items-center justify-between mb-3">
@@ -173,8 +147,7 @@ export default function PoetDetail() {
             </div>
             <div className="space-y-2">
               {poems.slice(0, 5).map((p, i) => (
-                <div key={i}
-                  className="bg-white/60 border border-[#e5ddd0] p-3 cursor-pointer hover:border-[#C23B22] transition-colors"
+                <div key={i} className="bg-white/60 border border-[#e5ddd0] p-3 cursor-pointer hover:border-[#C23B22] transition-colors"
                   style={{ outline: '1px solid #ede8e0', outlineOffset: 1 }}
                   onClick={() => navigate(`/detail/${p.poetry_id}`)}>
                   <div className="flex justify-between items-start mb-0.5">
@@ -188,7 +161,6 @@ export default function PoetDetail() {
           </div>
         )}
 
-        {/* 空状态 */}
         {poems.length === 0 && validTraj.length === 0 && (
           <div className="text-center py-8 text-gray-400 text-sm">暂无数据</div>
         )}
