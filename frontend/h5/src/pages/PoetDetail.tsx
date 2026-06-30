@@ -9,6 +9,7 @@ interface PoetInfo {
 interface TrajectoryEvent {
   event_year: string; ancient_place: string | null
   wgs84_lat: number | null; wgs84_lon: number | null; event_type: string
+  stay_duration_days?: number | null; source?: string | null
 }
 
 export default function PoetDetail() {
@@ -40,8 +41,44 @@ export default function PoetDetail() {
     })
   }, [id])
 
+  // 事件颜色映射（与 PC 版 eventColor 一致）
+  const eventColor = (type: string): string => {
+    if (['出生','去世'].includes(type)) return '#2196F3'
+    if (type === '科举') return '#00BCD4'
+    if (['仕宦','政治'].includes(type)) return '#1565C0'
+    if (type === '贬谪') return '#F44336'
+    if (['游览','交游'].includes(type)) return '#4CAF50'
+    if (type === '雅集') return '#FFD700'
+    if (type === '军事') return '#FF5722'
+    if (type === '隐居') return '#795548'
+    if (type === '创作') return '#9C27B0'
+    return '#999'
+  }
+
+  const formatDuration = (days: number | null | undefined): string => {
+    if (!days) return ''
+    if (days >= 365) return `（${Math.round(days/365)}年）`
+    if (days >= 30) return `（${Math.round(days/30)}月）`
+    return `（${days}天）`
+  }
+
+  // Haversine 距离计算
+  const haversine = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; const dLat = (lat2-lat1)*Math.PI/180; const dLon = (lon2-lon1)*Math.PI/180
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  }
+
   const validTraj = trajectory.filter(t => t.event_year)
-  const cities = [...new Set(validTraj.map(t => t.ancient_place).filter(Boolean))]
+  // 按年份排序
+  const sortedTraj = [...validTraj].sort((a, b) => (a.event_year || '').localeCompare(b.event_year || ''))
+  // 足迹城市（去重保留顺序）
+  const seen = new Set<string>()
+  const cities = sortedTraj.filter(t => {
+    if (!t.ancient_place || seen.has(t.ancient_place)) return false
+    seen.add(t.ancient_place)
+    return true
+  }).map(t => t.ancient_place!)
 
   if (!poet) return (
     <div className="p-8 text-center">
@@ -99,18 +136,25 @@ export default function PoetDetail() {
           ))}
         </div>
 
-        {validTraj.length > 0 && (
+        {sortedTraj.length > 0 && (
           <div className="mb-5">
             <div className="flex items-center gap-2 mb-3">
               <h3 className="text-[11px] font-bold text-[#5B4A3E] tracking-wider">生平履历</h3>
               <div className="flex-1 h-[1px] bg-gradient-to-r from-gray-200 to-transparent" />
             </div>
             <div className="relative pl-6 border-l-2 border-gray-200 space-y-4">
-              {validTraj.slice(0, 6).map((t, i) => (
+              {sortedTraj.map((t, i) => (
                 <div key={i} className="relative">
-                  <div className={`absolute -left-[25px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm ${i === 0 ? 'bg-[#c23a3a]' : 'bg-gray-300'}`} />
-                  <p className={`text-xs font-bold ${i === 0 ? 'text-[#c23a3a]' : 'text-gray-600'}`}>{t.event_year}</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5">{t.ancient_place || ''} · {t.event_type}</p>
+                  <div className="absolute -left-[25px] top-0.5 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm"
+                    style={{ background: eventColor(t.event_type) }} />
+                  <p className="text-xs font-bold" style={{ color: i === 0 ? eventColor(t.event_type) : '#666' }}>
+                    {t.event_year}
+                  </p>
+                  <p className="text-[11px] text-gray-600 mt-0.5">
+                    {t.ancient_place ? `${t.ancient_place} · ` : ''}{t.event_type}
+                    {formatDuration(t.stay_duration_days)}
+                  </p>
+                  {t.source && <p className="text-[9px] text-gray-300 mt-0.5">{t.source}</p>}
                 </div>
               ))}
             </div>
@@ -124,14 +168,31 @@ export default function PoetDetail() {
               <div className="flex-1 h-[1px] bg-gradient-to-r from-gray-200 to-transparent" />
             </div>
             <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
-              {cities.slice(0, 10).map((city, i) => (
-                <div key={i} className="min-w-[85px] bg-white/50 border border-[#e5ddd0] p-2.5 flex flex-col items-center">
-                  <svg className="w-5 h-5 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" />
-                  </svg>
-                  <p className="text-xs font-bold text-center text-[#5B4A3E]">{city}</p>
-                </div>
-              ))}
+              {cities.map((city, i) => {
+                // 找到该城市的出现位置，用于计算距离
+                const firstEvent = sortedTraj.find(e => e.ancient_place === city)
+                const prevEvent = i > 0 ? sortedTraj.find(e => e.ancient_place === cities[i-1]) : null
+                let dist = ''
+                if (prevEvent && firstEvent?.wgs84_lat && firstEvent?.wgs84_lon && prevEvent.wgs84_lat && prevEvent.wgs84_lon) {
+                  const d = Math.round(haversine(prevEvent.wgs84_lat, prevEvent.wgs84_lon, firstEvent.wgs84_lat, firstEvent.wgs84_lon))
+                  if (d > 0) dist = `${d}km`
+                }
+                return (
+                  <div key={i} className="min-w-[95px] bg-white/50 border border-[#e5ddd0] p-2.5 flex flex-col items-center">
+                    <svg className="w-5 h-5 mb-1 text-[#7a8b8b]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <p className="text-xs font-bold text-center text-[#5B4A3E]">{city}</p>
+                    {dist && <p className="text-[8px] text-gray-300 mt-0.5">{dist}</p>}
+                  </div>
+                )}
+              )}
+            </div>
+            <div className="mt-3 text-center">
+              <button onClick={() => navigate(`/poet/${id}/map`)}
+                className="text-[10px] text-[#C23B22] border border-[#C23B22] px-3 py-1 hover:bg-[#C23B22] hover:text-white transition-colors">
+                📍 查看足迹地图
+              </button>
             </div>
           </div>
         )}
