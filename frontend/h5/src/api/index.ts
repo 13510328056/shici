@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Poem, DailyPoem, Poet } from '../types'
+import type { Poem, DailyPoem, Poet, UnifiedSearchResult } from '../types'
 
 const api = axios.create({ baseURL: '/api/v1', timeout: 10000 })
 
@@ -45,6 +45,22 @@ export async function getRelatedPoems(poetryId: string) {
 
 export async function getGenreData(genreType: string): Promise<import('../types').GenreMeta> {
   const r = await api.get(`/play/genre/${encodeURIComponent(genreType)}`)
+  return r.data
+}
+
+export interface SearchParams {
+  keyword?: string
+  dynasty?: string
+  genre?: string
+  mood_tag?: string
+  season?: string
+  imagery?: string
+  page?: number
+  page_size?: number
+}
+
+export async function searchUnified(params: SearchParams): Promise<UnifiedSearchResult> {
+  const r = await api.get('/search/all', { params })
   return r.data
 }
 

@@ -50,3 +50,23 @@ export interface PoetStats {
   poems_by_city: { city: string; count: number }[]
   duration_by_type: { type: string; days: number; events: number }[]
 }
+
+export interface MatchReason {
+  field: string
+  label: string
+}
+
+export interface SearchRelevance {
+  score: number
+  reasons: MatchReason[]
+}
+
+export interface SearchPoem extends Poem {
+  relevance: SearchRelevance
+}
+
+export interface UnifiedSearchResult {
+  poets: Poet[]
+  poems: SearchPoem[]
+  total: number
+}

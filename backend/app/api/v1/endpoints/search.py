@@ -55,26 +55,49 @@ async def search_poetry(
 @router.get("/all")
 async def search_all(
     keyword: Optional[str] = Query(None, description="统一关键词"),
+    dynasty: Optional[str] = Query(None, description="朝代筛选"),
+    genre: Optional[str] = Query(None, description="体裁筛选"),
+    mood_tag: Optional[str] = Query(None, description="意境筛选"),
+    season: Optional[str] = Query(None, description="季节筛选"),
+    imagery: Optional[str] = Query(None, description="意象筛选"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=50),
     db: AsyncSession = Depends(get_db),
 ):
-    """统一搜索：同时搜索诗人 + 诗词"""
-    from app.models.poet import Poet
-    from sqlalchemy import select, func
+    """统一搜索：同时搜索诗人 + 诗词（支持组合筛选）"""
+    results = {"poets": [], "poems": [], "total": 0}
 
-    results = {"poets": [], "poems": []}
+    s = SearchService(db)
 
-    if keyword:
-        # 诗人搜索（ORM 方式）
-        poet_query = select(Poet).where(Poet.name.ilike(f"%{keyword}%")).limit(10)
-        poet_rows = (await db.execute(poet_query)).scalars().all()
-        results["poets"] = [
-            {"poet_id": str(p.poet_id), "name": p.name, "dynasty": p.dynasty}
-            for p in poet_rows
-        ]
+    # 诗人检索（keyword 或 dynasty 任意一个即可触发）
+    if keyword or dynasty:
+        results["poets"] = await s.search_poets(keyword=keyword, dynasty=dynasty)
 
-        # 搜索诗词
-        s = SearchService(db)
-        poem_data = await s.search(keyword=keyword, page_size=15)
-        results["poems"] = poem_data.get("results", [])
+    # 诗词检索
+    poem_data = await s.search(
+        keyword=keyword,
+        dynasty=dynasty,
+        genre=genre,
+        mood_tag=mood_tag,
+        season=season,
+        imagery=imagery,
+        page=page,
+        page_size=page_size,
+    )
+    results["poems"] = poem_data.get("results", [])
+    results["total"] = poem_data.get("total", 0)
 
     return results
+
+
+@router.get("/poets")
+async def search_poets(
+    keyword: Optional[str] = Query(None, description="诗人名称关键词"),
+    dynasty: Optional[str] = Query(None, description="朝代筛选"),
+    limit: int = Query(20, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+):
+    """单独检索诗人"""
+    s = SearchService(db)
+    poets = await s.search_poets(keyword=keyword, dynasty=dynasty, limit=limit)
+    return {"poets": poets}
