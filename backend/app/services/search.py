@@ -222,6 +222,7 @@ class SearchService:
                 "genre": poem.genre or "",
                 "dynasty": poem.dynasty,
                 "author": poem.author.name if poem.author else "",
+                "author_id": str(poem.author_id) if poem.author_id else "",
                 "creation_year": feat.creation_year if feat else None,
                 "season": feat.season if feat else [],
                 "mood_tags": feat.mood_tags if feat else [],

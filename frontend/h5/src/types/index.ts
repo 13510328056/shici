@@ -13,6 +13,7 @@ export interface Poem {
   title: string
   content: string
   author: string
+  author_id?: string
   dynasty: string
   genre?: string
   mood_tags?: string[]
